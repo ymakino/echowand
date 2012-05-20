@@ -1,6 +1,8 @@
 package echowand.info;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * データ長によるプロパティの制約を表現する。
@@ -9,6 +11,7 @@ import java.util.Arrays;
 public class PropertyConstraintSize implements PropertyConstraint {
     private int minSize;
     private int maxSize;
+    private Set<Integer> sizeSet;
     private byte[] initialData;
     
     /**
@@ -36,7 +39,6 @@ public class PropertyConstraintSize implements PropertyConstraint {
     public PropertyConstraintSize(int minSize, int maxSize) {
         this.minSize = minSize;
         this.maxSize = maxSize;
-        this.initialData = new byte[minSize];
     }
     
     /**
@@ -48,6 +50,43 @@ public class PropertyConstraintSize implements PropertyConstraint {
     public PropertyConstraintSize(int minSize, int maxSize, byte[] initialData) {
         this.minSize = minSize;
         this.maxSize = maxSize;
+        this.initialData = Arrays.copyOf(initialData, initialData.length);
+    }
+    
+    /**
+     * PropertyConstraintSizeを生成する。
+     * @param sizeSet プロパティデータサイズの集合
+     */
+    public PropertyConstraintSize(Set<Integer> sizeSet) {
+        if (sizeSet.isEmpty()) {
+            this.minSize = 0;
+            this.maxSize = 0;
+        } else {
+            int max = Integer.MIN_VALUE;
+            int min = Integer.MAX_VALUE;
+            for (int value : sizeSet) {
+                if (max < value) {
+                    max = value;
+                }
+                
+                if (min > value) {
+                    min = value;
+                }
+            }
+            
+            this.minSize = min;
+            this.maxSize = max;
+            this.sizeSet = new HashSet<Integer>(sizeSet);
+        }
+    }
+    
+    /**
+     * PropertyConstraintSizeを生成する。
+     * @param sizeSet プロパティデータサイズの集合
+     * @param initialData プロパティの初期データ
+     */
+    public PropertyConstraintSize(Set<Integer> sizeSet, byte[] initialData) {
+        this(sizeSet);
         this.initialData = Arrays.copyOf(initialData, initialData.length);
     }
     
@@ -68,7 +107,11 @@ public class PropertyConstraintSize implements PropertyConstraint {
     }
     
     private boolean isAcceptableSize(byte[] data) {
-        return (this.minSize <= data.length) && (data.length <= this.maxSize);
+        if (sizeSet == null) {
+            return (this.minSize <= data.length) && (data.length <= this.maxSize);
+        } else {
+            return sizeSet.contains(data.length);
+        }
     }
     
     @Override
@@ -82,7 +125,11 @@ public class PropertyConstraintSize implements PropertyConstraint {
     
     @Override
     public byte[] getInitialData() {
-        return Arrays.copyOf(this.initialData, this.initialData.length);
+        if (this.initialData != null) {
+            return Arrays.copyOf(this.initialData, this.initialData.length);
+        } else {
+            return new byte[minSize];
+        }
     }
     
     /**
