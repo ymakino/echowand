@@ -15,18 +15,11 @@ public class NodeProfileInfo extends BaseObjectInfo {
     public NodeProfileInfo() {
         setClassEOJ(new ClassEOJ((byte)0x0e, (byte)0xf0));
         
-        add(EPC.x8A, true, false, false, 3);
-        add(EPC.x8E, true, false, false, 4);
-        
-        add(EPC.x80, true, false, false, 1);
         add(EPC.x82, true, false, false, 4);
-        
         HashSet<Integer> set = new HashSet<Integer>();
         set.add(9); set.add(17);
         add(EPC.x83, true, false, false, new PropertyConstraintSize(set));
         add(EPC.xBF, true, true, false, 2);
-        add(EPC.xE0, true, true, false, new PropertyConstraintSize(1, 255));
-        add(EPC.xEE, true, true, false, new PropertyConstraintOnOff());
         add(EPC.xD3, true, false, false, 3);
         add(EPC.xD4, true, false, false, 2);
         add(EPC.xD5, false, false, true, new PropertyConstraintSize(1, 253));
