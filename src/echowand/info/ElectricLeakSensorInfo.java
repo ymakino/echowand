@@ -7,11 +7,11 @@ import echowand.common.EPC;
  * 漏電センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class ElectricLeackageSensorInfo extends BaseObjectInfo {
+public class ElectricLeakSensorInfo extends BaseObjectInfo {
     /**
-     * ElectricLeackageSensorInfoを生成する
+     * ElectricLeakSensorInfoを生成する
      */
-    public ElectricLeackageSensorInfo(){
+    public ElectricLeakSensorInfo(){
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x05)));
         
         add(EPC.xB1, true, false, true, new PropertyConstraintDetection());
