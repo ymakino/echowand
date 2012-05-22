@@ -7,11 +7,11 @@ import echowand.common.EPC;
  * 人体検知センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class HumanBodySensorInfo extends BaseObjectInfo {
+public class HumanDetectionSensorInfo extends BaseObjectInfo {
     /**
-     * HumanBodySensorInfoを生成する
+     * HumanDetectionSensorInfoを生成する
      */
-    public HumanBodySensorInfo() {
+    public HumanDetectionSensorInfo() {
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x07)));
         
         add(EPC.xB1, true, false, true, new PropertyConstraintDetection());
