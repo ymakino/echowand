@@ -68,7 +68,7 @@ public class InetSubnet implements Subnet {
      */
     public static final short  ECHONET_PORT = 3610;
     /**
-     * バッファの最大長
+     * 受信データ用バッファの最大長
      */
     public static final short  DEFAULT_BUFSIZE = 1500;
     
@@ -264,6 +264,15 @@ public class InetSubnet implements Subnet {
      */
     public Node getRemoteNode(InetAddress addr, int port) {
         return new InetSubnetNode(this, addr, port);
+    }
+    
+    /**
+     * リモートノードを表すNodeを生成する。
+     * @param addr リモートノードのIPアドレス
+     * @return リモートノードのNode
+     */
+    public Node getRemoteNode(InetAddress addr) {
+        return new InetSubnetNode(this, addr, ECHONET_PORT);
     }
     
     /**

@@ -210,7 +210,7 @@ public class InetSubnetTest {
     @Test
     public void testNodeEquals() {
         try {
-            Node node1 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"), 3610);
+            Node node1 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"));
             Node node2 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"), 3610);
             Node node3 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"), 3611);
             assertEquals(node1, node2);
