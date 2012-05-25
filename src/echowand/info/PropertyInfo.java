@@ -1,6 +1,9 @@
 package echowand.info;
 
+import echowand.util.ConstraintSize;
+import echowand.util.Constraint;
 import echowand.common.EPC;
+import java.util.Arrays;
 
 /**
  * ObjectInfoで利用されるプロパティを表現する。
@@ -26,11 +29,11 @@ public class PropertyInfo {
     /**
      * このプロパティの最小データサイズを表す。
      */
-    public PropertyConstraint constraint;
+    public Constraint constraint;
     /**
-     * このプロパティのデータを表す。
+     * このプロパティの初期値を表す。
      */
-    public byte[] data;
+    public byte[] initialData;
     
     /**
      * PropertyInfoを生成する。
@@ -42,7 +45,7 @@ public class PropertyInfo {
      * @param size プロパティのデータサイズ
      */
     public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, int size) {
-        this(epc, gettable, settable, observable, new PropertyConstraintSize(size));
+        this(epc, gettable, settable, observable, new byte[size]);
     }
     
     /**
@@ -51,15 +54,11 @@ public class PropertyInfo {
      * @param gettable Getの可否
      * @param settable Setの可否
      * @param observable 通知の有無
+     * @param size プロパティのデータサイズ
      * @param constraint プロパティの制約
      */
-    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, PropertyConstraint constraint) {
-        this.epc = epc;
-        this.gettable = gettable;
-        this.settable = settable;
-        this.observable = observable;
-        this.constraint = constraint;
-        this.data = constraint.getInitialData();
+    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, int size, Constraint constraint) {
+        this(epc, gettable, settable, observable, new byte[size], constraint);
     }
     
     /**
@@ -72,7 +71,7 @@ public class PropertyInfo {
      * @param data プロパティのデータ
      */
     public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] data) {
-        this(epc, gettable, settable, observable, new PropertyConstraintSize(data.length), data);
+        this(epc, gettable, settable, observable, data, new ConstraintSize(data.length));
     }
     
     /**
@@ -81,25 +80,16 @@ public class PropertyInfo {
      * @param gettable Getの可否
      * @param settable Setの可否
      * @param observable 通知の有無
-     * @param constraint プロパティの制約
      * @param data プロパティのデータ
+     * @param constraint プロパティの制約
      */
-    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, PropertyConstraint constraint, byte[] data) {
+    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] initialData, Constraint constraint) {
         this.epc = epc;
         this.gettable = gettable;
         this.settable = settable;
         this.observable = observable;
         this.constraint = constraint;
-        this.data = data;
-    }
-    
-    /**
-     * 指定されたデータがプロパティとして設定可能か調べる。
-     * @param data プロパティのデータ
-     * @return プロパティとして設定可能な場合にはtrue、そうでない場合にはfalse
-     */
-    public boolean isAcceptable(byte[] data) {
-        return constraint.isAcceptable(data);
+        this.initialData = initialData;
     }
     
     /**
@@ -119,7 +109,7 @@ public class PropertyInfo {
     
     /**
      * このPropertyInfoのハッシュコードを返す。
-     * @return このEOJのハッシュコード
+     * @return このPropertyInfoのハッシュコード
      */
     @Override
     public int hashCode() {

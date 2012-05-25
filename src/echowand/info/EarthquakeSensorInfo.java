@@ -14,6 +14,6 @@ public class EarthquakeSensorInfo extends BaseObjectInfo {
     public EarthquakeSensorInfo(){
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x05)));
         
-        add(EPC.xB1, true, false, true, new PropertyConstraintDetection());
+        add(EPC.xB1, true, false, true, new byte[]{0x42}, new PropertyConstraintDetection());
     }
 }

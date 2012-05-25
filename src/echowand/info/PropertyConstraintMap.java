@@ -1,5 +1,6 @@
 package echowand.info;
 
+import echowand.util.ConstraintSize;
 import echowand.common.PropertyMap;
 import java.util.Arrays;
 
@@ -7,7 +8,7 @@ import java.util.Arrays;
  * プロパティマップのデータ制約を表現する。
  * @author Yoshiki Makino
  */
-public class PropertyConstraintMap extends PropertyConstraintSize {
+public class PropertyConstraintMap extends ConstraintSize {
     
     /**
      * PropertyConstraintMapを生成する。
@@ -17,13 +18,8 @@ public class PropertyConstraintMap extends PropertyConstraintSize {
     }
     
     @Override
-    public boolean isAcceptable(byte[] data) {
+    public boolean isValid(byte[] data) {
         PropertyMap map = new PropertyMap(data);
         return Arrays.equals(data, map.toBytes());
-    }
-    
-    @Override
-    public byte[] getInitialData() {
-        return new PropertyMap().toBytes();
     }
 }

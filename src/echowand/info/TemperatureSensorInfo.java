@@ -14,6 +14,6 @@ public class TemperatureSensorInfo extends BaseObjectInfo {
     public TemperatureSensorInfo() {
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x11)));
         
-        add(EPC.xE0, true, false, true, 2);
+        add(EPC.xE0, true, false, true, 2, new PropertyConstraintTemperature());
     }
 }

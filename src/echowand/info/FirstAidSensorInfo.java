@@ -14,6 +14,6 @@ public class FirstAidSensorInfo extends BaseObjectInfo {
     public FirstAidSensorInfo(){
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x04)));
         
-        add(EPC.xB1, true, false, true, new PropertyConstraintDetection());
+        add(EPC.xB1, true, false, true, new byte[]{0x42}, new PropertyConstraintDetection());
     }
 }

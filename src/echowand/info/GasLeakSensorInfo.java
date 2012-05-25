@@ -14,6 +14,6 @@ public class GasLeakSensorInfo extends BaseObjectInfo {
     public GasLeakSensorInfo() {
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x01)));
         
-        add(EPC.xB1, true, false, true, new PropertyConstraintDetection());
+        add(EPC.xB1, true, false, true, new byte[]{0x42}, new PropertyConstraintDetection());
     }
 }

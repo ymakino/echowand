@@ -3,6 +3,7 @@ package echowand.object;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.info.ObjectInfo;
+import echowand.util.Constraint;
 import echowand.info.PropertyInfo;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -30,7 +31,7 @@ public class LocalObject implements EchonetObject {
         int len = objectInfo.size();
         for (int i=0; i<len; i++) {
             PropertyInfo info = objectInfo.getAtIndex(i);
-            propertyData.put(info.epc, new ObjectData(info.data));
+            propertyData.put(info.epc, new ObjectData(info.initialData));
         }
     }
     
@@ -93,7 +94,8 @@ public class LocalObject implements EchonetObject {
         }
         
         PropertyInfo propertyInfo = objectInfo.get(epc);
-        if (!propertyInfo.isAcceptable(data.toBytes())) {
+        Constraint constraint = propertyInfo.constraint;
+        if (!constraint.isValid(data.toBytes())) {
             return false;
         }
         

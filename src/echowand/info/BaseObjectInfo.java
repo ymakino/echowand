@@ -1,5 +1,6 @@
 package echowand.info;
 
+import echowand.util.Constraint;
 import echowand.common.ClassEOJ;
 import echowand.common.EPC;
 import echowand.common.PropertyMap;
@@ -31,11 +32,11 @@ public class BaseObjectInfo implements ObjectInfo {
      * BaseObjectInfoを生成する。
      */
     public BaseObjectInfo() {
-        add(EPC.x80, true, false,  true, new PropertyConstraintOnOff());
-        add(EPC.x88, true, false,  true, new PropertyConstraintDetection());
-        add(EPC.x9D, true, false, false, new PropertyConstraintMap()); 
-        add(EPC.x9E, true, false, false, new PropertyConstraintMap());
-        add(EPC.x9F, true, false, false, new PropertyConstraintMap());
+        add(EPC.x80, true, false,  true, new byte[]{0x30}, new PropertyConstraintOnOff());
+        add(EPC.x88, true, false,  true, new byte[]{0x42}, new PropertyConstraintDetection());
+        add(EPC.x9D, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap()); 
+        add(EPC.x9E, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
+        add(EPC.x9F, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
     }
 
     private synchronized void updatePropertyMapsInNeeds() {
@@ -115,8 +116,8 @@ public class BaseObjectInfo implements ObjectInfo {
      * @param constraint プロパティの制約
      * @return 追加が成功した場合にはtrue、失敗した場合にはfalse
      */
-    public final boolean add(EPC epc, boolean gettable, boolean settable, boolean observable, PropertyConstraint constraint) {
-        return add(new PropertyInfo(epc, gettable, settable, observable, constraint));
+    public final boolean add(EPC epc, boolean gettable, boolean settable, boolean observable, int size, Constraint constraint) {
+        return add(new PropertyInfo(epc, gettable, settable, observable, size, constraint));
     }
     
     /**
@@ -142,8 +143,8 @@ public class BaseObjectInfo implements ObjectInfo {
      * @param data プロパティのデータ
      * @return 追加が成功した場合にはtrue、失敗した場合にはfalse
      */
-    public final boolean add(EPC epc, boolean gettable, boolean settable, boolean observable, PropertyConstraint constraint, byte[] data) {
-        return add(new PropertyInfo(epc, gettable, settable, observable, constraint, data));
+    public final boolean add(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] data, Constraint constraint) {
+        return add(new PropertyInfo(epc, gettable, settable, observable, data, constraint));
     }
     
     /**

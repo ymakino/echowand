@@ -14,6 +14,6 @@ public class ElectricEnergySensorInfo extends BaseObjectInfo {
     public ElectricEnergySensorInfo() {
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x22)));
         
-        add(EPC.xE0, true, false, false, 4);
+        add(EPC.xE0, true, false, false, 4, new PropertyConstraintIntegralElectricEnergy());
     }
 }

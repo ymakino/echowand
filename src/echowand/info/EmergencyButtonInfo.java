@@ -14,6 +14,6 @@ public class EmergencyButtonInfo extends BaseObjectInfo {
     public EmergencyButtonInfo(){
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x03)));
         
-        add(EPC.xB1, true, false, true, new PropertyConstraintDetection());
+        add(EPC.xB1, true, false, true, new byte[]{0x42}, new PropertyConstraintDetection());
     }
 }
