@@ -9,13 +9,20 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- *
+ * フレームの送受信を行うサンプルプログラム
  * @author Yoshiki Makino
  */
 public class Sample0 {
+    /*
+     * リモートノードのIPアドレス
+     */
     public static String peerAddress = "192.168.1.1";
     
-    public static CommonFrame createCommonFrame1() {
+    /*
+     * ローカルのエアコンオブジェクトからリモートのノードプロファイルオブジェクトへ宛てた
+     * Getメッセージの共通フレームを作成する。
+     */
+    public static CommonFrame createCommonFrameGet() {
         CommonFrame commonFrame = new CommonFrame(new EOJ("013001"), new EOJ("0ef001"), ESV.Get);
         commonFrame.setTID((short)1);
         StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
@@ -30,7 +37,11 @@ public class Sample0 {
         return commonFrame;
     }
     
-    public static CommonFrame createCommonFrame2() {
+    /*
+     * ローカルのエアコンオブジェクトからリモートのエアコンオブジェクトへ宛てた
+     * SetGetメッセージの共通フレームを作成する。
+     */
+    public static CommonFrame createCommonFrameSetGet() {
         CommonFrame commonFrame = new CommonFrame(new EOJ("013001"), new EOJ("013001"), ESV.SetGet);
         commonFrame.setTID((short)2);
         StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
@@ -41,17 +52,22 @@ public class Sample0 {
         payload.addSecondProperty(new Property(EPC.x9D));
         return commonFrame;
     }
-    
-    public static CommonFrame createCommonFrame3() {
+
+    /*
+     * ローカルのエアコンオブジェクトからリモートのノードプロファイルオブジェクトへ宛てた
+     * 応答有りプロパティ通知の共通フレームを作成する。
+     */
+    public static CommonFrame createCommonFrameINFC() {
         CommonFrame commonFrame = new CommonFrame(new EOJ("013001"), new EOJ("0ef001"), ESV.INFC);
         commonFrame.setTID((short)3);
         StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x31)));
-        payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x41)));
-        // payload.addFirstProperty(new Property(EPC.x88));
         return commonFrame;
     }
-    
+
+    /*
+     * timeoutミリ秒後にプログラムが終了するようにスレッドを作成し実行する。
+     */
     public static void setTimeout(final int timeout) {
         Thread t = new Thread() {
             @Override
@@ -70,30 +86,60 @@ public class Sample0 {
     }
     
     public static void main(String[] args) {
+        
+        //3秒後にプログラムが終了するように設定
         setTimeout(3000);
         
+        // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
         InetSubnet subnet = new InetSubnet();
         
         try {
-            Node remoteNode1 = subnet.getRemoteNode(InetAddress.getByName(peerAddress), 3610);
-            Frame frame1 = new Frame(subnet.getLocalNode(), remoteNode1, createCommonFrame1());
+            //========================= Get =========================
+            // メッセージの宛先のNodeを取得
+            Node remoteNode1 = subnet.getRemoteNode(InetAddress.getByName(peerAddress));
+            
+            // Getフレームを作成
+            Frame frame1 = new Frame(subnet.getLocalNode(), remoteNode1, createCommonFrameGet());
+            
+            // フレームを送信
             System.out.println("Sending:  " + frame1);
             subnet.send(frame1);
+            
+            // フレームを受信
+            // 宛先ノードが存在しない場合には、ここでタイムアウトする
             System.out.println("Received: " + subnet.recv());
             System.out.println();
             
-            Node remoteNode2 = subnet.getRemoteNode(InetAddress.getByName(peerAddress), 3610);
-            Frame frame2 = new Frame(subnet.getLocalNode(), remoteNode2, createCommonFrame2());
+            
+            //========================= SetGet =========================
+            // メッセージの宛先のNodeを取得
+            Node remoteNode2 = subnet.getRemoteNode(InetAddress.getByName(peerAddress));
+            
+            // SetGetフレームを作成
+            Frame frame2 = new Frame(subnet.getLocalNode(), remoteNode2, createCommonFrameSetGet());
+            
+            // フレームを送信
             System.out.println("Sending:  " + frame2);
             subnet.send(frame2);
+            
+            // フレームを受信
+            // 宛先ノードが存在しない場合や宛先エアコンオブジェクトが存在しない場合には、ここでタイムアウトする
             System.out.println("Received: " + subnet.recv());
             System.out.println();
             
-            Node remoteNode3 = subnet.getRemoteNode(InetAddress.getByName(peerAddress), 3610);
-            Frame frame3 = new Frame(subnet.getLocalNode(), remoteNode3, createCommonFrame3());
+            
+            //========================= INFC =========================
+            // INFCフレームを作成、宛先はグループにする。
+            Frame frame3 = new Frame(subnet.getLocalNode(), subnet.getGroupNode(), createCommonFrameINFC());
+            
+            // フレームを送信
             System.out.println("Sending:  " + frame3);
             subnet.send(frame3);
-            System.out.println("Received: " + subnet.recv());
+            
+            for (;;) {
+                // フレームを受信
+                System.out.println("Received: " + subnet.recv());
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SubnetException e) {
