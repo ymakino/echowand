@@ -42,10 +42,10 @@ public class PropertyInfo {
      * @param gettable Getの可否
      * @param settable Setの可否
      * @param observable 通知の有無
-     * @param size プロパティのデータサイズ
+     * @param initialSize プロパティの初期データサイズ
      */
-    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, int size) {
-        this(epc, gettable, settable, observable, new byte[size]);
+    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, int initialSize) {
+        this(epc, gettable, settable, observable, new byte[initialSize]);
     }
     
     /**
@@ -54,11 +54,11 @@ public class PropertyInfo {
      * @param gettable Getの可否
      * @param settable Setの可否
      * @param observable 通知の有無
-     * @param size プロパティのデータサイズ
+     * @param initialSize プロパティの初期データサイズ
      * @param constraint プロパティの制約
      */
-    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, int size, Constraint constraint) {
-        this(epc, gettable, settable, observable, new byte[size], constraint);
+    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, int initialSize, Constraint constraint) {
+        this(epc, gettable, settable, observable, new byte[initialSize], constraint);
     }
     
     /**
@@ -68,10 +68,10 @@ public class PropertyInfo {
      * @param gettable Getの可否
      * @param settable Setの可否
      * @param observable 通知の有無
-     * @param data プロパティのデータ
+     * @param initialData プロパティの初期データ
      */
-    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] data) {
-        this(epc, gettable, settable, observable, data, new ConstraintSize(data.length));
+    public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] initialData) {
+        this(epc, gettable, settable, observable, initialData, new ConstraintSize(initialData.length));
     }
     
     /**
@@ -80,7 +80,7 @@ public class PropertyInfo {
      * @param gettable Getの可否
      * @param settable Setの可否
      * @param observable 通知の有無
-     * @param data プロパティのデータ
+     * @param initialData プロパティの初期データ
      * @param constraint プロパティの制約
      */
     public PropertyInfo(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] initialData, Constraint constraint) {
