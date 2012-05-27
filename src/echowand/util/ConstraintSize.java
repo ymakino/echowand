@@ -13,7 +13,6 @@ public class ConstraintSize implements Constraint {
     private int minSize;
     private int maxSize;
     private Set<Integer> sizeSet;
-    private byte[] initialData;
     
     /**
      * ConstraintSizeを生成する。
@@ -25,33 +24,12 @@ public class ConstraintSize implements Constraint {
     
     /**
      * ConstraintSizeを生成する。
-     * @param size プロパティデータサイズの制約
-     * @param initialData プロパティの初期データ
-     */
-    public ConstraintSize(int size, byte[] initialData) {
-        this(size, size, initialData);
-    }
-    
-    /**
-     * ConstraintSizeを生成する。
      * @param minSize プロパティデータの最小サイズ
      * @param maxSize プロパティデータの最大サイズ
      */
     public ConstraintSize(int minSize, int maxSize) {
         this.minSize = minSize;
         this.maxSize = maxSize;
-    }
-    
-    /**
-     * ConstraintSizeを生成する。
-     * @param minSize プロパティデータの最小サイズ
-     * @param maxSize プロパティデータの最大サイズ
-     * @param initialData プロパティの初期データ
-     */
-    public ConstraintSize(int minSize, int maxSize, byte[] initialData) {
-        this.minSize = minSize;
-        this.maxSize = maxSize;
-        this.initialData = Arrays.copyOf(initialData, initialData.length);
     }
     
     /**
@@ -79,16 +57,6 @@ public class ConstraintSize implements Constraint {
             this.maxSize = max;
             this.sizeSet = new HashSet<Integer>(sizeSet);
         }
-    }
-    
-    /**
-     * ConstraintSizeを生成する。
-     * @param sizeSet プロパティデータサイズの集合
-     * @param initialData プロパティの初期データ
-     */
-    public ConstraintSize(Set<Integer> sizeSet, byte[] initialData) {
-        this(sizeSet);
-        this.initialData = Arrays.copyOf(initialData, initialData.length);
     }
     
     /**
