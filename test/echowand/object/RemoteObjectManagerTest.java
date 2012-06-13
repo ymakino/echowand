@@ -156,4 +156,40 @@ public class RemoteObjectManagerTest {
         });
         assertEquals(5, list3.size());
     }
+    
+    @Test
+    public void testGetAtNode() {
+        final LocalSubnet subnet = new LocalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        RemoteObjectManager manager = new RemoteObjectManager();
+        
+        RemoteObject object1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
+        manager.add(object1);
+        RemoteObject object2 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001102"), transactionManager);
+        manager.add(object2);
+        
+        assertEquals(0, manager.getAtNode(subnet.getGroupNode()).size());
+        assertEquals(2, manager.getAtNode(subnet.getLocalNode()).size());
+    }
+    
+    @Test
+    public void testGetNodes() {
+        final LocalSubnet subnet = new LocalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        RemoteObjectManager manager = new RemoteObjectManager();
+        
+        assertTrue(manager.getNodes().isEmpty());
+        
+        RemoteObject object1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
+        manager.add(object1);
+        
+        assertEquals(1, manager.getNodes().size());
+        
+        RemoteObject object2 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001102"), transactionManager);
+        manager.add(object2);
+        
+        assertEquals(1, manager.getNodes().size());
+        
+        assertEquals(subnet.getLocalNode(), manager.getNodes().get(0));
+    }
 }

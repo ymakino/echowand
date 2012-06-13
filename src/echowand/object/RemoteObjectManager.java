@@ -71,6 +71,21 @@ public class RemoteObjectManager {
     }
     
     /**
+     * 指定されたNode内のRemoteObjectを取得する。
+     * @param node Nodeの指定
+     * @param eoj EOJの指定
+     * @return 指定したNodeとEOJで検索されたRemoteObject
+     */
+    public synchronized LinkedList<RemoteObject> getAtNode(final Node node) {
+        return get(new Selector<RemoteObject>() {
+            @Override
+            public boolean select(RemoteObject object) {
+                return object.getNode().equals(node);
+            }
+        });
+    }
+    
+    /**
      * Selectorが真を返すリモートオブジェクトを選択し、そのリストを返す。
      * @param selector リモートオブジェクトの選択
      * @return 選択したリモートオブジェクトのリスト
@@ -78,5 +93,13 @@ public class RemoteObjectManager {
     public LinkedList<RemoteObject> get(Selector<RemoteObject> selector) {
         Collector<RemoteObject> collector = new Collector<RemoteObject>(selector);
         return collector.collect(getAllObjects());
+    }
+    
+    /**
+     * ノードのリストを返す。
+     * @return ノードのリスト
+     */
+    public LinkedList<Node> getNodes() {
+        return new LinkedList<Node>(objects.keySet());
     }
 }
