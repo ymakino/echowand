@@ -54,6 +54,7 @@ public class NodeProfileObjectListener implements TransactionListener {
 
     /**
      * 指定されたインスタンスリストプロパティで指定されたEOJのRemoteObjectを生成する。
+     * 生成したRemoteObjectはRemoteObjectManagerに登録される。
      * @param subnet 生成するRemoteObjectの存在するサブネット
      * @param node 生成するRemoteObjectを管理しているノード
      * @param property インスタンスリストプロパティ
@@ -68,6 +69,8 @@ public class NodeProfileObjectListener implements TransactionListener {
 
     /**
      * 指定されたフレーム中のインスタンスリストプロパティで指定されたRemoteObjectを生成する。
+     * また、送信したノードのノードプロファイルのRemoteObjectも生成する。
+     * 生成したRemoteObjectはRemoteObjectManagerに登録される。
      * @param t レスポンスが所属するトランザクション
      * @param subnet レスポンスが送受信されたサブネット
      * @param frame レスポンスのフレーム
@@ -76,6 +79,9 @@ public class NodeProfileObjectListener implements TransactionListener {
     public void receive(Transaction t, Subnet subnet, Frame frame) {
         CommonFrame cf = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload) cf.getEDATA();
+        
+        manager.add(new RemoteObject(subnet, frame.getSender(), new EOJ("0ef001"), transactionManager));
+        
         int len = payload.getFirstOPC();
         for (int i = 0; i < len; i++) {
             Property property = payload.getFirstPropertyAt(i);

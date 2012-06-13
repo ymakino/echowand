@@ -33,7 +33,7 @@ public class NodeProfileObjectListenerTest {
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);
-
+        
         try {
             SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
             transactionConfig.setSenderNode(subnet.getLocalNode());
@@ -53,11 +53,12 @@ public class NodeProfileObjectListenerTest {
         CommonFrame cf = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get_Res);
         StandardPayload payload = (StandardPayload)cf.getEDATA();
         payload.addFirstProperty(new Property(EPC.xD6,
-                        new Data(new byte[]{(byte)0x02, (byte)0x0e, (byte)0xf0, (byte)0x01,
+                        new Data(new byte[]{(byte)0x02, (byte)0x00, (byte)0x12, (byte)0x01,
                                                         (byte)0x00, (byte)0x11, (byte)0x01})));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         profileListener.receive(transaction, subnet, frame);
         assertTrue(manager.get(subnet.getLocalNode(), new EOJ("0ef001")) != null);
         assertTrue(manager.get(subnet.getLocalNode(), new EOJ("001101")) != null);
+        assertTrue(manager.get(subnet.getLocalNode(), new EOJ("001201")) != null);
     }
 }
