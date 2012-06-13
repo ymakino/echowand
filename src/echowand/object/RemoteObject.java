@@ -265,6 +265,29 @@ public class RemoteObject implements EchonetObject {
         
         return transactionListener.getData();
     }
+    
+    /**
+     * 指定されたEPCのデータをアナウンスするように要求する。
+     * @param epc EPCの指定
+     * @return 指定したEPCのデータ
+     * @throws EchonetObjectException ネットワークに問題が発生した場合
+     */
+    public void observeData(EPC epc) throws EchonetObjectException {
+        RemoteObjectGetTransactionListener transactionListener;
+
+        SetGetTransactionConfig transactionConfig = createSetGetTransactionConfig();
+        transactionConfig.setAnnouncePreferred(true);
+        transactionConfig.addGet(epc);
+
+        transactionListener = new RemoteObjectGetTransactionListener(epc);
+        Transaction transaction = createSetGetTransaction(transactionConfig, transactionListener);
+        
+        try {
+            transaction.execute();
+        } catch (SubnetException e) {
+            throw new EchonetObjectException("getData failed", e);
+        }
+    }
 
     /**
      * 指定されたEPCに指定されたデータをセットする。

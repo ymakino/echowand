@@ -17,6 +17,8 @@ import echowand.common.EPC;
 import echowand.common.PropertyMap;
 import echowand.common.Data;
 import echowand.logic.TransactionManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.junit.Assert.*;
 import org.junit.*;
 
@@ -225,14 +227,51 @@ public class RemoteObjectTest {
         assertEquals(0, object.countObservers());
     }
     
+    private class DummyRemoteObjectObserver extends RemoteObjectObserver {
+        public EPC epc;
+        public ObjectData data;
+        
+        @Override
+        public void notifyData(RemoteObject object, EPC epc, ObjectData data) {
+            this.epc = epc;
+            this.data = data;
+        }
+    }
+    
     @Test
     public void testAnno() {
         LocalSubnet subnet = new LocalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
-        RemoteObjectObserver observer = new RemoteObjectObserver();
+        DummyRemoteObjectObserver observer = new DummyRemoteObjectObserver();
         object.addObserver(observer);
         object.notifyData(EPC.x80, new ObjectData((byte)0x41));
+        
+        assertEquals(EPC.x80, observer.epc);
+        assertEquals(new ObjectData((byte)0x41), observer.data);
+    }
+    
+    @Test
+    public void testObserveData() {
+        LocalSubnet subnet = new LocalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
+        
+        try {
+            object.observeData(EPC.x80);
+            Frame frame = subnet.recvNoWait();
+            CommonFrame commonFrame = frame.getCommonFrame();
+            StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+            assertEquals(ESV.INF_REQ, payload.getESV());
+            assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
+            assertEquals((byte)0, payload.getFirstPropertyAt(0).getPDC());
+        } catch (EchonetObjectException e) {
+            e.printStackTrace();
+            fail();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            fail();
+        }
     }
     
     @Test
