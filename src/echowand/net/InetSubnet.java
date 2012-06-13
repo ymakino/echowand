@@ -1,10 +1,7 @@
 package echowand.net;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.UnknownHostException;
+import java.net.*;
 
 
 class InetSubnetNode implements Node {
@@ -134,6 +131,9 @@ public class InetSubnet implements Subnet {
             socket.setLoopbackMode(false);
             socket.setReuseAddress(false);
             return true;
+        } catch (BindException e) {
+            e.printStackTrace();
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
             closeSocket();
