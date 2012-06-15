@@ -73,7 +73,6 @@ public class RemoteObjectManager {
     /**
      * 指定されたNode内のRemoteObjectを取得する。
      * @param node Nodeの指定
-     * @param eoj EOJの指定
      * @return 指定したNodeとEOJで検索されたRemoteObject
      */
     public synchronized LinkedList<RemoteObject> getAtNode(final Node node) {
