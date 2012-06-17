@@ -7,12 +7,16 @@ import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.util.Pair;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * Set、Get、SetGet、INF_REQトランザクションの詳細設定。
  * @author Yoshiki Makino
  */
 public class SetGetTransactionConfig extends TransactionConfig {
+    public static final Logger logger = Logger.getLogger(SetGetTransactionConfig.class.getName());
+    private static final String className = SetGetTransactionConfig.class.getName();
+    
     private LinkedList<Pair<EPC, Data>> setProperties;
     private LinkedList<EPC> getProperties;
     private boolean responseRequired;
@@ -60,6 +64,8 @@ public class SetGetTransactionConfig extends TransactionConfig {
      */
     @Override
     public void addPayloadProperties(int index, StandardPayload payload) {
+        logger.entering(className, "addPayloadProperties", new Object[]{index, payload});
+        
         if (setProperties.isEmpty()) {
             for (EPC epc : getProperties) {
                 payload.addFirstProperty(new Property(epc));
@@ -72,15 +78,21 @@ public class SetGetTransactionConfig extends TransactionConfig {
                 payload.addSecondProperty(new Property(epc));
             }
         }
+        
+        logger.exiting(className, "addPayloadProperties");
     }
     
     /**
      * SetGetTransactionConfigを生成する。
      */
     public SetGetTransactionConfig() {
+        logger.entering(className, "SetGetTransactionConfig");
+        
         this.setProperties = new LinkedList<Pair<EPC, Data>>();
         this.getProperties = new LinkedList<EPC>();
         responseRequired = true;
+        
+        logger.exiting(className, "SetGetTransactionConfig");
     }
     
     /**
@@ -88,7 +100,11 @@ public class SetGetTransactionConfig extends TransactionConfig {
      * @param responseRequired 応答が必須であればtrue、必須でなければfalse
      */
     public void setResponseRequired(boolean responseRequired) {
+        logger.entering(className, "setResponseRequired", responseRequired);
+        
         this.responseRequired = responseRequired;
+        
+        logger.exiting(className, "setResponseRequired");
     }
     
     /**
@@ -112,7 +128,11 @@ public class SetGetTransactionConfig extends TransactionConfig {
      * @param announcePreffered Getの代わりにINF_REQを使うのであればtrue、そうでなければfalse
      */
     public void setAnnouncePreferred(boolean announcePreffered) {
+        logger.entering(className, "setAnnouncePreferred", announcePreffered);
+        
         this.announcePreffered = announcePreffered;
+        
+        logger.exiting(className, "setAnnouncePreferred");
     }
     
     /**
@@ -121,7 +141,11 @@ public class SetGetTransactionConfig extends TransactionConfig {
      * @param data Setを行うデータ
      */
     public void addSet(EPC epc, Data data) {
+        logger.entering(className, "addSet", new Object[]{epc, data});
+        
         setProperties.add(new Pair<EPC, Data>(epc, data));
+        
+        logger.exiting(className, "addSet");
     }
     
     /**
@@ -129,6 +153,10 @@ public class SetGetTransactionConfig extends TransactionConfig {
      * @param epc 追加するプロパティのEPC
      */
     public void addGet(EPC epc) {
+        logger.entering(className, "addGet", epc);
+        
         getProperties.add(epc);
+        
+        logger.exiting(className, "addGet");
     }
 }

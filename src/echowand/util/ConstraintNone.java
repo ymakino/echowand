@@ -15,4 +15,9 @@ public class ConstraintNone implements Constraint {
     public boolean isValid(byte[] data) {
         return false;
     }
+    
+    @Override
+    public String toString() {
+        return "None";
+    }
 }

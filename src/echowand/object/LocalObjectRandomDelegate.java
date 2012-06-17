@@ -2,12 +2,15 @@ package echowand.object;
 
 import echowand.common.EPC;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * プロパティ値をランダムに変化させるDelegate
  * @author Yoshiki Makino
  */
 public class LocalObjectRandomDelegate implements LocalObjectDelegate {
+    public static final Logger logger = Logger.getLogger(LocalObjectRandomDelegate.class.getName());
+    private static final String className = LocalObjectRandomDelegate.class.getName();
 
     private EPC epc;
     private int len;
@@ -19,8 +22,12 @@ public class LocalObjectRandomDelegate implements LocalObjectDelegate {
      * @param len プロパティデータのバイト数
      */
     public LocalObjectRandomDelegate(EPC epc, int len) {
+        logger.entering(className, "LocalObjectRandomDelegate", new Object[]{epc, len});
+        
         this.epc = epc;
         this.len = len;
+        
+        logger.exiting(className, "LocalObjectRandomDelegate");
     }
 
     /**
@@ -32,13 +39,17 @@ public class LocalObjectRandomDelegate implements LocalObjectDelegate {
      */
     @Override
     public ObjectData getData(LocalObject object, EPC epc) {
+        logger.entering(className, "getData", new Object[]{object, epc});
+        
+        ObjectData data = null;
         if (this.epc == epc) {
             byte[] bytes = new byte[len];
             random.nextBytes(bytes);
-            return new ObjectData(bytes);
-        } else {
-            return null;
+            data = new ObjectData(bytes);
         }
+        
+        logger.exiting(className, "LocalObjectRandomDelegate", data);
+        return data;
     }
     
     /**

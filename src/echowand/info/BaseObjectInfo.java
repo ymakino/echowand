@@ -1,18 +1,21 @@
 package echowand.info;
 
-import echowand.util.Constraint;
 import echowand.common.ClassEOJ;
 import echowand.common.EPC;
 import echowand.common.PropertyMap;
+import echowand.util.Constraint;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 /**
  * ECHONETオブジェクト基本設定構築用クラス
  * @author Yoshiki Makino
  */
 public class BaseObjectInfo implements ObjectInfo {
+    public static final Logger logger = Logger.getLogger(BaseObjectInfo.class.getName());
+    private static final String className = BaseObjectInfo.class.getName();
     
     private class PropertyInfoComparator implements Comparator<PropertyInfo> {
         @Override
@@ -32,15 +35,22 @@ public class BaseObjectInfo implements ObjectInfo {
      * BaseObjectInfoを生成する。
      */
     public BaseObjectInfo() {
+        logger.entering(className, "BaseObjectInfo");
+        
         add(EPC.x80, true, false,  true, new byte[]{0x30}, new PropertyConstraintOnOff());
         add(EPC.x88, true, false,  true, new byte[]{0x42}, new PropertyConstraintDetection());
         add(EPC.x9D, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap()); 
         add(EPC.x9E, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
         add(EPC.x9F, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
+        
+        logger.exiting(className, "BaseObjectInfo");
     }
 
     private synchronized void updatePropertyMapsInNeeds() {
+        logger.entering(className, "updatePropertyMapsInNeeds");
+        
         if (!needsUpdatePropertyMap) {
+            logger.exiting(className, "updatePropertyMapsInNeeds");
             return;
         }
 
@@ -69,12 +79,18 @@ public class BaseObjectInfo implements ObjectInfo {
         addWithoutUpdating(setInfo.epc, setInfo.gettable, setInfo.settable, setInfo.observable, setMap.toBytes());
         PropertyInfo getInfo = get(EPC.x9F);
         addWithoutUpdating(getInfo.epc, getInfo.gettable, getInfo.settable, getInfo.observable, getMap.toBytes());
-        
+
         makePropListOutdated();
+
+        logger.exiting(className, "updatePropertyMapsInNeeds");
     }
 
     private void makeUpdatePropertyMapNeeded() {
+        logger.entering(className, "makeUpdatePropertyMapNeeded");
+        
         needsUpdatePropertyMap = true;
+        
+        logger.exiting(className, "makeUpdatePropertyMapNeeded");
     }
     
     /**
@@ -91,7 +107,11 @@ public class BaseObjectInfo implements ObjectInfo {
      * @param ceoj このBaseObjectInfoが表現するECHONETオブジェクトのClassEOJ
      */
     public final void setClassEOJ(ClassEOJ ceoj) {
+        logger.entering(className, "setClassEOJ", ceoj);
+        
         classEOJ = ceoj;
+        
+        logger.exiting(className, "setClassEOJ");
     }
     
     /**
@@ -153,9 +173,14 @@ public class BaseObjectInfo implements ObjectInfo {
      * @return 追加が成功した場合にはtrue、失敗した場合にはfalse
      */
     public final boolean add(PropertyInfo prop) {
+        logger.entering(className, "add", prop);
+        
         makeUpdatePropertyMapNeeded();
         makePropListOutdated();
-        return addWithoutUpdating(prop);
+        boolean status = addWithoutUpdating(prop);
+        
+        logger.exiting(className, "add", status);
+        return status;
     }
     
     private boolean addWithoutUpdating(EPC epc, boolean gettable, boolean settable, boolean observable, byte[] data) {
@@ -163,12 +188,21 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     private boolean addWithoutUpdating(PropertyInfo prop) {
+        logger.entering(className, "addWithoutUpdating", prop);
+        
         props.remove(prop);
-        return props.add(prop);
+        boolean status = props.add(prop);
+        
+        logger.exiting(className, "addWithoutUpdating", status);
+        return status;
     }
     
     private void makePropListOutdated() {
+        logger.entering(className, "makePropListOutdated");
+        
         propList = null;
+        
+        logger.exiting(className, "makePropListOutdated");
     }
     
     /**
@@ -176,9 +210,13 @@ public class BaseObjectInfo implements ObjectInfo {
      * @return プロパティのリスト
      */
     private ArrayList<PropertyInfo> getPropList() {
+        logger.entering(className, "getPropList");
+        
         if (propList == null) {
             propList = new ArrayList<PropertyInfo>(props);
         }
+        
+        logger.exiting(className, "getPropList", propList);
         return propList;
     }
     
@@ -189,8 +227,13 @@ public class BaseObjectInfo implements ObjectInfo {
      */
     @Override
     public PropertyInfo getAtIndex(int index) {
+        logger.entering(className, "getAtIndex", index);
+        
         updatePropertyMapsInNeeds();
-        return getPropList().get(index);
+        PropertyInfo propertyInfo = getPropList().get(index);
+        
+        logger.exiting(className, "getAtIndex", propertyInfo);
+        return propertyInfo;
     }
     
     /**
@@ -200,18 +243,24 @@ public class BaseObjectInfo implements ObjectInfo {
      */
     @Override
     public PropertyInfo get(EPC epc) {
+        logger.entering(className, "get", epc);
+
         updatePropertyMapsInNeeds();
         for (PropertyInfo prop : getPropList()) {
             if (prop.epc == epc) {
+                logger.exiting(className, "get", prop);
                 return prop;
             }
         }
-    
-        return new PropertyInfo(epc, false, false, false, 0);
+
+        PropertyInfo propertyInfo = new PropertyInfo(epc, false, false, false, 0);
+        logger.exiting(className, "get", propertyInfo);
+        return propertyInfo;
     }
-    
+
     /**
      * このBaseObjectInfoが表現するECHONETオブジェクトの全プロパティ設定数を返す。
+     *
      * @return 全プロパティ設定数
      */
     @Override

@@ -22,4 +22,9 @@ public class ConstraintIntersection implements Constraint {
     public boolean isValid(byte[] data) {
         return constraint1.isValid(data) && constraint2.isValid(data);
     }
+    
+    @Override
+    public String toString() {
+        return String.format("(%s & %s)", constraint1.toString(), constraint2.toString());
+    }
 }

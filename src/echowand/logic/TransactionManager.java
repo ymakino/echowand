@@ -4,12 +4,16 @@ import echowand.net.Frame;
 import echowand.net.Subnet;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * Transactionを管理するし、受信したフレームを適切なTransactionに処理させる。
  * @author Yoshiki Makino
  */
 public class TransactionManager implements Listener {
+    public static final Logger logger = Logger.getLogger(TransactionManager.class.getName());
+    private static final String className = TransactionManager.class.getName();
+    
     private Subnet subnet;
     private LinkedList<Transaction> transactions;
     
@@ -18,8 +22,12 @@ public class TransactionManager implements Listener {
      * @param subnet 生成するTransactionManagerが属するサブネット
      */
     public TransactionManager(Subnet subnet) {
+        logger.entering(className, "TransactionManager", subnet);
+        
         this.subnet = subnet;
         transactions = new LinkedList<Transaction>();
+        
+        logger.exiting(className, "TransactionManager");
     }
     
     /**
@@ -27,7 +35,11 @@ public class TransactionManager implements Listener {
      * @param t 登録するトランザクション
      */
     protected synchronized void addTransaction(Transaction t) {
+        logger.entering(className, "addTransaction", t);
+        
         transactions.add(t);
+        
+        logger.exiting(className, "addTransaction");
     }
     
     /**
@@ -35,7 +47,11 @@ public class TransactionManager implements Listener {
      * @param t 登録を抹消するトランザクション
      */
     protected synchronized void removeTransaction(Transaction t) {
+        logger.entering(className, "removeTransaction", t);
+        
         transactions.remove(t);
+        
+        logger.exiting(className, "removeTransaction");
     }
     
     /**
@@ -56,9 +72,12 @@ public class TransactionManager implements Listener {
      */
     @Override
     public synchronized boolean process(Subnet subnet, Frame frame, boolean processed) {
+        logger.entering(className, "process", new Object[]{subnet, frame, processed});
+        
         boolean ret = false;
         
         if (processed) {
+            logger.exiting(className, "process", ret);
             return ret;
         }
         
@@ -68,6 +87,7 @@ public class TransactionManager implements Listener {
             }
         }
         
+        logger.exiting(className, "process", ret);
         return ret;
     }
 
@@ -77,6 +97,12 @@ public class TransactionManager implements Listener {
      * @return このTransactionManagerに所属するTransaction
      */
     public Transaction createTransaction(TransactionConfig transactionConfig) {
-        return new Transaction(subnet, this, transactionConfig);
+        logger.entering(className, "createTransaction", transactionConfig);
+        
+        Transaction newTransaction = new Transaction(subnet, this, transactionConfig);
+        
+        logger.exiting(className, "createTransaction");
+        
+        return newTransaction;
     }
 }

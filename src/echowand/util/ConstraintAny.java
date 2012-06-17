@@ -15,4 +15,9 @@ public class ConstraintAny implements Constraint {
     public boolean isValid(byte[] data) {
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return "Any";
+    }
 }

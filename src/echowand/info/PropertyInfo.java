@@ -1,9 +1,9 @@
 package echowand.info;
 
-import echowand.util.ConstraintSize;
-import echowand.util.Constraint;
+import echowand.common.Data;
 import echowand.common.EPC;
-import java.util.Arrays;
+import echowand.util.Constraint;
+import echowand.util.ConstraintSize;
 
 /**
  * ObjectInfoで利用されるプロパティを表現する。
@@ -114,5 +114,24 @@ public class PropertyInfo {
     @Override
     public int hashCode() {
         return this.epc.hashCode();
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("PropertyInfo(EPC: ");
+        builder.append(epc);
+        builder.append(" Gettable: ");
+        builder.append(gettable);
+        builder.append(" Settable: ");
+        builder.append(settable);
+        builder.append(" Observable: ");
+        builder.append(observable);
+        builder.append(" InitialData: ");
+        builder.append(new Data(initialData));
+        builder.append(" Constraint: ");
+        builder.append(constraint);
+        builder.append(")");
+        return builder.toString();
     }
 }

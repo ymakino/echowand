@@ -7,12 +7,16 @@ import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.util.Pair;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * INF、INFCトランザクションの詳細設定。
  * @author Yoshiki Makino
  */
 public class AnnounceTransactionConfig extends TransactionConfig {
+    public static final Logger logger = Logger.getLogger(AnnounceTransactionConfig.class.getName());
+    private static final String className = AnnounceTransactionConfig.class.getName();
+    
     private LinkedList<Pair<EPC, Data>> annoProperties;
     private boolean responseRequired;
     
@@ -20,8 +24,12 @@ public class AnnounceTransactionConfig extends TransactionConfig {
      * AnnounceTransactionConfigを生成する。
      */
     public AnnounceTransactionConfig() {
+        logger.entering(className, "AnnounceTransactionConfig");
+        
         this.annoProperties = new LinkedList<Pair<EPC, Data>>();
         responseRequired = true;
+        
+        logger.exiting(className, "AnnounceTransactionConfig");
     }
 
     /**
@@ -30,9 +38,13 @@ public class AnnounceTransactionConfig extends TransactionConfig {
      */
     @Override
     public ESV getESV() {
+        logger.entering(className, "getESV");
+        
         if (responseRequired) {
+            logger.exiting(className, "getESV", ESV.INFC);
             return ESV.INFC;
         } else {
+            logger.exiting(className, "getESV", ESV.INF);
             return ESV.INF;
         }
     }
@@ -54,9 +66,13 @@ public class AnnounceTransactionConfig extends TransactionConfig {
      */
     @Override
     public void addPayloadProperties(int index, StandardPayload payload) {
+        logger.entering(className, "addPayloadProperties", new Object[]{index, payload});
+        
         for (Pair<EPC, Data> prop : annoProperties) {
             payload.addFirstProperty(new Property(prop.first, prop.second));
         }
+        
+        logger.exiting(className, "addPayloadProperties");
     }
     
     /**
@@ -65,7 +81,11 @@ public class AnnounceTransactionConfig extends TransactionConfig {
      * @param data 追加するプロパティのデータ
      */
     public void addAnnounce(EPC epc, Data data) {
+        logger.entering(className, "addAnnounce", new Object[]{epc, data});
+        
         annoProperties.add(new Pair<EPC, Data>(epc, data));
+        
+        logger.exiting(className, "addAnnounce");
     }
     
     /**
@@ -73,7 +93,11 @@ public class AnnounceTransactionConfig extends TransactionConfig {
      * @param responseRequired 応答が必須であればtrue、必須でなければfalse
      */
     public void setResponseRequired(boolean responseRequired) {
+        logger.entering(className, "setResponseRequired", responseRequired);
+        
         this.responseRequired = responseRequired;
+        
+        logger.exiting(className, "setResponseRequired");
     }
     
     /**

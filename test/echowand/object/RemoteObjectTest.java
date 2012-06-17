@@ -210,24 +210,7 @@ public class RemoteObjectTest {
         assertFalse(object.setTimeout(-100));
     }
     
-    @Test
-    public void testAddAndRemoveObserver() {
-        LocalSubnet subnet = new LocalSubnet();
-        TransactionManager transactionManager = new TransactionManager(subnet);
-        RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
-        RemoteObjectObserver observer1 = new RemoteObjectObserver();
-        RemoteObjectObserver observer2 = new RemoteObjectObserver();
-        object.addObserver(observer1);
-        assertEquals(1, object.countObservers());
-        object.addObserver(observer2);
-        assertEquals(2, object.countObservers());
-        object.removeObserver(observer1);
-        assertEquals(1, object.countObservers());
-        object.removeObserver(observer2);
-        assertEquals(0, object.countObservers());
-    }
-    
-    private class DummyRemoteObjectObserver extends RemoteObjectObserver {
+    private class DummyRemoteObjectObserver implements RemoteObjectObserver {
         public EPC epc;
         public ObjectData data;
         
@@ -236,6 +219,23 @@ public class RemoteObjectTest {
             this.epc = epc;
             this.data = data;
         }
+    }
+    
+    @Test
+    public void testAddAndRemoveObserver() {
+        LocalSubnet subnet = new LocalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
+        RemoteObjectObserver observer1 = new DummyRemoteObjectObserver();
+        RemoteObjectObserver observer2 = new DummyRemoteObjectObserver();
+        object.addObserver(observer1);
+        assertEquals(1, object.countObservers());
+        object.addObserver(observer2);
+        assertEquals(2, object.countObservers());
+        object.removeObserver(observer1);
+        assertEquals(1, object.countObservers());
+        object.removeObserver(observer2);
+        assertEquals(0, object.countObservers());
     }
     
     @Test

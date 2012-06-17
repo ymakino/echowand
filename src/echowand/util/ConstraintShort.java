@@ -68,4 +68,9 @@ public class ConstraintShort extends ConstraintSize {
         }
         return (minValue <= value) && (value <= maxValue);
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Short[0x%04x, 0x%04x]", minValue, maxValue);
+    }
 }

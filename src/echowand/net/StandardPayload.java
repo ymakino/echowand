@@ -252,13 +252,13 @@ public class StandardPayload implements Payload {
     private String propertiesToString(LinkedList<Property> properties) {
         StringBuilder builder = new StringBuilder();
         for (Property property : properties) {
-        builder.append("(");
+            builder.append("(");
             builder.append(property);
-        builder.append(")");
+            builder.append(")");
         }
         return builder.toString();
     }
-    
+
     
     /**
      * このStandardPayloadの文字列表現を返す。

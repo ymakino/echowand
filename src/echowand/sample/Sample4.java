@@ -67,7 +67,7 @@ class SetRandomThread extends Thread {
         }
     }
 }
-class PrintNotifiedDataObserver extends RemoteObjectObserver {
+class PrintNotifiedDataObserver implements RemoteObjectObserver {
     @Override
     public void notifyData(RemoteObject object, EPC epc, ObjectData data) {
         System.out.println(object.getNode() + ", " + object.getEOJ() + ", " + epc + ", " + data);

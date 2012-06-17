@@ -7,12 +7,16 @@ import echowand.logic.Transaction;
 import echowand.logic.TransactionManager;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
+import java.util.logging.Logger;
 
 /**
  * プロパティ値変更時に通知を行うDelegate
  * @author Yoshiki Makino
  */
 public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
+    public static final Logger logger = Logger.getLogger(LocalObjectNotifyDelegate.class.getName());
+    private static final String className = LocalObjectNotifyDelegate.class.getName();
+    
     private Subnet subnet;
     private TransactionManager transactionManager;
     
@@ -22,8 +26,12 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
      * @param transactionManager 通知トランザクションの生成に利用するTransactionManager
      */
     public LocalObjectNotifyDelegate(Subnet subnet, TransactionManager transactionManager) {
+        logger.entering(className, "addObject", new Object[]{subnet, transactionManager});
+        
         this.subnet = subnet;
         this.transactionManager = transactionManager;
+        
+        logger.exiting(className, "addObject");
     }
     
     /**
@@ -57,6 +65,8 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
      */
     @Override
     public void notifyDataChanged(LocalObject object, EPC epc, ObjectData data) {
+        logger.entering(className, "notifyDataChanged", new Object[]{object, epc, data});
+        
         if (object.isObservable(epc)) {
             try {
                 AnnounceTransactionConfig transactionConfig = new AnnounceTransactionConfig();
@@ -72,5 +82,7 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
                 e.printStackTrace();
             }
         }
+        
+        logger.exiting(className, "notifyDataChanged");
     }
 }

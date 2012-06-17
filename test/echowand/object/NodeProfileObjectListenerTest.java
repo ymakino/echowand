@@ -61,4 +61,36 @@ public class NodeProfileObjectListenerTest {
         assertTrue(manager.get(subnet.getLocalNode(), new EOJ("001101")) != null);
         assertTrue(manager.get(subnet.getLocalNode(), new EOJ("001201")) != null);
     }
+    
+    @Test
+    public void testINF_SNA() {
+        LocalSubnet subnet = new LocalSubnet();
+        RemoteObjectManager manager = new RemoteObjectManager();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);
+        
+        try {
+            SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
+            transactionConfig.setSenderNode(subnet.getLocalNode());
+            transactionConfig.setReceiverNode(subnet.getGroupNode());
+            transactionConfig.setSourceEOJ(new EOJ("0ef001"));
+            transactionConfig.setDestinationEOJ(new EOJ("0ef001"));
+            transactionConfig.addGet(EPC.x80);
+            Transaction transaction = transactionManager.createTransaction(transactionConfig);
+            transaction.execute();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            fail();
+        }
+        
+        SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
+        Transaction transaction = transactionManager.createTransaction(transactionConfig);
+        CommonFrame cf = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get_SNA);
+        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        payload.addFirstProperty(new Property(EPC.xD6));
+        Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
+        profileListener.receive(transaction, subnet, frame);
+        assertTrue(manager.get(subnet.getLocalNode(), new EOJ("0ef001")) != null);
+        assertEquals(1, manager.getAtNode(subnet.getLocalNode()).size());
+    }
 }

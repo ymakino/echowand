@@ -1,19 +1,19 @@
 package echowand.logic;
 
-import echowand.net.Frame;
-import echowand.net.SubnetException;
-import echowand.net.StandardPayload;
-import echowand.net.Subnet;
-import echowand.net.CommonFrame;
 import echowand.common.EOJ;
 import echowand.common.ESV;
+import echowand.net.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * トランザクション実行クラス
  * @author Yoshiki Makino
  */
 public class Transaction {
+    public static final Logger logger = Logger.getLogger(Transaction.class.getName());
+    private static final String className = Transaction.class.getName();
+    
     private TransactionConfig transactionConfig;
     private static final int DEFAULT_TIMEOUT = 60;
     private static short nextTID;
@@ -34,7 +34,7 @@ public class Transaction {
     
     private LinkedList<TransactionListener> transactionListeners;
     
-    private EnumMap<ESV, LinkedList<ESV>> responseESVMap;
+    private static EnumMap<ESV, LinkedList<ESV>> responseESVMap = new EnumMap<ESV, LinkedList<ESV>>(ESV.class);
     
     private static short getNextTID() {
         if (nextTID == 0) {
@@ -51,6 +51,8 @@ public class Transaction {
      * @param transactionConfig  リクエスト処理の詳細設定
      */
     public Transaction(Subnet subnet, TransactionManager transactionManager, TransactionConfig transactionConfig) {
+        logger.entering(className, "Transaction", new Object[]{subnet, transactionManager, transactionConfig});
+        
         this.subnet = subnet;
         this.transactionManager = transactionManager;
         this.transactionConfig = transactionConfig;
@@ -58,24 +60,27 @@ public class Transaction {
         this.done = false;
         this.countResponse = 0;
         this.timeout = DEFAULT_TIMEOUT;
-        this.responseESVMap = new EnumMap<ESV, LinkedList<ESV>>(ESV.class);
         this.transactionListeners = new LinkedList<TransactionListener>();
         initResponseESVMap();
+        
+        logger.exiting(className, "Transaction");
     }
     
     private void initResponseESVMap() {
-        addResponseESVMap(ESV.SetC, ESV.Set_Res);
-        addResponseESVMap(ESV.SetC, ESV.SetC_SNA);
-        addResponseESVMap(ESV.SetI, ESV.SetI_SNA);
-        addResponseESVMap(ESV.Get, ESV.Get_Res);
-        addResponseESVMap(ESV.Get, ESV.Get_SNA);
-        addResponseESVMap(ESV.SetGet, ESV.SetGet_Res);
-        addResponseESVMap(ESV.SetGet, ESV.SetGet_SNA);
-        addResponseESVMap(ESV.INF_REQ, ESV.INF);
-        addResponseESVMap(ESV.INF_REQ, ESV.INF_SNA);
-        addResponseESVMap(ESV.INF, ESV.INF_SNA);
-        addResponseESVMap(ESV.INFC, ESV.INFC_Res);
-        addResponseESVMap(ESV.INFC, ESV.INF_SNA);
+        if (responseESVMap.isEmpty()) {
+            addResponseESVMap(ESV.SetC, ESV.Set_Res);
+            addResponseESVMap(ESV.SetC, ESV.SetC_SNA);
+            addResponseESVMap(ESV.SetI, ESV.SetI_SNA);
+            addResponseESVMap(ESV.Get, ESV.Get_Res);
+            addResponseESVMap(ESV.Get, ESV.Get_SNA);
+            addResponseESVMap(ESV.SetGet, ESV.SetGet_Res);
+            addResponseESVMap(ESV.SetGet, ESV.SetGet_SNA);
+            addResponseESVMap(ESV.INF_REQ, ESV.INF);
+            addResponseESVMap(ESV.INF_REQ, ESV.INF_SNA);
+            addResponseESVMap(ESV.INF, ESV.INF_SNA);
+            addResponseESVMap(ESV.INFC, ESV.INFC_Res);
+            addResponseESVMap(ESV.INFC, ESV.INF_SNA);
+        }
     }
     
     protected void addResponseESVMap(ESV req, ESV res) {
@@ -102,7 +107,11 @@ public class Transaction {
      * @param listener 登録するTransactionListener
      */
     public void addTransactionListener(TransactionListener listener) {
+        logger.entering(className, "addTransactionListener", listener);
+        
         transactionListeners.add(listener);
+        
+        logger.exiting(className, "addTransactionListener");
     }
     
     
@@ -111,25 +120,41 @@ public class Transaction {
      * @param listener 登録を抹消するTransactionListener
      */
     public void removeTransactionListener(TransactionListener listener) {
+        logger.entering(className, "removeTransactionListener", listener);
+        
         transactionListeners.remove(listener);
+        
+        logger.exiting(className, "removeTransactionListener");
     }
     
     private void doCallBeginTransactionListeners() {
+        logger.entering(className, "doCallBeginTransactionListeners");
+        
         for (TransactionListener l : new ArrayList<TransactionListener>(transactionListeners)) {
             l.begin(this);
         }
+        
+        logger.exiting(className, "doCallBeginTransactionListeners");
     }
     
     private void doCallReceiveTransactionListeners(Frame frame) {
+        logger.entering(className, "doCallReceiveTransactionListeners", frame);
+        
         for (TransactionListener l : new ArrayList<TransactionListener>(transactionListeners)) {
             l.receive(this, subnet, frame);
         }
+        
+        logger.exiting(className, "doCallReceiveTransactionListeners");
     }
     
     private void doCallFinishTransactionListeners() {
+        logger.entering(className, "doCallFinishTransactionListeners");
+        
         for (TransactionListener l : new ArrayList<TransactionListener>(transactionListeners)) {
             l.finish(this);
         }
+        
+        logger.exiting(className, "doCallFinishTransactionListeners");
     }
     
     /**
@@ -137,7 +162,12 @@ public class Transaction {
      * @return 登録済みのTransactionListener数
      */
     public int countTransactionListeners() {
-        return transactionListeners.size();
+        logger.entering(className, "countTransactionListeners", timeout);
+        
+        int count = transactionListeners.size();
+        
+        logger.exiting(className, "countTransactionListeners", count);
+        return count;
     }
     
     /**
@@ -145,7 +175,11 @@ public class Transaction {
      * @param timeout タイムアウトの時間(ミリ秒)
      */
     public void setTimeout(int timeout) {
+        logger.entering(className, "setTimeout", timeout);
+        
         this.timeout = timeout;
+        
+        logger.exiting(className, "setTimeout");
     }
     
     /**
@@ -157,6 +191,8 @@ public class Transaction {
     }
     
     private StandardPayload createPayload(int index) {
+        logger.entering(className, "createPayload", index);
+        
         StandardPayload payload = new StandardPayload();
         payload.setDEOJ(transactionConfig.getDestinationEOJ());
         payload.setSEOJ(transactionConfig.getSourceEOJ());
@@ -165,10 +201,13 @@ public class Transaction {
         
         transactionConfig.addPayloadProperties(index, payload);
         
+        logger.exiting(className, "createPayload", payload);
         return payload;
     }
     
     private boolean sendRequest() throws SubnetException {
+        logger.entering(className, "sendRequest");
+        
         int count = transactionConfig.getCountPayloads();
         for (int i = 0; i < count; i++) {
             StandardPayload payload = createPayload(i);
@@ -179,34 +218,46 @@ public class Transaction {
             Frame frame = new Frame(transactionConfig.getSenderNode(), transactionConfig.getReceiverNode(), cf);
             subnet.send(frame);
         }
+        
+        logger.exiting(className, "sendRequest", true);
         return true;
     }
     
     private boolean isValidTransactionESVPair(ESV req, ESV res) {
+        logger.entering(className, "isValidTransactionESVPair", new Object[]{req, res});
+
         LinkedList<ESV> esvs = responseESVMap.get(req);
-        if (esvs == null) {
-            return false;
+        boolean valid = false;
+        if (esvs != null) {
+            valid = esvs.contains(res);
         }
-        return esvs.contains(res);
+
+        logger.exiting(className, "isValidTransactionESVPair", valid);
+        return valid;
     }
-    
+
     /**
      * 受信したレスポンスフレームの処理を行なう。
      * @param frame 受信したフレーム
      * @return フレームの処理に成功した場合にはtrue、そうでなければfalse
      */
     public synchronized boolean recvResponse(Frame frame) {
+        logger.entering(className, "recvResponse");
+        
         if (!this.waiting) {
+            logger.exiting(className, "recvResponse", false);
             return false;
         }
         
         if (!frame.getCommonFrame().isStandardPayload()) {
+            logger.exiting(className, "recvResponse", false);
             return false;
         }
         
         CommonFrame cf = frame.getCommonFrame();
         
         if (cf.getTID() != this.getTID()) {
+            logger.exiting(className, "recvResponse", false);
             return false;
         }
         
@@ -218,14 +269,17 @@ public class Transaction {
         
         if (!responseSEOJ.equals(requestDEOJ)) {
             if (!requestDEOJ.isAllInstance()) {
+                logger.exiting(className, "recvResponse", false);
                 return false;
             }
 
             if (!responseSEOJ.getClassEOJ().equals(requestDEOJ.getClassEOJ())) {
+                logger.exiting(className, "recvResponse", false);
                 return false;
             }
         }
         if (!responseDEOJ.equals(requestSEOJ)) {
+            logger.exiting(className, "recvResponse", false);
             return false;
         }
 
@@ -233,6 +287,7 @@ public class Transaction {
         ESV resESV = payload.getESV();
         
         if (!isValidTransactionESVPair(reqESV, resESV)) {
+            logger.exiting(className, "recvResponse", false);
             return false;
         }
         
@@ -240,6 +295,7 @@ public class Transaction {
         
         doCallReceiveTransactionListeners(frame);
         
+        logger.exiting(className, "recvResponse", true);
         return true;
     }
     
@@ -247,6 +303,8 @@ public class Transaction {
      * トランザクションを終了する。
      */
     public synchronized void finish() {
+        logger.entering(className, "finish");
+        
         if (!this.done) {
             this.waiting = false;
             this.done = true;
@@ -262,6 +320,8 @@ public class Transaction {
             
             notifyAll();
         }
+        
+        logger.exiting(className, "finish");
     }
     
     private class TimeoutTimerTask extends TimerTask {
@@ -269,9 +329,12 @@ public class Transaction {
         public TimeoutTimerTask(Transaction t) {
             this.t = t;
         }
+
         @Override
         public void run() {
+            logger.entering(className, "TimeoutTimerTask.run");
             t.finish();
+            logger.exiting(className, "TimeoutTimerTask.run");
         }
     }
     /**
@@ -279,7 +342,10 @@ public class Transaction {
      * @throws SubnetException フレームの生成や送信に失敗した場合 
      */
     public synchronized void execute() throws SubnetException {
+        logger.entering(className, "execute");
+        
         if (this.waiting || this.done) {
+            logger.exiting(className, "execute");
             return;
         }
         
@@ -294,18 +360,25 @@ public class Transaction {
             timer = new Timer(true);
             timer.schedule(new TimeoutTimerTask(this), timeout);
         }
+
+        logger.exiting(className, "execute");
     }
-    
+
     /**
      * トランザクションが終了するまで待つ。
      * @throws InterruptedException 割り込みが発生した場合
      */
     public synchronized void join() throws InterruptedException {
+        logger.entering(className, "join");
+        
         if (!isWaiting()) {
+            logger.exiting(className, "execute");
             return;
         }
         
         wait();
+        
+        logger.exiting(className, "execute");
     }
     
     /**
@@ -313,7 +386,12 @@ public class Transaction {
      * @return 受信したレスポンスフレーム数
      */
     public synchronized int countResponses() {
-        return this.countResponse;
+        logger.entering(className, "countResponses");
+        
+        int count = this.countResponse;
+        
+        logger.exiting(className, "countResponses", count);
+        return count;
     }
     
     /**

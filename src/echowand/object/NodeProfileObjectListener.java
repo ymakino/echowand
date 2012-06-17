@@ -8,12 +8,16 @@ import echowand.logic.TransactionListener;
 import echowand.logic.TransactionManager;
 import echowand.net.*;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * 他ノードから送信されたインスタンスリストのレスポンスを受信し、RemoteObjectを生成する。
  * @author Yoshiki Makino
  */
 public class NodeProfileObjectListener implements TransactionListener {
+    public static final Logger logger = Logger.getLogger(NodeProfileObjectListener.class.getName());
+    private static final String className = NodeProfileObjectListener.class.getName();
+    
     private final EPC INSTANCE_LIST_S = EPC.xD6;
     private RemoteObjectManager manager;
     private TransactionManager transactionManager;
@@ -24,8 +28,12 @@ public class NodeProfileObjectListener implements TransactionListener {
      * @param transactionManager 生成したRemoteObjectに登録するTransactionManager
      */
     public NodeProfileObjectListener(RemoteObjectManager manager, TransactionManager transactionManager) {
+        logger.entering(className, "NodeProfileObjectListener", new Object[]{manager, transactionManager});
+        
         this.manager = manager;
         this.transactionManager = transactionManager;
+        
+        logger.exiting(className, "NodeProfileObjectListener", manager);
     }
     
     /**
@@ -42,13 +50,23 @@ public class NodeProfileObjectListener implements TransactionListener {
      * @return プロパティの情報から抽出したEOJのリスト
      */
     private LinkedList<EOJ> parseInstanceListS(Property property) {
+        logger.entering(className, "parseInstanceListS", property);
+        
         LinkedList<EOJ> eojs = new LinkedList<EOJ>();
         Data data = property.getEDT();
+
+        if (data == null) {
+            logger.exiting(className, "parseInstanceListS", eojs);
+            return eojs;
+        }
+
         int len = data.size();
         for (int i=0; 3*(i+1)<len; i++) {
             byte[] eojBytes = data.toBytes(3*i+1, 3);
             eojs.add(new EOJ(eojBytes));
         }
+        
+        logger.exiting(className, "parseInstanceListS", eojs);
         return eojs;
     }
 
@@ -60,11 +78,15 @@ public class NodeProfileObjectListener implements TransactionListener {
      * @param property インスタンスリストプロパティ
      */
     private void addRemoteObjects(Subnet subnet, Node node, Property property) {
+        logger.entering(className, "addRemoteObjects", new Object[]{subnet, node, property});
+        
         LinkedList<EOJ> eojs = parseInstanceListS(property);
         for (EOJ eoj : eojs) {
             RemoteObject object = new RemoteObject(subnet, node, eoj, transactionManager);
             manager.add(object);
         }
+        
+        logger.exiting(className, "addRemoteObjects");
     }
 
     /**
@@ -77,6 +99,8 @@ public class NodeProfileObjectListener implements TransactionListener {
      */
     @Override
     public void receive(Transaction t, Subnet subnet, Frame frame) {
+        logger.entering(className, "receive", new Object[]{t, subnet, frame});
+        
         CommonFrame cf = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload) cf.getEDATA();
         
@@ -89,6 +113,8 @@ public class NodeProfileObjectListener implements TransactionListener {
                 addRemoteObjects(subnet, frame.getSender(), property);
             }
         }
+        
+        logger.exiting(className, "receive");
     }
 
     /**

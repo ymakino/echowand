@@ -69,4 +69,9 @@ public class ConstraintInt extends ConstraintSize {
         
         return (minValue <= value) && (value <= maxValue);
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Int[0x%08x, 0x%08x]", minValue, maxValue);
+    }
 }

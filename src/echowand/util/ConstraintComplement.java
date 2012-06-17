@@ -19,4 +19,9 @@ public class ConstraintComplement implements Constraint {
     public boolean isValid(byte[] data) {
         return !constraint.isValid(data);
     }
+    
+    @Override
+    public String toString() {
+        return String.format("C(%s)", constraint.toString());
+    }
 }

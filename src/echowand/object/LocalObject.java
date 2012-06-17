@@ -3,17 +3,21 @@ package echowand.object;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.info.ObjectInfo;
-import echowand.util.Constraint;
 import echowand.info.PropertyInfo;
+import echowand.util.Constraint;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * ローカルに存在するECHONETオブジェクト
  * @author Yoshiki Makino
  */
 public class LocalObject implements EchonetObject {
+    public static final Logger logger = Logger.getLogger(LocalObject.class.getName());
+    private static final String className = LocalObject.class.getName();
+    
     private EOJ eoj;
     private ObjectInfo objectInfo;
     private EnumMap<EPC, ObjectData> propertyData;
@@ -24,6 +28,8 @@ public class LocalObject implements EchonetObject {
      * @param objectInfo 作成するLocalObjectのオブジェクト情報
      */
     public LocalObject(ObjectInfo objectInfo) {
+        logger.entering(className, "LocalObject", objectInfo);
+        
         this.objectInfo = objectInfo;
         this.eoj = objectInfo.getClassEOJ().getEOJWithInstanceCode((byte)0x01);
         propertyData = new EnumMap<EPC, ObjectData>(EPC.class);
@@ -33,6 +39,8 @@ public class LocalObject implements EchonetObject {
             PropertyInfo info = objectInfo.getAtIndex(i);
             propertyData.put(info.epc, new ObjectData(info.initialData));
         }
+        
+        logger.exiting(className, "LocalObject");
     }
     
     /**
@@ -40,7 +48,11 @@ public class LocalObject implements EchonetObject {
      * @param instanceCode 設定するインスタンスコード
      */
     public void setInstanceCode(byte instanceCode) {
+        logger.entering(className, "setInstanceCode", instanceCode);
+        
         this.eoj = eoj.getClassEOJ().getEOJWithInstanceCode(instanceCode);
+        
+        logger.exiting(className, "setInstanceCode");
     }
     
     /**
@@ -50,100 +62,130 @@ public class LocalObject implements EchonetObject {
      * @return 設定に成功したらtrue、そうでなければfalse
      */
     public boolean setInternalData(EPC epc, ObjectData data) {
+        logger.entering(className, "setInternalData", new Object[]{epc, data});
+        
         if (!contains(epc)) {
+            logger.exiting(className, "setInternalData", false);
             return false;
         }
-        
+
         propertyData.put(epc, data);
+        
+        logger.exiting(className, "setInternalData", true);
         return true;
     }
-    
+
     /**
      * 指定されたEPCのプロパティの内容をSetの許可がなくても強制的に変更する。
      * Delegateが最初に処理を行い、Delegateの処理が成功しなかった場合にはLocalObject内部のデータを変更する。
+     *
      * @param epc 設定するデータのEPC
      * @param data 設定するデータの内容
      * @return 設定に成功したらtrue、そうでなければfalse
      */
     public boolean forceSetData(EPC epc, ObjectData data) {
-        
+        logger.entering(className, "forceSetData", new Object[]{epc, data});
+
         boolean success = setDataDelegate(epc, data);
-        
+
         if (!success) {
             success = setInternalData(epc, data);
             if (success) {
                 notifyDataChanged(epc, data);
             }
         }
-        
+
+        logger.exiting(className, "forceSetData", success);
         return success;
     }
-    
+
     /**
-     * 指定されたEPCのプロパティの内容を変更する。
-     * Setの許可がないプロパティへの操作や、データの制約に従わない操作は失敗する。
+     * 指定されたEPCのプロパティの内容を変更する。 Setの許可がないプロパティへの操作や、データの制約に従わない操作は失敗する。
      * Delegateが最初に処理を行い、Delegateの処理が成功しなかった場合にはLocalObject内部のデータを変更する。
+     *
      * @param epc 設定するデータのEPC
      * @param data 設定するデータの内容
      * @return 設定に成功したらtrue、そうでなければfalse
      */
     @Override
     public boolean setData(EPC epc, ObjectData data) {
+        logger.entering(className, "setData", new Object[]{epc, data});
+        
         if (!this.isSettable(epc)) {
+            logger.exiting(className, "setData", false);
             return false;
         }
-        
+
         PropertyInfo propertyInfo = objectInfo.get(epc);
         Constraint constraint = propertyInfo.constraint;
         if (!constraint.isValid(data.toBytes())) {
+            logger.exiting(className, "setData", false);
             return false;
         }
         
-        return forceSetData(epc, data);
+        boolean ret = forceSetData(epc, data);
+        logger.exiting(className, "setData", ret);
+        return ret;
     }
-    
-    
+
     /**
      * 指定されたEPCのプロパティのためにLocalObjectが内部で管理しているデータの内容を返す。
+     *
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
      */
     public ObjectData getInternalData(EPC epc) {
-        return propertyData.get(epc);
+        logger.entering(className, "getInternalData", epc);
+        
+        ObjectData data = propertyData.get(epc);
+        
+        logger.exiting(className, "getInternalData", data);
+        
+        return data;
     }
-    
+
     /**
      * 指定されたEPCのプロパティの内容をGetの許可がなくても強制的に返す。
      * Delegateが最初に処理を行い、Delegateがデータを返さない場合にはLocalObject内部のデータを返す。
+     *
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
      */
     public ObjectData forceGetData(EPC epc) {
-        ObjectData data = getDataDelegate(epc);
+        logger.entering(className, "forceGetData", epc);
         
+        ObjectData data = getDataDelegate(epc);
+
         if (data == null) {
             data = getInternalData(epc);
         }
-        
+
+        logger.exiting(className, "forceGetData", data);
         return data;
     }
-    
+
     /**
-     * 指定されたEPCのプロパティの内容を返す。
-     * Getの許可がない場合にはnullを返す。
+     * 指定されたEPCのプロパティの内容を返す。 Getの許可がない場合にはnullを返す。
      * Delegateが最初に処理を行い、Delegateがデータを返さない場合にはLocalObject内部のデータを返す。
+     *
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
      */
     @Override
     public ObjectData getData(EPC epc) {
+        logger.entering(className, "getData", epc);
+        
         if (!this.isGettable(epc)) {
+            logger.exiting(className, "getData", null);
             return null;
         }
+
+        ObjectData data = forceGetData(epc);
         
-        return forceGetData(epc);
+        logger.exiting(className, "getData", data);
+        return data;
     }
-    
+
     /**
      * このオブジェクトのEOJを返す。
      * @return このオブジェクトのEOJ
@@ -199,20 +241,30 @@ public class LocalObject implements EchonetObject {
      * @param data 変化後のプロパティデータの値
      */
     public void notifyDataChanged(EPC epc, ObjectData data) {
+        logger.entering(className, "notifyDataChanged", new Object[]{epc, data});
+        
         for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
             delegate.notifyDataChanged(this, epc, data);
         }
+        
+        logger.exiting(className, "notifyDataChanged");
     }
     
     private boolean setDataDelegate(EPC epc, ObjectData data) {
+        logger.entering(className, "setDataDelegate", new Object[]{epc, data});
+        
         boolean success = false;
         for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
             success |= delegate.setData(this, epc, data);
         }
+        
+        logger.exiting(className, "setDataDelegate", success);
         return success;
     }
     
     private ObjectData getDataDelegate(EPC epc) {
+        logger.entering(className, "getDataDelegate", new Object[]{epc});
+        
         ObjectData data = null;
         for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
             ObjectData lastData = delegate.getData(this, epc);
@@ -220,6 +272,8 @@ public class LocalObject implements EchonetObject {
                 data = lastData;
             }
         }
+        
+        logger.exiting(className, "getDataDelegate", data);
         return data;
     }
     
@@ -228,7 +282,11 @@ public class LocalObject implements EchonetObject {
      * @param delegate 登録するDelegate
      */
     public void addDelegate(LocalObjectDelegate delegate) {
+        logger.entering(className, "addDelegate", delegate);
+        
         delegates.add(delegate);
+        
+        logger.entering(className, "addDelegate");
     }
     
     /**
@@ -236,6 +294,10 @@ public class LocalObject implements EchonetObject {
      * @param delegate 抹消するDelegate
      */
     public void removeDelegate(LocalObjectDelegate delegate) {
+        logger.entering(className, "removeDelegate", delegate);
+        
         delegates.remove(delegate);
+        
+        logger.entering(className, "removeDelegate");
     }
 }

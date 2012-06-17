@@ -91,4 +91,9 @@ public class ConstraintSize implements Constraint {
         
         return isValidSize(data);
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Size(%d, %d)", minSize, maxSize);
+    }
 }

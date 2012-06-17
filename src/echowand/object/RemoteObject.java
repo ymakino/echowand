@@ -11,12 +11,16 @@ import echowand.logic.TransactionManager;
 import echowand.net.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * リモートに存在するECHONETオブジェクト
  * @author Yoshiki Makino
  */
 public class RemoteObject implements EchonetObject {
+    public static final Logger logger = Logger.getLogger(RemoteObject.class.getName());
+    private static final String className = RemoteObject.class.getName();
+    
     /**
      * トランザクションのタイムアウト(ミリ秒)
      */
@@ -54,12 +58,16 @@ public class RemoteObject implements EchonetObject {
      * @param transactionManager トランザクション生成に用いられるTransactionManager
      */
     public RemoteObject(Subnet subnet, Node node, EOJ eoj, TransactionManager transactionManager) {
+        logger.entering(className, "RemoteObject", new Object[]{subnet, node, eoj, transactionManager});
+        
         this.subnet = subnet;
         this.node = node;
         this.eoj = eoj;
         this.transactionManager = transactionManager;
         this.observers = new LinkedList<RemoteObjectObserver>();
         this.timeout = TRANSACTION_TIMEOUT;
+        
+        logger.entering(className, "RemoteObject");
     }
     
     /**
@@ -102,68 +110,92 @@ public class RemoteObject implements EchonetObject {
      * @return タイムアウトの設定に成功したらtrue、そうでなければfalse
      */
     public boolean setTimeout(int timeout) {
+        logger.entering(className, "setTimeout", timeout);
+        
         if (timeout > 0) {
             this.timeout = timeout;
+            logger.exiting(className, "setTimeout", true);
             return true;
         } else {
+            logger.exiting(className, "setTimeout", false);
             return false;
         }
     }
     
     private boolean isValidFrame(Frame frame) {
-            if (!frame.getSender().equals(node)) {
-                return false;
-            }
-            
-            CommonFrame cf = frame.getCommonFrame();
-            if (! (cf.getEDATA() instanceof StandardPayload)) {
-                return false;
-            }
-            
-            StandardPayload payload = (StandardPayload) cf.getEDATA();
-            if (! payload.getSEOJ().equals(eoj)) {
-                return false;
-            }
-            
-            return true;
+        logger.entering(className, "isValidFrame", frame);
+
+        if (!frame.getSender().equals(node)) {
+            logger.exiting(className, "isValidFrame", false);
+            return false;
+        }
+
+        CommonFrame cf = frame.getCommonFrame();
+        if (!(cf.getEDATA() instanceof StandardPayload)) {
+            logger.exiting(className, "isValidFrame", false);
+            return false;
+        }
+
+        StandardPayload payload = (StandardPayload) cf.getEDATA();
+        if (!payload.getSEOJ().equals(eoj)) {
+            logger.exiting(className, "isValidFrame", false);
+            return false;
+        }
+
+        logger.exiting(className, "isValidFrame", true);
+        return true;
     }
-    
+
     private Property getValidFirstProperty(Frame frame, EPC epc) {
-            if (!isValidFrame(frame)) {
-                return null;
-            }
-            CommonFrame cf = frame.getCommonFrame();
-            StandardPayload payload = (StandardPayload) cf.getEDATA();
-            if (payload.getFirstOPC() != 1) {
-                return null;
-            }
-            Property property = payload.getFirstPropertyAt(0);
-            if (property.getEPC() == epc) {
-                return property;
-            }
+        logger.entering(className, "getValidFirstProperty", new Object[]{frame, epc});
+        
+        if (!isValidFrame(frame)) {
+            logger.exiting(className, "getValidFirstProperty", null);
             return null;
+        }
+        CommonFrame cf = frame.getCommonFrame();
+        StandardPayload payload = (StandardPayload) cf.getEDATA();
+        if (payload.getFirstOPC() != 1) {
+            logger.exiting(className, "getValidFirstProperty", null);
+            return null;
+        }
+        Property property = payload.getFirstPropertyAt(0);
+        if (property.getEPC() == epc) {
+            logger.exiting(className, "getValidFirstProperty", property);
+            return property;
+        }
+        
+        logger.exiting(className, "getValidFirstProperty", null);
+        return null;
     }
-    
+
     class RemoteObjectGetTransactionListener implements TransactionListener {
+
         private EPC epc;
         private ObjectData data;
         private LinkedList<Data> acc;
-        
+
         public RemoteObjectGetTransactionListener(EPC epc) {
             this.epc = epc;
         }
-        
+
         public ObjectData getData() {
             return data;
         }
         
         @Override
         public void begin(Transaction t) {
+            logger.entering(className, "RemoteObjectGetTransactionListener.begin", t);
+            
             acc = new LinkedList<Data>();
+            
+            logger.exiting(className, "RemoteObjectGetTransactionListener.begin");
         }
 
         @Override
         public void receive(Transaction t, Subnet subnet, Frame frame) {
+            logger.entering(className, "RemoteObjectGetTransactionListener.receive", new Object[]{t, subnet, frame});
+            
             Property property = getValidFirstProperty(frame, this.epc);
             if (property != null) {
                 if (property.getPDC() > 0) {
@@ -171,14 +203,20 @@ public class RemoteObject implements EchonetObject {
                     t.finish();
                 }
             }
+            
+            logger.exiting(className, "RemoteObjectGetTransactionListener.receive");
         }
 
         @Override
         public void finish(Transaction t) {
+            logger.entering(className, "RemoteObjectGetTransactionListener.finish", t);
+            
             if (!acc.isEmpty()) {
                 data = new ObjectData(acc);
             }
             acc = null;
+            
+            logger.exiting(className, "RemoteObjectGetTransactionListener.finish");
         }
     }
     
@@ -201,11 +239,15 @@ public class RemoteObject implements EchonetObject {
 
         @Override
         public void receive(Transaction t, Subnet subnet, Frame frame) {
+            logger.entering(className, "RemoteObjectSetTransactionListener.receive", new Object[]{t, subnet, frame});
+            
             Property property = getValidFirstProperty(frame, this.epc);
             if (property != null) {
                 success = (property.getPDC() == 0);
                 t.finish();
             }
+            
+            logger.exiting(className, "RemoteObjectSetTransactionListener.receive");
         }
 
         @Override
@@ -214,19 +256,27 @@ public class RemoteObject implements EchonetObject {
     }
     
     private SetGetTransactionConfig createSetGetTransactionConfig() {
+        logger.entering(className, "createSetGetTransactionConfig");
+        
         SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
         transactionConfig.setResponseRequired(true);
         transactionConfig.setSenderNode(subnet.getLocalNode());
         transactionConfig.setReceiverNode(this.getNode());
         transactionConfig.setSourceEOJ(SOURCE_EOJ);
         transactionConfig.setDestinationEOJ(eoj);
+        
+        logger.exiting(className, "createSetGetTransactionConfig", transactionConfig);
         return transactionConfig;
     }
     
     private Transaction createSetGetTransaction(SetGetTransactionConfig transactionConfig, TransactionListener transactionListener) {
+        logger.entering(className, "createSetGetTransaction", new Object[]{transactionConfig, transactionListener});
+        
         Transaction transaction = transactionManager.createTransaction(transactionConfig);
         transaction.setTimeout(timeout);
         transaction.addTransactionListener(transactionListener);
+        
+        logger.exiting(className, "createSetGetTransaction", transaction);
         return transaction;
     }
     
@@ -239,6 +289,8 @@ public class RemoteObject implements EchonetObject {
      */
     @Override
     public ObjectData getData(EPC epc) throws EchonetObjectException {
+        logger.entering(className, "getData", epc);
+        
         RemoteObjectGetTransactionListener transactionListener;
 
         SetGetTransactionConfig transactionConfig = createSetGetTransactionConfig();
@@ -250,20 +302,28 @@ public class RemoteObject implements EchonetObject {
         try {
             transaction.execute();
         } catch (SubnetException e) {
-            throw new EchonetObjectException("getData failed", e);
+            EchonetObjectException exception = new EchonetObjectException("getData failed", e);
+            logger.throwing(className, "getData", exception);
+            throw exception;
         }
         
         try {
             transaction.join();
         } catch (InterruptedException e) {
-            throw new EchonetObjectException("interrupted", e);
+            EchonetObjectException exception = new EchonetObjectException("interrupted", e);
+            logger.throwing(className, "getData", exception);
+            throw exception;
         }
         
         if (transaction.countResponses() == 0) {
-            throw new EchonetObjectException("no response");
+            EchonetObjectException exception = new EchonetObjectException("no response");
+            logger.throwing(className, "getData", exception);
+            throw exception;
         }
         
-        return transactionListener.getData();
+        ObjectData data =  transactionListener.getData();
+        logger.exiting(className, "getData", data);
+        return data;
     }
     
     /**
@@ -272,6 +332,8 @@ public class RemoteObject implements EchonetObject {
      * @throws EchonetObjectException ネットワークに問題が発生した場合
      */
     public void observeData(EPC epc) throws EchonetObjectException {
+        logger.entering(className, "observeData", epc);
+        
         RemoteObjectGetTransactionListener transactionListener;
 
         SetGetTransactionConfig transactionConfig = createSetGetTransactionConfig();
@@ -284,8 +346,12 @@ public class RemoteObject implements EchonetObject {
         try {
             transaction.execute();
         } catch (SubnetException e) {
-            throw new EchonetObjectException("getData failed", e);
+            EchonetObjectException exception = new EchonetObjectException("getData failed", e);
+            logger.throwing(className, "observeData", exception);
+            throw exception;
         }
+        
+        logger.exiting(className, "observeData");
     }
 
     /**
@@ -298,6 +364,8 @@ public class RemoteObject implements EchonetObject {
      */
     @Override
     public boolean setData(EPC epc, ObjectData data) throws EchonetObjectException {
+        logger.entering(className, "setData", new Object[]{epc, data});
+        
         RemoteObjectSetTransactionListener transactionListener;
 
         SetGetTransactionConfig transactionConfig = createSetGetTransactionConfig();
@@ -308,17 +376,20 @@ public class RemoteObject implements EchonetObject {
 
         try {
             transaction.execute();
-        } catch (SubnetException e) {
-            throw new EchonetObjectException("setData failed", e);
-        }
-
-        try {
             transaction.join();
+        } catch (SubnetException e) {
+            EchonetObjectException exception = new EchonetObjectException("setData failed", e);
+            logger.throwing(className, "setData", exception);
+            throw exception;
         } catch (InterruptedException e) {
-            throw new EchonetObjectException("interrupted", e);
+            EchonetObjectException exception = new EchonetObjectException("interrupted", e);
+            logger.throwing(className, "setData", exception);
+            throw exception;
         }
 
-        return transactionListener.isSuccess();
+        boolean success = transactionListener.isSuccess();
+        logger.exiting(className, "setData", success);
+        return success;
     }
 
     private PropertyMap getPropertyMap(EPC epc) throws EchonetObjectException {
@@ -375,7 +446,11 @@ public class RemoteObject implements EchonetObject {
      * @param observer 登録するオブザーバ
      */
     public void addObserver(RemoteObjectObserver observer) {
+        logger.entering(className, "addObserver", observer);
+        
         observers.add(observer);
+        
+        logger.exiting(className, "addObserver");
     }
     
     /**
@@ -383,7 +458,11 @@ public class RemoteObject implements EchonetObject {
      * @param observer 登録を抹消するオブザーバ
      */
     public void removeObserver(RemoteObjectObserver observer) {
+        logger.entering(className, "removeObserver", observer);
+        
         observers.remove(observer);
+        
+        logger.exiting(className, "removeObserver");
     }
     
     /**
@@ -400,8 +479,12 @@ public class RemoteObject implements EchonetObject {
      * @param data 通知データ
      */
     public void notifyData(EPC epc, ObjectData data) {
+        logger.entering(className, "notifyData", new Object[]{epc, data});
+        
         for (RemoteObjectObserver observer : new ArrayList<RemoteObjectObserver>(observers)) {
             observer.notifyData(this, epc, data);
         }
+        
+        logger.exiting(className, "notifyData");
     }
 }

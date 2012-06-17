@@ -5,6 +5,7 @@ import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * 送受信のメインループを実行する。
@@ -13,6 +14,9 @@ import java.util.LinkedList;
  * @author Yoshiki Makino
  */
 public class MainLoop implements Runnable {
+    public static final Logger logger = Logger.getLogger(MainLoop.class.getName());
+    private static final String className = MainLoop.class.getName();
+    
     private Subnet subnet;
     private LinkedList<Listener> listeners;
     
@@ -20,7 +24,11 @@ public class MainLoop implements Runnable {
      * MainLoopを生成する。
      */
     public MainLoop() {
+        logger.entering(className, "MainLoop");
+        
         this.listeners = new LinkedList<Listener>();
+        
+        logger.exiting(className, "MainLoop");
     }
 
     /**
@@ -28,7 +36,11 @@ public class MainLoop implements Runnable {
      * @param subnet 設定するサブネット
      */
     public void setSubnet(Subnet subnet) {
+        logger.entering(className, "setSubnet", subnet);
+        
         this.subnet = subnet;
+        
+        logger.exiting(className, "setSubnet");
     }
     
     /**
@@ -45,7 +57,13 @@ public class MainLoop implements Runnable {
      * @throws SubnetException 受信に失敗した場合
      */
     public Frame recvFrame() throws SubnetException {
-        return subnet.recv();
+        logger.entering(className, "recvFrame");
+        
+        Frame frame = subnet.recv();
+        
+        logger.exiting(className, "recvFrame");
+        
+        return frame;
     }
     
     /**
@@ -53,7 +71,11 @@ public class MainLoop implements Runnable {
      * @param listener 登録するListener
      */
     public synchronized void addListener(Listener listener) {
+        logger.entering(className, "addListener", listener);
+        
         listeners.add(listener);
+        
+        logger.exiting(className, "addListener");
     }
     
     /**
@@ -61,7 +83,11 @@ public class MainLoop implements Runnable {
      * @param listener 登録を抹消するListener
      */
     public synchronized void removeListener(Listener listener) {
+        logger.entering(className, "removeListener", listener);
+        
         listeners.remove(listener);
+        
+        logger.exiting(className, "removeListener");
     }
     
     /**
@@ -69,14 +95,23 @@ public class MainLoop implements Runnable {
      * @return 登録されているListenerの数
      */
     public synchronized int countListeners() {
-        return listeners.size();
+        logger.entering(className, "countListeners");
+        
+        int count = listeners.size();
+        
+        logger.exiting(className, "countListeners", count);
+        return count;
     }
     
     private synchronized void invokeListeners(Frame frame) {
+        logger.entering(className, "invokeListeners", frame);
+        
         boolean processed = false;
         for (Listener listener : new ArrayList<Listener>(listeners)) {
             processed |= listener.process(subnet, frame, processed);
         }
+        
+        logger.exiting(className, "invokeListeners");
     }
 
     /**
@@ -85,13 +120,19 @@ public class MainLoop implements Runnable {
      */
     @Override
     public void run() {
-        for (;;) {
-            try {
-                Frame frame = recvFrame();
-                invokeListeners(frame);
-            } catch(SubnetException e) {
-                e.printStackTrace();
+        logger.entering(className, "run");
+
+        try {
+            for (;;) {
+                try {
+                    Frame frame = recvFrame();
+                    invokeListeners(frame);
+                } catch (SubnetException e) {
+                    e.printStackTrace();
+                }
             }
+        } finally {
+            logger.exiting(className, "run");
         }
     }
 }

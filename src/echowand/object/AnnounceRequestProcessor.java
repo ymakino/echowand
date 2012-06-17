@@ -1,22 +1,21 @@
 package echowand.object;
 
-import echowand.net.Frame;
-import echowand.net.SubnetException;
-import echowand.net.Property;
-import echowand.net.StandardPayload;
-import echowand.net.Subnet;
-import echowand.net.CommonFrame;
 import echowand.common.EOJ;
 import echowand.common.ESV;
 import echowand.logic.RequestProcessor;
+import echowand.net.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * INF、INFCリクエストの処理を実行
  * @author Yoshiki Makino
  */
 public class AnnounceRequestProcessor extends RequestProcessor {
+    public static final Logger logger = Logger.getLogger(AnnounceRequestProcessor.class.getName());
+    private static final String className = AnnounceRequestProcessor.class.getName();
+    
     private LocalObjectManager localManager;
     private RemoteObjectManager remoteManager;
     
@@ -28,12 +27,18 @@ public class AnnounceRequestProcessor extends RequestProcessor {
      * @param remoteManager データの通知を伝えるためのリモートオブジェクト群
      */
     public AnnounceRequestProcessor(LocalObjectManager localManager, RemoteObjectManager remoteManager) {
+        logger.entering(className, "AnnounceRequestProcessor", new Object[]{localManager, remoteManager});
+        
         this.localManager = localManager;
         this.remoteManager = remoteManager;
+        
+        logger.exiting(className, "AnnounceRequestProcessor");
     }
     
     
     private StandardPayload updateINForINFC(Frame frame) {
+        logger.entering(className, "updateINForINFC", frame);
+        
         CommonFrame commonFrame = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload)commonFrame.getEDATA();
         
@@ -52,9 +57,12 @@ public class AnnounceRequestProcessor extends RequestProcessor {
             }
         }
 
+        logger.exiting(className, "updateINForINFC", replyPayload);
         return replyPayload;
     }
     private void replyINForINFC(Subnet subnet, Frame frame, StandardPayload replyPayload, LocalObject object) {
+        logger.entering(className, "replyINForINFC", new Object[]{subnet, frame, replyPayload, object});
+        
         CommonFrame commonFrame = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
 
@@ -69,9 +77,13 @@ public class AnnounceRequestProcessor extends RequestProcessor {
         } catch (SubnetException e) {
             e.printStackTrace();
         }
+        
+        logger.exiting(className, "replyINForINFC");
     }
 
     private boolean processINForINFC(Subnet subnet, Frame frame, boolean needsReply) {
+        logger.entering(className, "processINForINFC", new Object[]{subnet, frame, needsReply});
+        
         CommonFrame commonFrame = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload)commonFrame.getEDATA();
         EOJ eoj = payload.getDEOJ();
@@ -95,6 +107,7 @@ public class AnnounceRequestProcessor extends RequestProcessor {
             }
         }
 
+        logger.exiting(className, "processINForINFC", true);
         return true;
     }
     
@@ -107,10 +120,16 @@ public class AnnounceRequestProcessor extends RequestProcessor {
      */
     @Override
     public boolean processINF(Subnet subnet, Frame frame, boolean processed) {
+        logger.entering(className, "processINF", new Object[]{subnet, frame, processed});
+        
         if (processed) {
             return false;
         }
-        return processINForINFC(subnet, frame, false);
+        
+        boolean ret = processINForINFC(subnet, frame, false);
+        
+        logger.exiting(className, "processINF", ret);
+        return ret;
     }
 
     /**
@@ -122,9 +141,15 @@ public class AnnounceRequestProcessor extends RequestProcessor {
      */
     @Override
     public boolean processINFC(Subnet subnet, Frame frame, boolean processed) {
+        logger.entering(className, "processINF", new Object[]{subnet, frame, processed});
         if (processed) {
+            logger.exiting(className, "processINF", false);
             return false;
         }
-        return processINForINFC(subnet, frame, true);
+        
+        boolean ret = processINForINFC(subnet, frame, true);
+        
+        logger.exiting(className, "processINF", ret);
+        return ret;
     }
 }

@@ -62,4 +62,9 @@ public class ConstraintByte extends ConstraintSize {
         }
         return (minValue <= value) && (value <= maxValue);
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Byte[0x%02x, 0x%02x]", minValue, maxValue);
+    }
 }

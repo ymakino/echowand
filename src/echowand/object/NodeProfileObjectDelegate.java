@@ -6,12 +6,16 @@ import echowand.common.EPC;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * ノードプロファイルの代理となり、0xD3-0xD7のGet命令の処理を実行。
  * @author Yoshiki Makino
  */
 public class NodeProfileObjectDelegate implements LocalObjectDelegate {
+    public static final Logger logger = Logger.getLogger(NodeProfileObjectDelegate.class.getName());
+    private static final String className = NodeProfileObjectDelegate.class.getName();
+    
     private LocalObjectManager manager;
     
     /**
@@ -20,7 +24,11 @@ public class NodeProfileObjectDelegate implements LocalObjectDelegate {
      * @param manager ローカルオブジェクト管理を行うオブジェクト
      */
     public NodeProfileObjectDelegate(LocalObjectManager manager) {
+        logger.entering(className, "NodeProfileObjectDelegate", manager);
+        
         this.manager = manager;
+        
+        logger.exiting(className, "NodeProfileObjectDelegate");
     }
 
     private ObjectData getInstanceCountData() {
