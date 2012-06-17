@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class NodeProfileObjectDelegate implements LocalObjectDelegate {
-    public static final Logger logger = Logger.getLogger(NodeProfileObjectDelegate.class.getName());
+    private static final Logger logger = Logger.getLogger(NodeProfileObjectDelegate.class.getName());
     private static final String className = NodeProfileObjectDelegate.class.getName();
     
     private LocalObjectManager manager;

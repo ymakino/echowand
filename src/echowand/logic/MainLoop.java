@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class MainLoop implements Runnable {
-    public static final Logger logger = Logger.getLogger(MainLoop.class.getName());
+    private static final Logger logger = Logger.getLogger(MainLoop.class.getName());
     private static final String className = MainLoop.class.getName();
     
     private Subnet subnet;

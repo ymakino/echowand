@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
-    public static final Logger logger = Logger.getLogger(LocalObjectNotifyDelegate.class.getName());
+    private static final Logger logger = Logger.getLogger(LocalObjectNotifyDelegate.class.getName());
     private static final String className = LocalObjectNotifyDelegate.class.getName();
     
     private Subnet subnet;

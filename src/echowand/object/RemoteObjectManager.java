@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class RemoteObjectManager {
-    public static final Logger logger = Logger.getLogger(RemoteObjectManager.class.getName());
+    private static final Logger logger = Logger.getLogger(RemoteObjectManager.class.getName());
     private static final String className = RemoteObjectManager.class.getName();
     
     private HashMap<Node, HashMap<EOJ, RemoteObject>> objects;

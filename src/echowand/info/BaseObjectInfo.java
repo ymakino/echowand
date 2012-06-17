@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class BaseObjectInfo implements ObjectInfo {
-    public static final Logger logger = Logger.getLogger(BaseObjectInfo.class.getName());
+    private static final Logger logger = Logger.getLogger(BaseObjectInfo.class.getName());
     private static final String className = BaseObjectInfo.class.getName();
     
     private class PropertyInfoComparator implements Comparator<PropertyInfo> {

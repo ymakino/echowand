@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class Transaction {
-    public static final Logger logger = Logger.getLogger(Transaction.class.getName());
+    private static final Logger logger = Logger.getLogger(Transaction.class.getName());
     private static final String className = Transaction.class.getName();
     
     private TransactionConfig transactionConfig;

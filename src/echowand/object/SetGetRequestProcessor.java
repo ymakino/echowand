@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 
 public class SetGetRequestProcessor extends RequestProcessor {
-    public static final Logger logger = Logger.getLogger(SetGetRequestProcessor.class.getName());
+    private static final Logger logger = Logger.getLogger(SetGetRequestProcessor.class.getName());
     private static final String className = SetGetRequestProcessor.class.getName();
     
     private LocalObjectManager manager;

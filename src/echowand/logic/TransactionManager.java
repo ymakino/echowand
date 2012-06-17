@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class TransactionManager implements Listener {
-    public static final Logger logger = Logger.getLogger(TransactionManager.class.getName());
+    private static final Logger logger = Logger.getLogger(TransactionManager.class.getName());
     private static final String className = TransactionManager.class.getName();
     
     private Subnet subnet;

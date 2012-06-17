@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class AnnounceRequestProcessor extends RequestProcessor {
-    public static final Logger logger = Logger.getLogger(AnnounceRequestProcessor.class.getName());
+    private static final Logger logger = Logger.getLogger(AnnounceRequestProcessor.class.getName());
     private static final String className = AnnounceRequestProcessor.class.getName();
     
     private LocalObjectManager localManager;

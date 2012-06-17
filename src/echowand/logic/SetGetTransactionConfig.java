@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class SetGetTransactionConfig extends TransactionConfig {
-    public static final Logger logger = Logger.getLogger(SetGetTransactionConfig.class.getName());
+    private static final Logger logger = Logger.getLogger(SetGetTransactionConfig.class.getName());
     private static final String className = SetGetTransactionConfig.class.getName();
     
     private LinkedList<Pair<EPC, Data>> setProperties;

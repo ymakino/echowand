@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class LocalObjectDateTimeDelegate implements LocalObjectDelegate {
-    public static final Logger logger = Logger.getLogger(LocalObjectDateTimeDelegate.class.getName());
+    private static final Logger logger = Logger.getLogger(LocalObjectDateTimeDelegate.class.getName());
     private static final String className = LocalObjectDateTimeDelegate.class.getName();
 
     /**

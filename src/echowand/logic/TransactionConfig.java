@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public abstract class TransactionConfig {
-    public static final Logger logger = Logger.getLogger(TransactionConfig.class.getName());
+    private static final Logger logger = Logger.getLogger(TransactionConfig.class.getName());
     private static final String className = TransactionConfig.class.getName();
     
     private Node senderNode;

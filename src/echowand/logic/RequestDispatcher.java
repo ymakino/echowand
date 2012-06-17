@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class RequestDispatcher implements Listener {
-    public static final Logger logger = Logger.getLogger(RequestDispatcher.class.getName());
+    private static final Logger logger = Logger.getLogger(RequestDispatcher.class.getName());
     private static final String className = RequestDispatcher.class.getName();
     
     private LinkedList<RequestProcessor> processors;

@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class LocalObject implements EchonetObject {
-    public static final Logger logger = Logger.getLogger(LocalObject.class.getName());
+    private static final Logger logger = Logger.getLogger(LocalObject.class.getName());
     private static final String className = LocalObject.class.getName();
     
     private EOJ eoj;

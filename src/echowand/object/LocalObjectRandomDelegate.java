@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class LocalObjectRandomDelegate implements LocalObjectDelegate {
-    public static final Logger logger = Logger.getLogger(LocalObjectRandomDelegate.class.getName());
+    private static final Logger logger = Logger.getLogger(LocalObjectRandomDelegate.class.getName());
     private static final String className = LocalObjectRandomDelegate.class.getName();
 
     private EPC epc;

@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class LocalSetGetAtomic implements Runnable {
-    public static final Logger logger = Logger.getLogger(LocalSetGetAtomic.class.getName());
+    private static final Logger logger = Logger.getLogger(LocalSetGetAtomic.class.getName());
     private static final String className = LocalSetGetAtomic.class.getName();
     
     private LocalObject object;

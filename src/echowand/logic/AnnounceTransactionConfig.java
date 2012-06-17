@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class AnnounceTransactionConfig extends TransactionConfig {
-    public static final Logger logger = Logger.getLogger(AnnounceTransactionConfig.class.getName());
+    private static final Logger logger = Logger.getLogger(AnnounceTransactionConfig.class.getName());
     private static final String className = AnnounceTransactionConfig.class.getName();
     
     private LinkedList<Pair<EPC, Data>> annoProperties;

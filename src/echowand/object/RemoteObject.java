@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class RemoteObject implements EchonetObject {
-    public static final Logger logger = Logger.getLogger(RemoteObject.class.getName());
+    private static final Logger logger = Logger.getLogger(RemoteObject.class.getName());
     private static final String className = RemoteObject.class.getName();
     
     /**

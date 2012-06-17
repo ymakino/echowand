@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class InstanceListRequestExecutor {
-    public static final Logger logger = Logger.getLogger(InstanceListRequestExecutor.class.getName());
+    private static final Logger logger = Logger.getLogger(InstanceListRequestExecutor.class.getName());
     private static final String className = InstanceListRequestExecutor.class.getName();
     
     private Subnet subnet;

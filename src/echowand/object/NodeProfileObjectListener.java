@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class NodeProfileObjectListener implements TransactionListener {
-    public static final Logger logger = Logger.getLogger(NodeProfileObjectListener.class.getName());
+    private static final Logger logger = Logger.getLogger(NodeProfileObjectListener.class.getName());
     private static final String className = NodeProfileObjectListener.class.getName();
     
     private final EPC INSTANCE_LIST_S = EPC.xD6;

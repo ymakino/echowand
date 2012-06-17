@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 public class LocalObjectManager {
-    public static final Logger logger = Logger.getLogger(LocalObjectManager.class.getName());
+    private static final Logger logger = Logger.getLogger(LocalObjectManager.class.getName());
     private static final String className = LocalObjectManager.class.getName();
     
     private HashMap<EOJ, LocalObject> objectsMap;
