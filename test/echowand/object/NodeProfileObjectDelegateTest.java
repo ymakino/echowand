@@ -7,6 +7,7 @@ import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.info.BaseObjectInfo;
+import echowand.info.HumiditySensorInfo;
 import echowand.info.NodeProfileInfo;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.TooManyObjectsException;
@@ -130,7 +131,7 @@ public class NodeProfileObjectDelegateTest {
     }
     @Test
     public void testClassList() {
-        ObjectData data = object.getData(EPC.xD6);
+        ObjectData data = object.getData(EPC.xD7);
         for (int i = 0; i < 257; i++) {
             try {
                 manager.add(new LocalObject(new DummyInfo(i)));
@@ -164,5 +165,22 @@ public class NodeProfileObjectDelegateTest {
         assertEquals((byte)0xff, lastExtraData.get(0));
         assertEquals((byte)0x01, lastExtraData.get(1));
         assertEquals((byte)0x00, lastExtraData.get(2));
+    }
+    @Test
+    public void testDupClassList() {
+        assertEquals(0, object.getData(EPC.xD7).get(0));
+        
+        ObjectData data = object.getData(EPC.xD7);
+        for (int i = 0; i < 100; i++) {
+            try {
+                manager.add(new LocalObject(new TemperatureSensorInfo()));
+                manager.add(new LocalObject(new HumiditySensorInfo()));
+            } catch (TooManyObjectsException e) {
+                e.printStackTrace();
+                fail();
+            }
+            assertEquals(2, object.getData(EPC.xD7).get(0));
+            assertEquals(0, object.getData(EPC.xD7).getExtraSize());
+        }
     }
 }
