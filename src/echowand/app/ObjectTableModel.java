@@ -1,5 +1,7 @@
 package echowand.app;
 
+import echowand.common.ClassEOJ;
+import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.object.EchonetObjectException;
 import echowand.object.ObjectData;
@@ -12,7 +14,8 @@ enum ColumnKind {
     SET(2, Boolean.class, "Set"),
     ANNO(3, Boolean.class, "Anno"),
     SIZE(4, Integer.class, "Size"),
-    DATA(5, ObjectData.class, "Data");
+    DATA(5, ObjectData.class, "Data"),
+    FORMATTED(6, String.class, "Formatted");
     
     private int index;
     private Class rendererClass;
@@ -126,6 +129,7 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         if (index >= 0) {
             fireTableCellUpdated(index, ColumnKind.SIZE.getIndex());
             fireTableCellUpdated(index, ColumnKind.DATA.getIndex());
+            fireTableCellUpdated(index, ColumnKind.FORMATTED.getIndex());
         }
     }
     
@@ -166,7 +170,20 @@ public class ObjectTableModel extends AbstractObjectTableModel {
     public int getColumnCount() {
         return ColumnKind.count();
     }
-
+    
+    private ReadableConverterMap converterMap = new ReadableConverterMap();
+    private String getReadableString(CachedRemoteObject object, EPC epc) {
+        
+        ObjectData data = object.getData(epc);
+        if (data == null) {
+            return "";
+        }
+        
+        EOJ eoj = object.getEOJ();
+        ClassEOJ ceoj = eoj.getClassEOJ();
+        return converterMap.get(null, ceoj, eoj, epc).dataToString(data);
+    }
+    
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (!cachedObject.isPropertyMapsCached()) {
@@ -190,6 +207,7 @@ public class ObjectTableModel extends AbstractObjectTableModel {
                     return null;
                 }
             case DATA: return cachedObject.getData(epc);
+            case FORMATTED: return getReadableString(cachedObject, epc);
         }
 
         return null;
@@ -241,6 +259,7 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         try {
             cachedObject.setData(epc, new ObjectData(newBytes));
             cachedObject.updateCache(epc);
+            fireEPCDataUpdated(epc);
         } catch (EchonetObjectException e) {
             e.printStackTrace();
         }
