@@ -25,7 +25,7 @@ public class ObjectTableModelNotifyObserver implements RemoteObjectObserver {
     public void notifyData(RemoteObject object, EPC epc, ObjectData data) {
         if (cachedObject != null) {
             cachedObject.setCachedData(epc, data);
-            model.fireEPCDataUpdated(epc);
+            model.fireEPCDataUpdated(epc, cachedObject);
         }
     }
 }

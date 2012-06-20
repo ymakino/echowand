@@ -1,5 +1,6 @@
 package echowand.app;
 
+import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.object.ObjectData;
 import java.util.LinkedList;
@@ -23,7 +24,7 @@ class MultipleObjectTableModelRefreshThread extends CachedRemoteObjectRefreshThr
     @Override
     public void notifyPropertyDataChanged(EPC epc) {
         if (!isInvalid()) {
-            model.fireEPCDataUpdated(epc);
+            model.fireEPCDataUpdated(epc, getCachedObject());
         }
     }
 }
@@ -112,15 +113,16 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
 
     @Override
     public int getRowCount() {
-        int count = 0;
+        int rowCount = 0;
+        
         for (int code = 0x80; code <= 0xff; code++) {
             EPC epc = EPC.fromByte((byte) code);
             if (isValidEPC(epc)) {
-                count++;
+                rowCount++;
             }
         }
         
-        return count;
+        return rowCount;
     }
 
     @Override
@@ -157,14 +159,15 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
 
     private EPC index2epc(int index) {
-        int count = 0;
+        int indexCount = 0;
+        
         for (int code = 0x80; code <= 0xff; code++) {
             EPC epc = EPC.fromByte((byte) code);
             if (isValidEPC(epc)) {
-                if (index == count) {
+                if (index == indexCount) {
                     return epc;
                 }
-                count++;
+                indexCount++;
             }
         }
 
@@ -172,17 +175,18 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
 
     private int epc2index(EPC epc) {
-        int count = 0;
+        int indexCount = 0;
+        
         for (int code = 0x80; code <= 0xff; code++) {
             EPC cur = EPC.fromByte((byte) code);
             if (isValidEPC(cur)) {
                 if (epc == cur) {
-                    return count;
+                    return indexCount;
                 }
-                count++;
+                indexCount++;
             }
         }
-        return count;
+        return indexCount;
     }
 
     @Override
@@ -210,13 +214,17 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         
         return object.getData(epc);
     }
-
+    
     @Override
-    public void fireEPCDataUpdated(EPC epc) {
+    public void fireEPCDataUpdated(EPC epc, CachedRemoteObject updatedObject) {
         int row = epc2index(epc);
+        EOJ updatedEOJ = updatedObject.getEOJ();
+        
         for (int i = 0; i < getTupleList().size(); i++) {
-            int column = i + 1;
-            this.fireTableCellUpdated(row, column);
+            if (updatedEOJ.equals(getTupleList().get(i).getCachedObject().getEOJ())) {
+                int column = i + 1;
+                this.fireTableCellUpdated(row, column);
+            }
         }
     }
 

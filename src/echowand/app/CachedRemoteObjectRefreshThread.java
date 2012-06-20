@@ -16,6 +16,10 @@ public class CachedRemoteObjectRefreshThread extends Thread {
     public CachedRemoteObjectRefreshThread(CachedRemoteObject cahcedObject) {
         this.cachedObject = cahcedObject;
     }
+    
+    public CachedRemoteObject getCachedObject() {
+        return cachedObject;
+    }
 
     public boolean isDone() {
         return done;
