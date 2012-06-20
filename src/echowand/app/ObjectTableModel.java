@@ -1,8 +1,8 @@
 package echowand.app;
 
-import echowand.common.ClassEOJ;
 import echowand.common.EOJ;
 import echowand.common.EPC;
+import echowand.net.Node;
 import echowand.object.EchonetObjectException;
 import echowand.object.ObjectData;
 
@@ -95,12 +95,24 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         refreshCacheThread = new ObjectTableModelRefreshThread(this, cachedObject);
         refreshCacheThread.start();
     }
+    
+    public synchronized boolean isRefreshingCache() {
+        if (refreshCacheThread == null) {
+            return false;
+        }
+        
+        return refreshCacheThread.isAlive();
+    }
 
-    public void stopRefreshCache() {
+    public synchronized void stopRefreshCache() {
         if (refreshCacheThread != null) {
             refreshCacheThread.invalidate();
         }
         refreshCacheThread = null;
+    }
+
+    public CachedRemoteObject getCachedObject() {
+        return cachedObject;
     }
 
     public synchronized void setCachedObject(CachedRemoteObject cachedObject) {
@@ -125,6 +137,10 @@ public class ObjectTableModel extends AbstractObjectTableModel {
     
     @Override
     public void fireEPCDataUpdated(EPC epc) {
+        if (cachedObject == null) {
+            return;
+        }
+        
         int index = cachedObject.getIndexOfEPC(epc);
         if (index >= 0) {
             fireTableCellUpdated(index, ColumnKind.SIZE.getIndex());
@@ -179,14 +195,14 @@ public class ObjectTableModel extends AbstractObjectTableModel {
             return "";
         }
         
+        Node node = object.getNode();
         EOJ eoj = object.getEOJ();
-        ClassEOJ ceoj = eoj.getClassEOJ();
-        return converterMap.get(null, ceoj, eoj, epc).dataToString(data);
+        return converterMap.get(node, eoj, epc).dataToString(data);
     }
     
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (!cachedObject.isPropertyMapsCached()) {
+        if (cachedObject == null || !cachedObject.isPropertyMapsCached()) {
             return null;
         }
         

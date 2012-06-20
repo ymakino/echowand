@@ -122,6 +122,7 @@ class ReadableConverterDate extends ReadableConverter {
     private int b2i(byte b) {
         return (0x000000ff) & b;
     }
+    
     @Override
     public String dataToString(ObjectData data) {
         int dataSize = data.size();
@@ -142,6 +143,7 @@ class ReadableConverterTime extends ReadableConverter {
     private int b2i(byte b) {
         return (0x000000ff) & b;
     }
+    
     @Override
     public String dataToString(ObjectData data) {
         int dataSize = data.size();
@@ -156,10 +158,14 @@ class ReadableConverterTime extends ReadableConverter {
 }
 
 class ReadableConverterMultipleToggle extends ReadableConverter {
-    private HashMap<Byte, String> stepMap;
+    private HashMap<Byte, String> readableMap;
     
-    public ReadableConverterMultipleToggle(Map<Byte, String> stepMap) {
-        this.stepMap = new HashMap<Byte, String>(stepMap);
+    public ReadableConverterMultipleToggle(Map<Byte, String> readableMap) {
+        this.readableMap = new HashMap<Byte, String>(readableMap);
+    }
+    
+    public void put(byte key, String value) {
+        readableMap.put(key, value);
     }
 
     @Override
@@ -170,7 +176,7 @@ class ReadableConverterMultipleToggle extends ReadableConverter {
             return INVALID;
         }
         
-        String string = stepMap.get(data.get(0));
+        String string = readableMap.get(data.get(0));
         if (string == null) {
             return INVALID;
         }
@@ -222,15 +228,23 @@ class ReadableConverterVersion extends ReadableConverter {
             return INVALID;
         }
         
-        int v0 = data.get(0);
-        int v1 = data.get(1);
-        int v2 = data.get(2);
-        int v3 = data.get(3);
-        if (v3 != 0x00) {
+        int major = (0x000000ff) & data.get(0);
+        int minor = (0x000000ff) & data.get(1);
+        byte release = data.get(2);
+        byte extra = data.get(3);
+        
+        if (extra != 0x00) {
             return INVALID;
         }
-
-        return String.format("%d.%d %c", v0, v1, v2);
+        
+        String versionString = String.format("%d.%d", major, minor);
+        
+        if (release != 0x00) {
+            String releaseString = new String(new byte[]{(byte)release});
+            versionString = String.format("%s Release %s", versionString, releaseString);
+        }
+        
+        return versionString;
     }
 }
 

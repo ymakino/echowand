@@ -1,11 +1,13 @@
 package echowand.app;
 
-import echowand.common.EOJ;
-import echowand.common.EPC;
+import echowand.common.*;
 import echowand.logic.TransactionManager;
-import echowand.net.LocalSubnet;
-import echowand.net.Subnet;
+import echowand.net.*;
+import echowand.object.ObjectData;
 import echowand.object.RemoteObject;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -17,13 +19,15 @@ public class ObjectTableModelTest {
     
     Subnet subnet;
     TransactionManager transactionManager;
-    RemoteObject remoteObject;
+    RemoteObject remoteObject1;
+    RemoteObject remoteObject2;
     
     @Before
     public void setUp() {
         subnet = new LocalSubnet();
         transactionManager = new TransactionManager(subnet);
-        remoteObject = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("0ef001"), transactionManager);
+        remoteObject1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("0ef001"), transactionManager);
+        remoteObject2 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
     }
 
     /**
@@ -31,11 +35,21 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testRefreshCache() {
-        System.out.println("refreshCache");
-        ObjectTableModel instance = new ObjectTableModel();
-        instance.refreshCache();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        
+        model.setCachedObject(new CachedRemoteObject(remoteObject1));
+        CachedRemoteObject object = model.getCachedObject();
+        
+        assertFalse(object.isCached(EPC.x80));
+        
+        object.setCachedData(EPC.x80, new ObjectData(new byte[]{0x00}));
+        
+        assertTrue(object.isCached(EPC.x80));
+        
+        model.refreshCache();
+        
+        assertTrue(model.isRefreshingCache());
+        assertFalse(object.isCached(EPC.x80));
     }
 
     /**
@@ -43,11 +57,20 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testStopRefreshCache() {
-        System.out.println("stopRefreshCache");
-        ObjectTableModel instance = new ObjectTableModel();
-        instance.stopRefreshCache();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        
+        model.setCachedObject(new CachedRemoteObject(remoteObject1));
+        model.stopRefreshCache();
+        
+        assertFalse(model.isRefreshingCache());
+        
+        model.refreshCache();
+        
+        assertTrue(model.isRefreshingCache());
+        
+        model.stopRefreshCache();
+        
+        assertFalse(model.isRefreshingCache());
     }
 
     /**
@@ -55,24 +78,28 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testSetRemoteObject() {
-        ObjectTableModel instance = new ObjectTableModel();
-        instance.setCachedObject(new CachedRemoteObject(remoteObject));
-        assertEquals(1, remoteObject.countObservers());
-        instance.setCachedObject(null);
-        assertEquals(0, remoteObject.countObservers());
-    }
-
-    /**
-     * Test of fireEPCDataUpdated method, of class ObjectTableModel.
-     */
-    @Test
-    public void testFireEPCDataUpdated() {
-        System.out.println("fireEPCDataUpdated");
-        EPC epc = null;
-        ObjectTableModel instance = new ObjectTableModel();
-        instance.fireEPCDataUpdated(epc);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        CachedRemoteObject cachedObject1 = new CachedRemoteObject(remoteObject1);
+        CachedRemoteObject cachedObject2 = new CachedRemoteObject(remoteObject2);
+        
+        assertEquals(0, cachedObject1.countObservers());
+        assertEquals(0, cachedObject2.countObservers());
+        
+        model.setCachedObject(cachedObject1);
+        
+        assertTrue(model.isRefreshingCache());
+        assertEquals(1, cachedObject1.countObservers());
+        assertEquals(0, cachedObject2.countObservers());
+        
+        model.setCachedObject(cachedObject2);
+        
+        assertEquals(0, cachedObject1.countObservers());
+        assertEquals(1, cachedObject2.countObservers());
+        
+        model.setCachedObject(null);
+        
+        assertEquals(0, cachedObject1.countObservers());
+        assertEquals(0, cachedObject2.countObservers());
     }
 
     /**
@@ -80,11 +107,11 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testRelease() {
-        System.out.println("release");
-        ObjectTableModel instance = new ObjectTableModel();
-        instance.release();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        model.setCachedObject(new CachedRemoteObject(remoteObject1));
+        assertFalse(model.getCachedObject() == null);
+        model.release();
+        assertTrue(model.getCachedObject() == null);
     }
 
     /**
@@ -92,13 +119,23 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testGetRowCount() {
-        System.out.println("getRowCount");
-        ObjectTableModel instance = new ObjectTableModel();
-        int expResult = 0;
-        int result = instance.getRowCount();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals(0, model.getRowCount());
+        
+        CachedRemoteObject cachedObject1 = new CachedRemoteObject(remoteObject1);
+        model.setCachedObject(cachedObject1);
+        model.stopRefreshCache();
+        
+        assertEquals(0, model.getRowCount());
+        
+        PropertyMap map = new PropertyMap();
+        map.set(EPC.x80);
+        map.set(EPC.x88);
+        map.set(EPC.xE0);
+        cachedObject1.setCachedData(EPC.x9D, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x9E, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x9F, new ObjectData(map.toBytes()));
+        assertEquals(3, model.getRowCount());
     }
 
     /**
@@ -106,14 +143,14 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testGetColumnClass() {
-        System.out.println("getColumnClass");
-        int column = 0;
-        ObjectTableModel instance = new ObjectTableModel();
-        Class expResult = null;
-        Class result = instance.getColumnClass(column);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals(EPC.class, model.getColumnClass(0));
+        assertEquals(Boolean.class, model.getColumnClass(1));
+        assertEquals(Boolean.class, model.getColumnClass(2));
+        assertEquals(Boolean.class, model.getColumnClass(3));
+        assertEquals(Integer.class, model.getColumnClass(4));
+        assertEquals(ObjectData.class, model.getColumnClass(5));
+        assertEquals(String.class, model.getColumnClass(6));
     }
 
     /**
@@ -121,14 +158,14 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testGetColumnName() {
-        System.out.println("getColumnName");
-        int column = 0;
-        ObjectTableModel instance = new ObjectTableModel();
-        String expResult = "";
-        String result = instance.getColumnName(column);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals("EPC", model.getColumnName(0));
+        assertEquals("Get", model.getColumnName(1));
+        assertEquals("Set", model.getColumnName(2));
+        assertEquals("Anno", model.getColumnName(3));
+        assertEquals("Size", model.getColumnName(4));
+        assertEquals("Data", model.getColumnName(5));
+        assertEquals("Formatted", model.getColumnName(6));
     }
 
     /**
@@ -136,13 +173,8 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testGetColumnCount() {
-        System.out.println("getColumnCount");
-        ObjectTableModel instance = new ObjectTableModel();
-        int expResult = 0;
-        int result = instance.getColumnCount();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals(7, model.getColumnCount());
     }
 
     /**
@@ -150,15 +182,50 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testGetValueAt() {
-        System.out.println("getValueAt");
-        int rowIndex = 0;
-        int columnIndex = 0;
-        ObjectTableModel instance = new ObjectTableModel();
-        Object expResult = null;
-        Object result = instance.getValueAt(rowIndex, columnIndex);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals(0, model.getRowCount());
+        
+        CachedRemoteObject cachedObject1 = new CachedRemoteObject(remoteObject1);
+        model.setCachedObject(cachedObject1);
+        model.stopRefreshCache();
+        
+        assertEquals(0, model.getRowCount());
+        
+        PropertyMap map = new PropertyMap();
+        map.set(EPC.x80);
+        cachedObject1.setCachedData(EPC.x9D, new ObjectData(map.toBytes()));
+        map.set(EPC.x88);
+        cachedObject1.setCachedData(EPC.x9E, new ObjectData(map.toBytes()));
+        map.set(EPC.xE0);
+        cachedObject1.setCachedData(EPC.x9F, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x80, new ObjectData((byte)0x30));
+        cachedObject1.setCachedData(EPC.x88, new ObjectData((byte)0x42));
+        cachedObject1.setCachedData(EPC.xE0, new ObjectData((byte)0x12, (byte)0x34));
+        
+        assertEquals(EPC.x80, model.getValueAt(0, 0));
+        assertEquals(true, model.getValueAt(0, 1));
+        assertEquals(true, model.getValueAt(0, 2));
+        assertEquals(true, model.getValueAt(0, 3));
+        assertEquals(1, model.getValueAt(0, 4));
+        assertEquals(new ObjectData((byte)0x30), model.getValueAt(0, 5));
+        assertEquals("ON", model.getValueAt(0, 6));
+        
+        assertEquals(EPC.x88, model.getValueAt(1, 0));
+        assertEquals(true, model.getValueAt(1, 1));
+        assertEquals(true, model.getValueAt(1, 2));
+        assertEquals(false, model.getValueAt(1, 3));
+        assertEquals(1, model.getValueAt(1, 4));
+        assertEquals(new ObjectData((byte)0x42), model.getValueAt(1, 5));
+        assertEquals("NORMAL", model.getValueAt(1, 6));
+        
+        assertEquals(EPC.xE0, model.getValueAt(2, 0));
+        assertEquals(true, model.getValueAt(2, 1));
+        assertEquals(false, model.getValueAt(2, 2));
+        assertEquals(false, model.getValueAt(2, 3));
+        assertEquals(2, model.getValueAt(2, 4));
+        assertEquals(new ObjectData((byte)0x12, (byte)0x34), model.getValueAt(2, 5));
+        assertEquals("1234", model.getValueAt(2, 6));
+        
     }
 
     /**
@@ -166,14 +233,85 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testSetValueAt() {
-        System.out.println("setValueAt");
-        Object aValue = null;
-        int row = 0;
-        int column = 0;
-        ObjectTableModel instance = new ObjectTableModel();
-        instance.setValueAt(aValue, row, column);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals(0, model.getRowCount());
+        
+        CachedRemoteObject cachedObject1 = new CachedRemoteObject(remoteObject1);
+        model.setCachedObject(cachedObject1);
+        model.stopRefreshCache();
+        
+        assertEquals(0, model.getRowCount());
+        
+        PropertyMap map = new PropertyMap();
+        map.set(EPC.x80);
+        cachedObject1.setCachedData(EPC.x9D, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x9E, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x9F, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x80, new ObjectData((byte)0x30));
+        
+        Thread dummyPeer = new Thread() {
+            
+            private void processSetC() {
+                try {
+                    Frame frame;
+                    CommonFrame commonFrame;
+                    StandardPayload payload;
+                    for (;;) {
+                        frame = subnet.recv();
+                        commonFrame = frame.getCommonFrame();
+                        payload = (StandardPayload) commonFrame.getEDATA();
+
+                        if (payload.getESV() == ESV.SetC && payload.getFirstPropertyAt(0).getEPC() == EPC.x80) {
+                            break;
+                        }
+                    }
+                    assertEquals(1, payload.getFirstPropertyAt(0).getPDC());
+                    assertEquals(new Data((byte) 0x31), payload.getFirstPropertyAt(0).getEDT());
+
+                    payload.setESV(ESV.Set_Res);
+                    payload.getFirstPropertyAt(0).setEDT(new Data());
+
+                    transactionManager.process(subnet, frame, false);
+                } catch (SubnetException e) {
+                    fail("frame = subnet.recv()");
+                    e.printStackTrace();
+                }
+                
+            }
+            
+            private void processGet() {
+                try {
+                    Frame frame = subnet.recv();
+                    CommonFrame commonFrame = frame.getCommonFrame();
+                    StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+                    
+                    assertEquals(ESV.Get, payload.getESV());
+                    assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
+                    
+                    payload.setESV(ESV.Get_Res);
+                    payload.getFirstPropertyAt(0).setEDT(new Data((byte)0x31));
+
+                    transactionManager.process(subnet, frame, false);
+                } catch (SubnetException e) {
+                    fail("frame = subnet.recv()");
+                    e.printStackTrace();
+                }
+                
+            }
+
+            @Override
+            public void run() {
+                processSetC();
+                processGet();
+            }
+        };
+        
+        dummyPeer.start();
+
+        model.setValueAt("31", 0, 5);
+        
+        assertEquals(1, model.getValueAt(0, 4));
+        assertEquals(new ObjectData((byte)0x31), model.getValueAt(0, 5));
     }
 
     /**
@@ -181,14 +319,25 @@ public class ObjectTableModelTest {
      */
     @Test
     public void testIsCellEditable() {
-        System.out.println("isCellEditable");
-        int rowIndex = 0;
-        int columnIndex = 0;
-        ObjectTableModel instance = new ObjectTableModel();
-        boolean expResult = false;
-        boolean result = instance.isCellEditable(rowIndex, columnIndex);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ObjectTableModel model = new ObjectTableModel();
+        assertEquals(0, model.getRowCount());
+        
+        CachedRemoteObject cachedObject1 = new CachedRemoteObject(remoteObject1);
+        model.setCachedObject(cachedObject1);
+        model.stopRefreshCache();
+        
+        assertEquals(0, model.getRowCount());
+        
+        PropertyMap map = new PropertyMap();
+        cachedObject1.setCachedData(EPC.x9D, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x9E, new ObjectData(map.toBytes()));
+        map.set(EPC.x80);
+        cachedObject1.setCachedData(EPC.x9F, new ObjectData(map.toBytes()));
+        cachedObject1.setCachedData(EPC.x80, new ObjectData((byte)0x30));
+        
+        assertFalse(model.isCellEditable(0, 5));
+        
+        cachedObject1.setCachedData(EPC.x9E, new ObjectData(map.toBytes()));
+        assertTrue(model.isCellEditable(0, 5));
     }
 }

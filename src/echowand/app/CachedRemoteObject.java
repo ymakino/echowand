@@ -3,6 +3,8 @@ package echowand.app;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.PropertyMap;
+import echowand.net.Node;
+import echowand.net.Subnet;
 import echowand.object.*;
 import java.util.EnumMap;
 
@@ -142,6 +144,14 @@ public class CachedRemoteObject implements EchonetObject {
         return -1;
     }
 
+    public Subnet getSubnet() {
+        return remoteObject.getSubnet();
+    }
+    
+    public Node getNode() {
+        return remoteObject.getNode();
+    }
+    
     @Override
     public EOJ getEOJ() {
         return remoteObject.getEOJ();
@@ -165,5 +175,9 @@ public class CachedRemoteObject implements EchonetObject {
     
     public void removeObserver(RemoteObjectObserver observer) {
         remoteObject.removeObserver(observer);
+    }
+    
+    public int countObservers() {
+        return remoteObject.countObservers();
     }
 }
