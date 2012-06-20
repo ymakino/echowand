@@ -181,7 +181,7 @@ public class ObjectViewer implements Runnable {
         }
 
         IntervalDataUpdater updater1 = new IntervalDataUpdater(temperatureSensor, EPC.x80);
-        updater1.addData(new ObjectData((byte) 0x32), 1000);
+        updater1.addData(new ObjectData((byte) 0x30), 1000);
         updater1.addData(new ObjectData((byte) 0x31), 1000);
         updater1.start();
         
