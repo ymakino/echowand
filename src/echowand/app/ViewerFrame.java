@@ -73,7 +73,7 @@ public class ViewerFrame extends javax.swing.JFrame {
         
         objectList.addListSelectionListener(new ListSelectionListener() {
             
-            private void updateModelFor(Object object) {
+            private void updateModelWith(Object object) {
                 if (objectTable.getModel() != objectTableModel) {
                     objectTable.setModel(objectTableModel);
                     viewerMain.fixObjectTableColumnWidth(objectTable);
@@ -88,7 +88,7 @@ public class ViewerFrame extends javax.swing.JFrame {
                 objectTableModel.setCachedObject(cachedObject);
             }
 
-            private void updateModelForMultiple(Object[] objects) {
+            private void updateModelWithMultiple(Object[] objects) {
                 if (objectTable.getModel() != multipleObjectTableModel) {
                     objectTable.setModel(multipleObjectTableModel);
                     objectTableModel.setCachedObject(null);
@@ -106,13 +106,13 @@ public class ViewerFrame extends javax.swing.JFrame {
                 Object[] objects = objectList.getSelectedValues();
                 switch (objects.length) {
                     case 0:
-                        updateModelFor(null);
+                        updateModelWith(null);
                         break;
                     case 1:
-                        updateModelFor(objects[0]);
+                        updateModelWith(objects[0]);
                         break;
                     default:
-                        updateModelForMultiple(objects);
+                        updateModelWithMultiple(objects);
                         break;
                 }
             }
