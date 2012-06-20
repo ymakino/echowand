@@ -4,14 +4,9 @@ import echowand.net.Node;
 import echowand.net.SubnetException;
 import echowand.object.InstanceListRequestExecutor;
 import echowand.object.RemoteObject;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.LinkedList;
-import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -77,57 +72,51 @@ public class ViewerFrame extends javax.swing.JFrame {
         });
         
         objectList.addListSelectionListener(new ListSelectionListener() {
+            
+            private void updateModelFor(Object object) {
+                if (objectTable.getModel() != objectTableModel) {
+                    objectTable.setModel(objectTableModel);
+                    viewerMain.fixObjectTableColumnWidth(objectTable);
+                    multipleObjectTableModel.setCachedObjects(new LinkedList<CachedRemoteObject>());
+                }
+                
+                CachedRemoteObject cachedObject = null;
+                if (object != null) {
+                    cachedObject = new CachedRemoteObject((RemoteObject)object);
+                }
+                
+                objectTableModel.setCachedObject(cachedObject);
+            }
+
+            private void updateModelForMultiple(Object[] objects) {
+                if (objectTable.getModel() != multipleObjectTableModel) {
+                    objectTable.setModel(multipleObjectTableModel);
+                    objectTableModel.setCachedObject(null);
+                }
+                
+                LinkedList<CachedRemoteObject> cachedObjects = new LinkedList<CachedRemoteObject>();
+                for (int i = 0; i < objects.length; i++) {
+                    cachedObjects.add(new CachedRemoteObject((RemoteObject) objects[i]));
+                }
+                multipleObjectTableModel.setCachedObjects(cachedObjects);
+            }
+            
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 Object[] objects = objectList.getSelectedValues();
-                if (objects.length == 1) {
-                    if (objectTable.getModel() != objectTableModel) {
-                        objectTable.setModel(objectTableModel);
-                        viewerMain.fixObjectTableColumnWidth(objectTable);
-                        multipleObjectTableModel.setCachedObjects(new LinkedList<CachedRemoteObject>());
-                    }
-                    CachedRemoteObject cachedObject = new CachedRemoteObject((RemoteObject)objects[0]);
-                    objectTableModel.setCachedObject(cachedObject);
-                } else {
-                    if (objectTable.getModel() != multipleObjectTableModel) {
-                        objectTable.setModel(multipleObjectTableModel);
-                        objectTableModel.setCachedObject(null);
-                    }
-                    LinkedList<CachedRemoteObject> cachedObjects = new LinkedList<CachedRemoteObject>();
-                    for (int i=0; i<objects.length; i++) {
-                        cachedObjects.add(new CachedRemoteObject((RemoteObject)objects[i]));
-                    }
-                    multipleObjectTableModel.setCachedObjects(cachedObjects);
+                switch (objects.length) {
+                    case 0:
+                        updateModelFor(null);
+                        break;
+                    case 1:
+                        updateModelFor(objects[0]);
+                        break;
+                    default:
+                        updateModelForMultiple(objects);
+                        break;
                 }
             }
         });
-        
-        KeyListener objectTableKeyListener = new KeyAdapter() {
-
-            @Override
-            public void keyTyped(KeyEvent ke) {
-                int row = objectTable.getSelectedRow();
-                if (objectTable.editCellAt(row, 5)) {
-                    JTextField editingField = (JTextField) objectTable.getEditorComponent();
-                    editingField.requestFocus();
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent ke) {
-                if (objectTable.isEditing()) {
-                    return;
-                }
-                
-                int keyCode = ke.getKeyCode();
-                if (keyCode == KeyEvent.VK_DELETE || keyCode == KeyEvent.VK_BACK_SPACE) {
-                    int row = objectTable.getSelectedRow();
-                    objectTable.editCellAt(row, 5);
-                    objectTable.getEditorComponent().requestFocus();
-                }
-            }
-        };
-        objectTable.addKeyListener(objectTableKeyListener);
         
         updateNodeListModel();
         

@@ -2,6 +2,7 @@ package echowand.app;
 
 import echowand.common.EOJ;
 import echowand.common.EPC;
+import echowand.object.EchonetObjectException;
 import echowand.object.ObjectData;
 import java.util.LinkedList;
 
@@ -131,8 +132,8 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
 
     @Override
-    public Class getColumnClass(int column) {
-        if (column == 0) {
+    public Class getColumnClass(int columnIndex) {
+        if (columnIndex == 0) {
             return EPC.class;
         } else {
             return ObjectData.class;
@@ -140,11 +141,11 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
     
     @Override
-    public String getColumnName(int column) {
-        if (column == 0) {
+    public String getColumnName(int columnIndex) {
+        if (columnIndex == 0) {
             return "EPC";
         }
-        return getTupleList().get(column - 1).getCachedObject().getEOJ().toString();
+        return getTupleList().get(columnIndex - 1).getCachedObject().getEOJ().toString();
     }
     
     private boolean isValidEPC(EPC epc) {
@@ -188,20 +189,34 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         }
         return indexCount;
     }
+    
+    private CachedRemoteObject index2object(int index) {
+        
+        LinkedList<MultipleObjectTableModelTuple> list = getTupleList();
+        
+        if (index < 0 || list.size() <= index) {
+            return null;
+        }
+        
+        return list.get(index).getCachedObject();
+    }
 
     @Override
-    public Object getValueAt(int row, int column) {
-        EPC epc = index2epc(row);
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        EPC epc = index2epc(rowIndex);
         
         if (epc.isInvalid()) {
             return null;
         }
         
-        if (column == 0) {
+        if (columnIndex == 0) {
             return epc;
         }
         
-        CachedRemoteObject object = getTupleList().get(column - 1).getCachedObject();
+        CachedRemoteObject object = index2object(columnIndex - 1);
+        if (object == null) {
+            return null;
+        }
         
         if (!object.isValidEPC(epc)) {
             return "-";
@@ -216,14 +231,59 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
     
     @Override
+    public synchronized void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        
+        CachedRemoteObject cachedObject = index2object(columnIndex - 1);
+        if (cachedObject == null) {
+            return;
+        }
+        
+        EPC epc = cachedObject.getEPC(rowIndex);
+        
+        if (epc.isInvalid()) {
+            return;
+        }
+        
+        byte[] newBytes = string2Bytes((String)aValue);
+        if (newBytes == null) {
+            return;
+        }
+        
+        try {
+            cachedObject.setData(epc, new ObjectData(newBytes));
+            cachedObject.updateCache(epc);
+            fireEPCDataUpdated(epc, cachedObject);
+        } catch (EchonetObjectException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public synchronized boolean isCellEditable(int rowIndex, int columnIndex) {
+        
+        CachedRemoteObject cachedObject = index2object(columnIndex - 1);
+        if (cachedObject == null) {
+            return false;
+        }
+        
+        EPC epc = index2epc(rowIndex);
+        
+        if (epc.isInvalid()) {
+            return false;
+        }
+        
+        return cachedObject.isSettable(epc);
+    }
+    
+    @Override
     public void fireEPCDataUpdated(EPC epc, CachedRemoteObject updatedObject) {
-        int row = epc2index(epc);
+        int rowIndex = epc2index(epc);
         EOJ updatedEOJ = updatedObject.getEOJ();
         
         for (int i = 0; i < getTupleList().size(); i++) {
             if (updatedEOJ.equals(getTupleList().get(i).getCachedObject().getEOJ())) {
-                int column = i + 1;
-                this.fireTableCellUpdated(row, column);
+                int columnIndex = i + 1;
+                this.fireTableCellUpdated(rowIndex, columnIndex);
             }
         }
     }

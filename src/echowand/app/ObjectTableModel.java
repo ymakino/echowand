@@ -233,32 +233,6 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         return null;
     }
     
-    private byte[] string2Bytes(String str) {
-        if (str.startsWith("0x") || str.startsWith("0X")) {
-            str = str.substring(2);
-        }
-        
-        if (str.isEmpty() || (str.length() % 2) == 1) {
-            return null;
-        }
-
-        try {
-            int size = str.length() / 2;
-            byte[] ret = new byte[size];
-            for (int i = 0; i < size; i++) {
-                int baseIndex = i * 2;
-                String c1 = str.substring(baseIndex, baseIndex + 1);
-                String c2 = str.substring(baseIndex + 1, baseIndex + 2);
-
-                ret[i] = (byte) (Integer.parseInt(c1, 16) * 16 + Integer.parseInt(c2, 16));
-            }
-
-            return ret;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-    
     @Override
     public synchronized void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if (columnIndex != ColumnKind.DATA.getIndex()) {
