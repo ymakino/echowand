@@ -89,16 +89,16 @@ public class ViewerFrame extends javax.swing.JFrame {
             }
 
             private void updateModelWithMultiple(Object[] objects) {
-                if (objectTable.getModel() != multipleObjectTableModel) {
-                    objectTable.setModel(multipleObjectTableModel);
-                    objectTableModel.setCachedObject(null);
-                }
-                
                 LinkedList<CachedRemoteObject> cachedObjects = new LinkedList<CachedRemoteObject>();
                 for (int i = 0; i < objects.length; i++) {
                     cachedObjects.add(new CachedRemoteObject((RemoteObject) objects[i]));
                 }
                 multipleObjectTableModel.setCachedObjects(cachedObjects);
+                
+                if (objectTable.getModel() != multipleObjectTableModel) {
+                    objectTable.setModel(multipleObjectTableModel);
+                    objectTableModel.setCachedObject(null);
+                }
             }
             
             @Override

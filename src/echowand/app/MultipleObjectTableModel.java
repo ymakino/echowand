@@ -4,6 +4,7 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.object.EchonetObjectException;
 import echowand.object.ObjectData;
+import echowand.util.Pair;
 import java.util.LinkedList;
 
 class MultipleObjectTableModelRefreshThread extends CachedRemoteObjectRefreshThread {
@@ -14,18 +15,11 @@ class MultipleObjectTableModelRefreshThread extends CachedRemoteObjectRefreshThr
         super(cahcedObject);
         this.model = model;
     }
-    
-    @Override
-    public void notifyPropertyMapChanged() {
-        if (!isInvalid()) {
-            model.fireTableDataChanged();
-        }
-    }
 
     @Override
-    public void notifyPropertyDataChanged(EPC epc) {
+    public void notifyPropertyDataChanged() {
         if (!isInvalid()) {
-            model.fireEPCDataUpdated(epc, getCachedObject());
+            model.fireTableDataChanged();
         }
     }
 }
@@ -76,26 +70,41 @@ class MultipleObjectTableModelTuple {
  */
 public class MultipleObjectTableModel extends AbstractObjectTableModel{
     private LinkedList<MultipleObjectTableModelTuple> tupleList = new LinkedList<MultipleObjectTableModelTuple>();
-
-    private synchronized LinkedList<MultipleObjectTableModelTuple> getTupleList() {
-        return new LinkedList<MultipleObjectTableModelTuple>(tupleList);
-    }
     
     @Override
-    public void refreshCache() {
-        for (MultipleObjectTableModelTuple t: getTupleList()) {
+    public synchronized void refreshCache() {
+        for (MultipleObjectTableModelTuple t: tupleList) {
             t.refreshCache();
         }
     }
     
-    public void stopRefreshCache() {
-        for (MultipleObjectTableModelTuple t: getTupleList()) {
+    public synchronized void stopRefreshCache() {
+        for (MultipleObjectTableModelTuple t: tupleList) {
             t.stopRefreshCache();
         }
     }
     
-    
+    private boolean isSameWithCurrentList(LinkedList<CachedRemoteObject> objects) {
+        if (objects.size() != tupleList.size()) {
+            return false;
+        }
+        int size = objects.size();
+        for (int i = 0; i < size; i++) {
+            CachedRemoteObject newObject = objects.get(i);
+            CachedRemoteObject oldObject = tupleList.get(i).getCachedObject();
+            if (!newObject.equals(oldObject)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     public synchronized void setCachedObjects(LinkedList<CachedRemoteObject> objects) {
+        if (isSameWithCurrentList(objects)) {
+            return;
+        }
+        
         for (MultipleObjectTableModelTuple t : tupleList) {
             t.release();
         }
@@ -127,8 +136,8 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
 
     @Override
-    public int getColumnCount() {
-        return getTupleList().size() + 1;
+    public synchronized int getColumnCount() {
+        return tupleList.size() + 1;
     }
 
     @Override
@@ -141,15 +150,17 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
     
     @Override
-    public String getColumnName(int columnIndex) {
+    public synchronized String getColumnName(int columnIndex) {
         if (columnIndex == 0) {
             return "EPC";
         }
-        return getTupleList().get(columnIndex - 1).getCachedObject().getEOJ().toString();
+        
+        int index = columnIndex - 1;
+        return tupleList.get(index).getCachedObject().getEOJ().toString();
     }
     
-    private boolean isValidEPC(EPC epc) {
-        for (MultipleObjectTableModelTuple t : getTupleList()) {
+    private synchronized boolean isValidEPC(EPC epc) {
+        for (MultipleObjectTableModelTuple t : tupleList) {
             CachedRemoteObject object = t.getCachedObject();
             if (object.isValidEPC(epc)) {
                 return true;
@@ -159,13 +170,20 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         return false;
     }
 
+    private Pair<Integer, EPC> index2epcCache = null;
+    
     private EPC index2epc(int index) {
+        if (index2epcCache != null && index2epcCache.first == index) {
+            return index2epcCache.second;
+        }
+        
         int indexCount = 0;
         
         for (int code = 0x80; code <= 0xff; code++) {
             EPC epc = EPC.fromByte((byte) code);
             if (isValidEPC(epc)) {
                 if (index == indexCount) {
+                    index2epcCache = new Pair<Integer, EPC>(index, epc);
                     return epc;
                 }
                 indexCount++;
@@ -190,15 +208,13 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         return indexCount;
     }
     
-    private CachedRemoteObject index2object(int index) {
+    private synchronized CachedRemoteObject index2object(int index) {
         
-        LinkedList<MultipleObjectTableModelTuple> list = getTupleList();
-        
-        if (index < 0 || list.size() <= index) {
+        if (index < 0 || tupleList.size() <= index) {
             return null;
         }
         
-        return list.get(index).getCachedObject();
+        return tupleList.get(index).getCachedObject();
     }
 
     @Override
@@ -226,12 +242,11 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
             return null;
         }
         
-        
         return object.getData(epc);
     }
     
     @Override
-    public synchronized void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         
         CachedRemoteObject cachedObject = index2object(columnIndex - 1);
         if (cachedObject == null) {
@@ -259,7 +274,7 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
     
     @Override
-    public synchronized boolean isCellEditable(int rowIndex, int columnIndex) {
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
         
         CachedRemoteObject cachedObject = index2object(columnIndex - 1);
         if (cachedObject == null) {
@@ -275,21 +290,23 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         return cachedObject.isSettable(epc);
     }
     
+    private synchronized LinkedList<MultipleObjectTableModelTuple> cloneTupleList() {
+        return new LinkedList<MultipleObjectTableModelTuple>(tupleList);
+    }
+    
     @Override
     public void fireEPCDataUpdated(EPC epc, CachedRemoteObject updatedObject) {
         int rowIndex = epc2index(epc);
         EOJ updatedEOJ = updatedObject.getEOJ();
         
-        for (int i = 0; i < getTupleList().size(); i++) {
-            if (updatedEOJ.equals(getTupleList().get(i).getCachedObject().getEOJ())) {
+        
+        LinkedList<MultipleObjectTableModelTuple> currentList = cloneTupleList();
+        int size = currentList.size();
+        for (int i = 0; i < size; i++) {
+            if (updatedEOJ.equals(currentList.get(i).getCachedObject().getEOJ())) {
                 int columnIndex = i + 1;
                 this.fireTableCellUpdated(rowIndex, columnIndex);
             }
         }
-    }
-
-    @Override
-    public void fireTableDataChanged() {
-        super.fireTableDataChanged();
     }
 }

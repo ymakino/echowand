@@ -21,9 +21,22 @@ public class ObjectTableModelNotifyObserver implements RemoteObjectObserver {
         this.cachedObject = cachedObject;
     }
 
+    private boolean equalsObject(Object o1, Object o2) {
+        if (o1 == null || o2 == null) {
+            return o1 == null && o2 == null;
+        }
+        
+        return o1.equals(o2);
+    }
+    
     @Override
     public void notifyData(RemoteObject object, EPC epc, ObjectData data) {
         if (cachedObject != null) {
+            ObjectData lastData = cachedObject.getData(epc);
+            if (equalsObject(lastData, data)) {
+                return;
+            }
+            
             cachedObject.setCachedData(epc, data);
             model.fireEPCDataUpdated(epc, cachedObject);
         }

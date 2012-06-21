@@ -90,10 +90,6 @@ public class CachedRemoteObject implements EchonetObject {
 
     @Override
     public ObjectData getData(EPC epc) {
-        if (!isCached(epc)) {
-            return null;
-        }
-
         return dataCache.get(epc);
     }
 
@@ -179,5 +175,19 @@ public class CachedRemoteObject implements EchonetObject {
     
     public int countObservers() {
         return remoteObject.countObservers();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        
+        if (o instanceof CachedRemoteObject) {
+            CachedRemoteObject other = (CachedRemoteObject)o;
+            return remoteObject.equals(other.remoteObject);
+        }
+
+        return false;
     }
 }

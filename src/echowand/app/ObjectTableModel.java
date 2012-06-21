@@ -63,16 +63,9 @@ class ObjectTableModelRefreshThread extends CachedRemoteObjectRefreshThread {
     }
 
     @Override
-    public void notifyPropertyMapChanged() {
+    public void notifyPropertyDataChanged() {
         if (!isInvalid()) {
             model.fireTableDataChanged();
-        }
-    }
-
-    @Override
-    public void notifyPropertyDataChanged(EPC epc) {
-        if (!isInvalid()) {
-            model.fireEPCDataUpdated(epc, getCachedObject());
         }
     }
 }
@@ -89,7 +82,7 @@ public class ObjectTableModel extends AbstractObjectTableModel {
     private ReadableConverterMap converterMap = new ReadableConverterMap();
 
     @Override
-    public void refreshCache() {
+    public synchronized void refreshCache() {
         stopRefreshCache();
         cachedObject.clearCache();
         observer.setCachedObject(cachedObject);
@@ -115,10 +108,14 @@ public class ObjectTableModel extends AbstractObjectTableModel {
     public CachedRemoteObject getCachedObject() {
         return cachedObject;
     }
-
-    public synchronized void setCachedObject(CachedRemoteObject cachedObject) {
+    
+    private synchronized boolean setCachedObjectWithoutRefresh(CachedRemoteObject cachedObject) {
         if (this.cachedObject == cachedObject) {
-            return;
+            return false;
+        }
+
+        if (this.cachedObject != null && this.cachedObject.equals(cachedObject)) {
+            return false;
         }
         
         if (this.cachedObject != null) {
@@ -126,27 +123,43 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         }
         
         this.cachedObject = cachedObject;
+        
+        if (this.cachedObject != null) {
+            this.cachedObject.addObserver(observer);
+        }
+        
+        return true;
+    }
 
-        if (cachedObject == null) {
+    public void setCachedObject(CachedRemoteObject cachedObject) {
+        if (!setCachedObjectWithoutRefresh(cachedObject)) {
+            return;
+        }
+
+        if (cachedObject != null) {
+            refreshCache();
+        } else {
             stopRefreshCache();
             fireTableDataChanged();
-        } else {
-            this.cachedObject.addObserver(observer);
-            refreshCache();
         }
     }
     
-    @Override
-    public synchronized void fireEPCDataUpdated(EPC epc, CachedRemoteObject updatedObject) {
+    private synchronized int getIndexOfEPC(EPC epc, CachedRemoteObject updatedObject) {
         if (cachedObject == null) {
-            return;
+            return -1;
         }
         
         if (!cachedObject.getEOJ().equals(updatedObject.getEOJ())) {
-            return;
+            return -1;
         }
         
-        int index = cachedObject.getIndexOfEPC(epc);
+        return cachedObject.getIndexOfEPC(epc);
+    }
+    
+    @Override
+    public void fireEPCDataUpdated(EPC epc, CachedRemoteObject updatedObject) {
+
+        int index = getIndexOfEPC(epc, updatedObject);
         if (index >= 0) {
             fireTableCellUpdated(index, ColumnKind.SIZE.getIndex());
             fireTableCellUpdated(index, ColumnKind.DATA.getIndex());
@@ -154,17 +167,19 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         }
     }
     
-    public synchronized void release() {
+    public void release() {
         setCachedObject(null);
     }
 
     @Override
-    public synchronized int getRowCount() {
-        if (cachedObject == null) {
+    public int getRowCount() {
+        CachedRemoteObject currentCachedObject = getCachedObject();
+        
+        if (currentCachedObject == null) {
             return 0;
         }
         
-        return cachedObject.size();
+        return currentCachedObject.size();
     }
 
     @Override
@@ -205,41 +220,45 @@ public class ObjectTableModel extends AbstractObjectTableModel {
     }
     
     @Override
-    public synchronized Object getValueAt(int rowIndex, int columnIndex) {
-        if (cachedObject == null || !cachedObject.isPropertyMapsCached()) {
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        CachedRemoteObject currentCachedObject = getCachedObject();
+        
+        if (currentCachedObject == null || !currentCachedObject.isPropertyMapsCached()) {
             return null;
         }
         
-        EPC epc = cachedObject.getEPC(rowIndex);
+        EPC epc = currentCachedObject.getEPC(rowIndex);
         
         ColumnKind kind = ColumnKind.valueOf(columnIndex);
         
         switch (kind) {
             case EPC: return epc;
-            case GET: return cachedObject.isGettable(epc);
-            case SET: return cachedObject.isSettable(epc);
-            case ANNO: return cachedObject.isObservable(epc);
+            case GET: return currentCachedObject.isGettable(epc);
+            case SET: return currentCachedObject.isSettable(epc);
+            case ANNO: return currentCachedObject.isObservable(epc);
             case SIZE:
-                ObjectData data = cachedObject.getData(epc);
+                ObjectData data = currentCachedObject.getData(epc);
                 if (data != null) {
                     return data.size();
                 } else {
                     return null;
                 }
-            case DATA: return cachedObject.getData(epc);
-            case FORMATTED: return getReadableString(cachedObject, epc);
+            case DATA: return currentCachedObject.getData(epc);
+            case FORMATTED: return getReadableString(currentCachedObject, epc);
         }
 
         return null;
     }
     
     @Override
-    public synchronized void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        CachedRemoteObject currentCachedObject = getCachedObject();
+        
         if (columnIndex != ColumnKind.DATA.getIndex()) {
             return;
         }
         
-        EPC epc = cachedObject.getEPC(rowIndex);
+        EPC epc = currentCachedObject.getEPC(rowIndex);
         
         if (epc.isInvalid()) {
             return;
@@ -251,26 +270,28 @@ public class ObjectTableModel extends AbstractObjectTableModel {
         }
         
         try {
-            cachedObject.setData(epc, new ObjectData(newBytes));
-            cachedObject.updateCache(epc);
-            fireEPCDataUpdated(epc, cachedObject);
+            currentCachedObject.setData(epc, new ObjectData(newBytes));
+            currentCachedObject.updateCache(epc);
+            fireEPCDataUpdated(epc, currentCachedObject);
         } catch (EchonetObjectException e) {
             e.printStackTrace();
         }
     }
     
     @Override
-    public synchronized boolean isCellEditable(int rowIndex, int columnIndex) {
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        CachedRemoteObject currentCachedObject = getCachedObject();
+        
         if (columnIndex != ColumnKind.DATA.getIndex()) {
             return false;
         }
         
-        EPC epc = cachedObject.getEPC(rowIndex);
+        EPC epc = currentCachedObject.getEPC(rowIndex);
         
         if (epc.isInvalid()) {
             return false;
         }
         
-        return cachedObject.isSettable(epc);
+        return currentCachedObject.isSettable(epc);
     }
 }

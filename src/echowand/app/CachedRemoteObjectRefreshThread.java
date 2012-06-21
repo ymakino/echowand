@@ -33,10 +33,7 @@ public class CachedRemoteObjectRefreshThread extends Thread {
         return !valid;
     }
 
-    public synchronized void notifyPropertyMapChanged() {
-    }
-
-    public synchronized void notifyPropertyDataChanged(EPC epc) {
+    public synchronized void notifyPropertyDataChanged() {
     }
 
     private boolean updateCacheOfEPC(EPC epc) {
@@ -46,10 +43,7 @@ public class CachedRemoteObjectRefreshThread extends Thread {
         
         try {
             if (cachedObject.isGettable(epc)) {
-                if (cachedObject.updateCache(epc)) {
-                    notifyPropertyDataChanged(epc);
-                    return true;
-                }
+                return cachedObject.updateCache(epc);
             } else if (cachedObject.isObservable(epc)) {
                 cachedObject.observeData(epc);
                 return true;
@@ -67,12 +61,16 @@ public class CachedRemoteObjectRefreshThread extends Thread {
 
         try {
             cachedObject.updatePropertyMapsCache();
-            notifyPropertyMapChanged();
-
+            
             int size = cachedObject.size();
             for (int i = 0; valid && i < size; i++) {
                 success &= updateCacheOfEPC(cachedObject.getEPC(i));
             }
+            
+            if (valid) {
+                notifyPropertyDataChanged();
+            }
+            
         } catch (EchonetObjectException e) {
             e.printStackTrace();
             success = false;
