@@ -99,6 +99,8 @@ public class ViewerFrame extends javax.swing.JFrame {
                     objectTable.setModel(multipleObjectTableModel);
                     objectTableModel.setCachedObject(null);
                 }
+                
+                viewerMain.fixMultipleObjectTableColumnWidth(objectTable);
             }
             
             @Override
@@ -146,13 +148,14 @@ public class ViewerFrame extends javax.swing.JFrame {
                 e.printStackTrace();
             }
 
-            if (valid) {
-                nodeListModel.updateNodes();
-            }
-            
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
                 @Override
                 public void run() {
+                    if (valid) {
+                        nodeListModel.updateNodes();
+                    }
+                    
                     nodeList.setSelectedIndex(0);
                 }
             });

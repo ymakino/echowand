@@ -4,7 +4,7 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.object.EchonetObjectException;
 import echowand.object.ObjectData;
-import echowand.util.Pair;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 class MultipleObjectTableModelRefreshThread extends CachedRemoteObjectRefreshThread {
@@ -122,17 +122,8 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
     }
 
     @Override
-    public int getRowCount() {
-        int rowCount = 0;
-        
-        for (int code = 0x80; code <= 0xff; code++) {
-            EPC epc = EPC.fromByte((byte) code);
-            if (isValidEPC(epc)) {
-                rowCount++;
-            }
-        }
-        
-        return rowCount;
+    public synchronized int getRowCount() {
+        return countValidEPC();
     }
 
     @Override
@@ -158,6 +149,35 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         int index = columnIndex - 1;
         return tupleList.get(index).getCachedObject().getEOJ().toString();
     }
+
+    private boolean indexCachedUpdated = false;
+    private HashMap<Integer, EPC> index2epcCache = new HashMap<Integer, EPC>();
+    private HashMap<EPC, Integer> epc2indexCache = new HashMap<EPC, Integer>();
+    private int rowCountCache = 0;
+    
+    private synchronized void clearIndexCache() {
+        indexCachedUpdated = false;
+        index2epcCache.clear();
+        epc2indexCache.clear();
+    }
+
+    private synchronized void updateIndexCache() {
+        int indexCount = 0;
+
+        for (int code = 0x80; code <= 0xff; code++) {
+            EPC epc = EPC.fromByte((byte) code);
+            if (isValidEPC(epc)) {
+                index2epcCache.put(indexCount, epc);
+                epc2indexCache.put(epc, indexCount);
+                indexCount++;
+            } else {
+                epc2indexCache.put(epc, indexCount);
+            }
+        }
+        
+        rowCountCache = indexCount;
+        indexCachedUpdated = true;
+    }
     
     private synchronized boolean isValidEPC(EPC epc) {
         for (MultipleObjectTableModelTuple t : tupleList) {
@@ -169,43 +189,40 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
         
         return false;
     }
-
-    private Pair<Integer, EPC> index2epcCache = null;
     
-    private EPC index2epc(int index) {
-        if (index2epcCache != null && index2epcCache.first == index) {
-            return index2epcCache.second;
+    private synchronized EPC index2epc(int index) {
+        if (!indexCachedUpdated) {
+            updateIndexCache();
         }
         
-        int indexCount = 0;
+        EPC cachedEPC = index2epcCache.get(index);
         
-        for (int code = 0x80; code <= 0xff; code++) {
-            EPC epc = EPC.fromByte((byte) code);
-            if (isValidEPC(epc)) {
-                if (index == indexCount) {
-                    index2epcCache = new Pair<Integer, EPC>(index, epc);
-                    return epc;
-                }
-                indexCount++;
-            }
+        if (cachedEPC == null) {
+            return EPC.Invalid;
         }
-
-        return EPC.Invalid;
+        
+        return cachedEPC;
     }
 
-    private int epc2index(EPC epc) {
-        int indexCount = 0;
-        
-        for (int code = 0x80; code <= 0xff; code++) {
-            EPC cur = EPC.fromByte((byte) code);
-            if (isValidEPC(cur)) {
-                if (epc == cur) {
-                    return indexCount;
-                }
-                indexCount++;
-            }
+    private synchronized int epc2index(EPC epc) {
+        if (!indexCachedUpdated) {
+            updateIndexCache();
         }
-        return indexCount;
+        Integer cachedIndex = epc2indexCache.get(epc);
+        
+        if (cachedIndex == null) {
+            return -1;
+        }
+        
+        return cachedIndex;
+    }
+    
+    private synchronized int countValidEPC() {
+        if (!indexCachedUpdated) {
+            updateIndexCache();
+        }
+        
+        return index2epcCache.size();
     }
     
     private synchronized CachedRemoteObject index2object(int index) {
@@ -308,5 +325,11 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
                 this.fireTableCellUpdated(rowIndex, columnIndex);
             }
         }
+    }
+    
+    @Override
+    public void fireTableDataChanged() {
+        clearIndexCache();
+        super.fireTableDataChanged();
     }
 }

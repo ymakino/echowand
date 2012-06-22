@@ -7,6 +7,7 @@ import echowand.net.Node;
 import echowand.net.Subnet;
 import echowand.object.*;
 import java.util.EnumMap;
+import java.util.HashMap;
 
 /**
  *
@@ -93,7 +94,15 @@ public class CachedRemoteObject implements EchonetObject {
         return dataCache.get(epc);
     }
 
-    public int size() {
+    private int sizeCache = -1;
+    private HashMap<Integer, EPC> indexEPCCache = new HashMap<Integer, EPC>();
+    
+    public synchronized int size() {
+        
+        if (sizeCache != -1) {
+            return sizeCache;
+        }
+        
         if (!isPropertyMapsCached()) {
             return 0;
         }
@@ -107,25 +116,48 @@ public class CachedRemoteObject implements EchonetObject {
             }
         }
 
+        sizeCache = count;
+        
         return count;
     }
-
-    public EPC getEPC(int index) {
-        if (!isPropertyMapsCached()) {
-            return null;
-        }
-
+    
+    private synchronized boolean updateIndexEPCCache() {
         int count = 0;
+        
+        if (!isPropertyMapsCached()) {
+            return false;
+        }
+        
         for (byte code = (byte) 0x80; code <= (byte) 0xff; code++) {
             EPC epc = EPC.fromByte(code);
             if (isValidEPC(epc)) {
-                if (index == count) {
-                    return epc;
-                }
+                indexEPCCache.put(count, epc);
                 count++;
             }
         }
-        return EPC.Invalid;
+        
+        return true;
+    }
+
+    public synchronized EPC getEPC(int index) {
+        
+        EPC cachedEPC = indexEPCCache.get(index);
+        
+        if (cachedEPC != null) {
+            return cachedEPC;
+        }
+        
+        if (!updateIndexEPCCache()) {
+            return null;
+        }
+        
+        cachedEPC = indexEPCCache.get(index);
+        if (cachedEPC == null) {
+            indexEPCCache.put(index, EPC.Invalid);
+            cachedEPC = EPC.Invalid;
+        }
+
+        return cachedEPC;
     }
 
     public int getIndexOfEPC(EPC epc) {
