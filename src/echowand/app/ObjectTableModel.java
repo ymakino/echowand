@@ -84,7 +84,9 @@ public class ObjectTableModel extends AbstractObjectTableModel {
     @Override
     public synchronized void refreshCache() {
         stopRefreshCache();
-        cachedObject.clearCache();
+        if (cachedObject != null) {
+            cachedObject.clearCache();
+        }
         observer.setCachedObject(cachedObject);
         refreshCacheThread = new ObjectTableModelRefreshThread(this, cachedObject);
         refreshCacheThread.start();

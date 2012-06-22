@@ -60,6 +60,10 @@ public class CachedRemoteObjectRefreshThread extends Thread {
         boolean success = true;
 
         try {
+            if (cachedObject == null) {
+                return true;
+            }
+            
             cachedObject.updatePropertyMapsCache();
             
             int size = cachedObject.size();
