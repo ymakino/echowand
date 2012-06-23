@@ -82,8 +82,10 @@ public class NodeProfileObjectListener implements TransactionListener {
         
         LinkedList<EOJ> eojs = parseInstanceListS(property);
         for (EOJ eoj : eojs) {
-            RemoteObject object = new RemoteObject(subnet, node, eoj, transactionManager);
-            manager.add(object);
+            if (manager.get(node, eoj) == null) {
+                RemoteObject object = new RemoteObject(subnet, node, eoj, transactionManager);
+                manager.add(object);
+            }
         }
         
         logger.exiting(className, "addRemoteObjects");
@@ -104,7 +106,9 @@ public class NodeProfileObjectListener implements TransactionListener {
         CommonFrame cf = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload) cf.getEDATA();
         
-        manager.add(new RemoteObject(subnet, frame.getSender(), new EOJ("0ef001"), transactionManager));
+        if (manager.get(frame.getSender(), new EOJ("0ef001")) == null) {
+            manager.add(new RemoteObject(subnet, frame.getSender(), new EOJ("0ef001"), transactionManager));
+        }
         
         int len = payload.getFirstOPC();
         for (int i = 0; i < len; i++) {
