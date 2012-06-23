@@ -5,8 +5,11 @@ import echowand.net.SubnetException;
 import echowand.object.InstanceListRequestExecutor;
 import echowand.object.RemoteObject;
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -120,8 +123,6 @@ public class ViewerFrame extends javax.swing.JFrame {
             }
         });
         
-        updateNodeListModel();
-        
         viewerMain.fixObjectTableColumnWidth(objectTable);
         
         viewerMain.setObjectTableRenderer(objectTable);
@@ -138,27 +139,32 @@ public class ViewerFrame extends javax.swing.JFrame {
 
         @Override
         public void run() {
-            InstanceListRequestExecutor updater = viewerMain.createInstanceListRequestExecutor();
+            while (valid) {
+                InstanceListRequestExecutor updater = viewerMain.createInstanceListRequestExecutor();
 
-            try {
-                updater.executeAndJoin();
-            } catch (SubnetException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (valid) {
-                        nodeListModel.updateNodes();
-                    }
-                    
-                    nodeList.setSelectedIndex(0);
+                try {
+                    updater.executeAndJoin();
+                } catch (SubnetException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            });
+
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        nodeListModel.updateNodes();
+                        objectListModel.updateObjects();
+                    }
+                });
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ViewerFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
     
@@ -190,25 +196,14 @@ public class ViewerFrame extends javax.swing.JFrame {
         objectList = new javax.swing.JList();
         jScrollPane3 = new javax.swing.JScrollPane();
         objectTable = new javax.swing.JTable();
-        reloadButton = new javax.swing.JButton();
-        menuBar = new javax.swing.JMenuBar();
-        fileMenu = new javax.swing.JMenu();
-        reloadMenuItem = new javax.swing.JMenuItem();
-        openMenuItem = new javax.swing.JMenuItem();
-        saveMenuItem = new javax.swing.JMenuItem();
-        saveAsMenuItem = new javax.swing.JMenuItem();
-        exitMenuItem = new javax.swing.JMenuItem();
-        editMenu = new javax.swing.JMenu();
-        cutMenuItem = new javax.swing.JMenuItem();
-        copyMenuItem = new javax.swing.JMenuItem();
-        pasteMenuItem = new javax.swing.JMenuItem();
-        deleteMenuItem = new javax.swing.JMenuItem();
-        helpMenu = new javax.swing.JMenu();
-        contentsMenuItem = new javax.swing.JMenuItem();
-        aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ECHONET Object Viewer");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
@@ -255,117 +250,28 @@ public class ViewerFrame extends javax.swing.JFrame {
                 objectTableFocusGained(evt);
             }
         });
+        objectTable.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                objectTableKeyPressed(evt);
+            }
+        });
         jScrollPane3.setViewportView(objectTable);
 
         jSplitPane1.setRightComponent(jScrollPane3);
-
-        reloadButton.setText("Reload");
-        reloadButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reloadButtonActionPerformed(evt);
-            }
-        });
-
-        fileMenu.setMnemonic('f');
-        fileMenu.setText("File");
-
-        reloadMenuItem.setText("Reload");
-        reloadMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reloadMenuItemActionPerformed(evt);
-            }
-        });
-        fileMenu.add(reloadMenuItem);
-
-        openMenuItem.setMnemonic('o');
-        openMenuItem.setText("Open");
-        fileMenu.add(openMenuItem);
-
-        saveMenuItem.setMnemonic('s');
-        saveMenuItem.setText("Save");
-        fileMenu.add(saveMenuItem);
-
-        saveAsMenuItem.setMnemonic('a');
-        saveAsMenuItem.setText("Save As ...");
-        saveAsMenuItem.setDisplayedMnemonicIndex(5);
-        fileMenu.add(saveAsMenuItem);
-
-        exitMenuItem.setMnemonic('x');
-        exitMenuItem.setText("Exit");
-        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitMenuItemActionPerformed(evt);
-            }
-        });
-        fileMenu.add(exitMenuItem);
-
-        menuBar.add(fileMenu);
-
-        editMenu.setMnemonic('e');
-        editMenu.setText("Edit");
-
-        cutMenuItem.setMnemonic('t');
-        cutMenuItem.setText("Cut");
-        editMenu.add(cutMenuItem);
-
-        copyMenuItem.setMnemonic('y');
-        copyMenuItem.setText("Copy");
-        editMenu.add(copyMenuItem);
-
-        pasteMenuItem.setMnemonic('p');
-        pasteMenuItem.setText("Paste");
-        editMenu.add(pasteMenuItem);
-
-        deleteMenuItem.setMnemonic('d');
-        deleteMenuItem.setText("Delete");
-        editMenu.add(deleteMenuItem);
-
-        menuBar.add(editMenu);
-
-        helpMenu.setMnemonic('h');
-        helpMenu.setText("Help");
-
-        contentsMenuItem.setMnemonic('c');
-        contentsMenuItem.setText("Contents");
-        helpMenu.add(contentsMenuItem);
-
-        aboutMenuItem.setMnemonic('a');
-        aboutMenuItem.setText("About");
-        helpMenu.add(aboutMenuItem);
-
-        menuBar.add(helpMenu);
-
-        setJMenuBar(menuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(reloadButton)
-                .addContainerGap())
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reloadButton)
-                .addContainerGap())
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-        System.exit(0);
-    }//GEN-LAST:event_exitMenuItemActionPerformed
-
-    private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadMenuItemActionPerformed
-        updateNodeListModel();
-    }//GEN-LAST:event_reloadMenuItemActionPerformed
 
     private void mouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mouseClicked
         if (evt.getComponent() == objectList) {
@@ -376,11 +282,6 @@ public class ViewerFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_mouseClicked
-
-    private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
-        AbstractObjectTableModel tableModel = (AbstractObjectTableModel)objectTable.getModel();
-        tableModel.refreshCache();
-    }//GEN-LAST:event_reloadButtonActionPerformed
 
     private void nodeListFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nodeListFocusGained
         if (nodeList.getSelectedIndex() == -1) {
@@ -400,30 +301,28 @@ public class ViewerFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_objectTableFocusGained
 
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        if (updateNodeListModelThread == null) {
+            updateNodeListModelThread = new UpdateNodeListModelThread();
+            updateNodeListModelThread.start();
+        }
+    }//GEN-LAST:event_formWindowActivated
+
+    private void objectTableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_objectTableKeyPressed
+        if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_R) {
+            AbstractObjectTableModel tableModel = (AbstractObjectTableModel) objectTable.getModel();
+            tableModel.refreshCache();
+        }
+    }//GEN-LAST:event_objectTableKeyPressed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem aboutMenuItem;
-    private javax.swing.JMenuItem contentsMenuItem;
-    private javax.swing.JMenuItem copyMenuItem;
-    private javax.swing.JMenuItem cutMenuItem;
-    private javax.swing.JMenuItem deleteMenuItem;
-    private javax.swing.JMenu editMenu;
-    private javax.swing.JMenuItem exitMenuItem;
-    private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenu helpMenu;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JMenuBar menuBar;
     private javax.swing.JList nodeList;
     private javax.swing.JList objectList;
     private javax.swing.JTable objectTable;
-    private javax.swing.JMenuItem openMenuItem;
-    private javax.swing.JMenuItem pasteMenuItem;
-    private javax.swing.JButton reloadButton;
-    private javax.swing.JMenuItem reloadMenuItem;
-    private javax.swing.JMenuItem saveAsMenuItem;
-    private javax.swing.JMenuItem saveMenuItem;
     // End of variables declaration//GEN-END:variables
 }

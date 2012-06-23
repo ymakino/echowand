@@ -18,35 +18,40 @@ public class NodeListModel extends AbstractListModel {
         this.nodes = remoteManager.getNodes();
     }
     
-    private boolean areSameNodes(LinkedList<Node> nodes1, LinkedList<Node> nodes2) {
-        if (nodes1.size() != nodes2.size()) {
-            return false;
-        }
-        
-        for (int i=0; i<nodes1.size(); i++) {
-            Node node1 = nodes1.get(i);
-            Node node2 = nodes2.get(i);
-            if (!node1.equals(node2)) {
-                return false;
+    private LinkedList<Node> subtractNodeList(LinkedList<Node> base, LinkedList<Node> subst) {
+        LinkedList<Node> resultList = new LinkedList<Node>();
+        int size = base.size();
+        for (int i=0; i<size; i++) {
+            Node node = base.get(i);
+            if (!subst.contains(node)) {
+                resultList.add(node);
             }
         }
         
-        return true;
+        return resultList;
     }
     
-    public void updateNodes() {
-        LinkedList<Node> oldNodes = nodes;
-        nodes = remoteManager.getNodes();
-        if (areSameNodes(nodes, oldNodes)) {
+    public synchronized void updateNodes() {
+        LinkedList<Node> newNodes = remoteManager.getNodes();
+        
+        LinkedList<Node> removedNodes = subtractNodeList(nodes, newNodes);
+        LinkedList<Node> addedNodes = subtractNodeList(newNodes, nodes);
+        
+        if (removedNodes.size() == 0 && addedNodes.size() == 0) {
             return;
         }
         
-        if (oldNodes.size() != 0) {
-            fireIntervalRemoved(this, 0, oldNodes.size() - 1);
+        for (int i=0; i<removedNodes.size(); i++) {
+            int index = nodes.indexOf(removedNodes.get(i));
+            nodes.remove(index);
+            fireIntervalRemoved(this, index, index);
         }
         
-        if (nodes.size() != 0) {
-            fireIntervalAdded(this, 0, nodes.size() - 1);
+        if (addedNodes.size() > 0) {
+            int oldSize = nodes.size();
+            int newSize = oldSize + addedNodes.size();
+            nodes.addAll(addedNodes);
+            fireIntervalAdded(this, oldSize, newSize - 1);
         }
     }
 
