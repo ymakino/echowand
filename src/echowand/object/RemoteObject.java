@@ -173,7 +173,7 @@ public class RemoteObject implements EchonetObject {
 
         private EPC epc;
         private ObjectData data;
-        private LinkedList<Data> acc;
+        private LinkedList<Data> dataList;
 
         public RemoteObjectGetTransactionListener(EPC epc) {
             this.epc = epc;
@@ -187,7 +187,7 @@ public class RemoteObject implements EchonetObject {
         public void begin(Transaction t) {
             logger.entering(className, "RemoteObjectGetTransactionListener.begin", t);
             
-            acc = new LinkedList<Data>();
+            dataList = new LinkedList<Data>();
             
             logger.exiting(className, "RemoteObjectGetTransactionListener.begin");
         }
@@ -198,8 +198,8 @@ public class RemoteObject implements EchonetObject {
             
             Property property = getValidFirstProperty(frame, this.epc);
             if (property != null) {
-                if (property.getPDC() > 0) {
-                    acc.add(property.getEDT());
+                if (property.getPDC() != 0) {
+                    dataList.add(property.getEDT());
                     t.finish();
                 }
             }
@@ -211,10 +211,10 @@ public class RemoteObject implements EchonetObject {
         public void finish(Transaction t) {
             logger.entering(className, "RemoteObjectGetTransactionListener.finish", t);
             
-            if (!acc.isEmpty()) {
-                data = new ObjectData(acc);
+            if (!dataList.isEmpty()) {
+                data = new ObjectData(dataList);
             }
-            acc = null;
+            dataList = null;
             
             logger.exiting(className, "RemoteObjectGetTransactionListener.finish");
         }

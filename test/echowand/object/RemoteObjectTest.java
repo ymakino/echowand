@@ -54,6 +54,9 @@ public class RemoteObjectTest {
             pmap.set(EPC.x9F);
             pmap.set(EPC.xE0);
             payload.addFirstProperty(new Property(EPC.x9F, new Data(pmap.toBytes())));
+        } else if (epc == EPC.xE0) {
+            Data bigData = new Data(new byte[253]);
+            payload.addFirstProperty(new Property(EPC.xE0, bigData));
         }
         cf.setTID(tid);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -149,6 +152,10 @@ public class RemoteObjectTest {
             new ResponseThread(subnet, transactionManager).start();
             ObjectData data = object.getData(EPC.x80);
             assertEquals(new ObjectData((byte) 0x41), data);
+            
+            new ResponseThread(subnet, transactionManager).start();
+            ObjectData bigData = object.getData(EPC.xE0);
+            assertEquals(new ObjectData(new byte[253]), bigData);
         } catch (EchonetObjectException e) {
             e.printStackTrace();
             fail();
