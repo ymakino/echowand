@@ -3,54 +3,6 @@ package echowand.net;
 import java.io.IOException;
 import java.net.*;
 
-
-class InetSubnetNode implements Node {
-    private InetSubnet subnet;
-    private InetAddress addr;
-    private int port;
-    
-    public InetSubnetNode(InetSubnet subnet, InetAddress addr, int port) {
-        this.subnet = subnet;
-        this.addr = addr;
-        this.port = port;
-    }
-    
-    public int getPort() {
-        return port;
-    }
-    
-    public InetAddress getAddress() {
-        return addr;
-    }
-    
-    @Override
-    public boolean isMemberOf(Subnet subnet) {
-        return this.subnet == subnet;
-    }
-    
-    @Override
-    public String toString() {
-        return addr.getHostAddress() + ":" + port;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (! (o instanceof InetSubnetNode)) {
-            return false;
-        }
-        InetSubnetNode node = (InetSubnetNode)o;
-        return (this.addr.equals(node.addr) && this.port == node.port && this.subnet.equals(node.subnet));
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 67 * hash + (this.addr != null ? this.addr.hashCode() : 0);
-        hash = 67 * hash + this.port;
-        return hash;
-    }
-}
-
 /**
  * IPネットワークのサブネット
  * @author Yoshiki Makino
@@ -72,8 +24,8 @@ public class InetSubnet implements Subnet {
     private MulticastSocket socket;
     private InetAddress group;
     private InetAddress local;
-    private InetSubnetNode groupNode;
-    private InetSubnetNode localNode;
+    private InetNode groupNode;
+    private InetNode localNode;
     private int bufferSize = DEFAULT_BUFSIZE;
     private boolean enable = false;
     
@@ -208,7 +160,7 @@ public class InetSubnet implements Subnet {
         }
 
         try {
-            InetSubnetNode node = (InetSubnetNode) frame.getReceiver();
+            InetNode node = (InetNode) frame.getReceiver();
             InetAddress addr = node.getAddress();
             int port = node.getPort();
             DatagramPacket packet = new DatagramPacket(data, data.length, addr, port);
@@ -263,7 +215,7 @@ public class InetSubnet implements Subnet {
      * @return リモートノードのNode
      */
     public Node getRemoteNode(InetAddress addr, int port) {
-        return new InetSubnetNode(this, addr, port);
+        return new InetNode(this, addr, port);
     }
     
     /**
@@ -272,7 +224,7 @@ public class InetSubnet implements Subnet {
      * @return リモートノードのNode
      */
     public Node getRemoteNode(InetAddress addr) {
-        return new InetSubnetNode(this, addr, ECHONET_PORT);
+        return new InetNode(this, addr, ECHONET_PORT);
     }
     
     /**
@@ -282,7 +234,7 @@ public class InetSubnet implements Subnet {
     @Override
     public synchronized Node getLocalNode() {
         if (localNode == null) {
-            localNode = new InetSubnetNode(this, local, ECHONET_PORT);
+            localNode = new InetNode(this, local, ECHONET_PORT);
         }
         return localNode;
     }
@@ -295,7 +247,7 @@ public class InetSubnet implements Subnet {
     @Override
     public synchronized Node getGroupNode() {
         if (groupNode == null) {
-            groupNode = new InetSubnetNode(this, group, ECHONET_PORT);
+            groupNode = new InetNode(this, group, ECHONET_PORT);
         }
         return groupNode;
     }
