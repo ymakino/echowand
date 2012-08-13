@@ -371,12 +371,9 @@ public class Transaction {
     public synchronized void join() throws InterruptedException {
         logger.entering(className, "join");
         
-        if (!isWaiting()) {
-            logger.exiting(className, "execute");
-            return;
+        if (isWaitingResponse()) {
+            wait();
         }
-        
-        wait();
         
         logger.exiting(className, "execute");
     }
@@ -398,7 +395,7 @@ public class Transaction {
      * トランザクションが処理中であるか示す。
      * @return トランザクションが処理中であればtrue、そうでなければfalse
      */
-    public synchronized boolean isWaiting() {
+    public synchronized boolean isWaitingResponse() {
         return waiting;
     }
 

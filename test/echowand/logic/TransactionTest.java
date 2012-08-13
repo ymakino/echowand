@@ -153,7 +153,7 @@ public class TransactionTest {
             fail();
         }
         
-        assertTrue(t.isWaiting());
+        assertTrue(t.isWaitingResponse());
         assertFalse(t.isDone());
 
         try {
@@ -173,7 +173,7 @@ public class TransactionTest {
         }
         
         assertEquals(1, t.countResponses());
-        assertFalse(t.isWaiting());
+        assertFalse(t.isWaitingResponse());
         assertTrue(t.isDone());
     }
     
@@ -188,7 +188,7 @@ public class TransactionTest {
             fail();
         }
         
-        assertTrue(t.isWaiting());
+        assertTrue(t.isWaitingResponse());
         assertFalse(t.isDone());
 
         try {
@@ -209,7 +209,7 @@ public class TransactionTest {
         }
         
         assertEquals(0, t.countResponses());
-        assertFalse(t.isWaiting());
+        assertFalse(t.isWaitingResponse());
         assertTrue(t.isDone());
     }
     
@@ -312,7 +312,7 @@ public class TransactionTest {
             t.execute();
             Thread.sleep(200);
             assertFalse(t.isDone());
-            assertTrue(t.isWaiting());
+            assertTrue(t.isWaitingResponse());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -327,7 +327,7 @@ public class TransactionTest {
             t.execute();
             Thread.sleep(200);
             assertTrue(t.isDone());
-            assertFalse(t.isWaiting());
+            assertFalse(t.isWaitingResponse());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
