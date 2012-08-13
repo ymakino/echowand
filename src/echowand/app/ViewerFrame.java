@@ -143,7 +143,8 @@ public class ViewerFrame extends javax.swing.JFrame {
                 InstanceListRequestExecutor updater = viewerMain.createInstanceListRequestExecutor();
 
                 try {
-                    updater.executeAndJoin();
+                    updater.execute();
+                    updater.join();
                 } catch (SubnetException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
