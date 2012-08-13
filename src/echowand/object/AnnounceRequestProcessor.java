@@ -60,6 +60,7 @@ public class AnnounceRequestProcessor extends RequestProcessor {
         logger.exiting(className, "updateINForINFC", replyPayload);
         return replyPayload;
     }
+    
     private void replyINForINFC(Subnet subnet, Frame frame, StandardPayload replyPayload, LocalObject object) {
         logger.entering(className, "replyINForINFC", new Object[]{subnet, frame, replyPayload, object});
         
@@ -123,6 +124,7 @@ public class AnnounceRequestProcessor extends RequestProcessor {
         logger.entering(className, "processINF", new Object[]{subnet, frame, processed});
         
         if (processed) {
+            logger.exiting(className, "processINF", false);
             return false;
         }
         
@@ -141,15 +143,16 @@ public class AnnounceRequestProcessor extends RequestProcessor {
      */
     @Override
     public boolean processINFC(Subnet subnet, Frame frame, boolean processed) {
-        logger.entering(className, "processINF", new Object[]{subnet, frame, processed});
+        logger.entering(className, "processINFC", new Object[]{subnet, frame, processed});
+        
         if (processed) {
-            logger.exiting(className, "processINF", false);
+            logger.exiting(className, "processINFC", false);
             return false;
         }
         
         boolean ret = processINForINFC(subnet, frame, true);
         
-        logger.exiting(className, "processINF", ret);
+        logger.exiting(className, "processINFC", ret);
         return ret;
     }
 }
