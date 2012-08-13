@@ -63,8 +63,12 @@ public class InstanceListRequestExecutorTest {
     public void testUpdateAndJoin() {
         try {
             assertFalse(executor.join());
-            assertTrue(executor.executeAndJoin());
-            assertFalse(executor.executeAndJoin());
+            
+            assertTrue(executor.execute());
+            assertTrue(executor.join());
+            
+            assertFalse(executor.execute());
+            assertFalse(executor.join());
         } catch (SubnetException e) {
             fail();
         } catch (InterruptedException e) {

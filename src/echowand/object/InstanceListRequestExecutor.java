@@ -100,21 +100,4 @@ public class InstanceListRequestExecutor {
         logger.exiting(className, "join", true);
         return true;
     }
-    
-    /**
-     * 他のノードのインスタンスリストを要求するトランザクションを実行する
-     * トランザクションが終了するまで待機する。
-     * @return 成功した場合はtrue、トランザクションがすでに開始されている場合にはfalse
-     * @throws SubnetException トランザクションに問題が発生した場合
-     * @throws InterruptedException 割り込みが発生した場合
-     */
-    public boolean executeAndJoin() throws SubnetException, InterruptedException {
-        logger.entering(className, "executeAndJoin");
-        
-        boolean ret = execute() && join();
-        
-        logger.exiting(className, "executeAndJoin");
-        
-        return ret;
-    }
 }
