@@ -84,7 +84,8 @@ public class Sample5 {
         
         InstanceListRequestExecutor updater = new InstanceListRequestExecutor(subnet, transactionManager, remoteManager);
         try {
-            updater.executeAndJoin();
+            updater.execute();
+            updater.join();
         } catch (SubnetException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
