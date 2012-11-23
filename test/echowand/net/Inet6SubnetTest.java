@@ -1,32 +1,29 @@
 package echowand.net;
 
-import echowand.net.CommonFrame;
-import echowand.net.Frame;
-import echowand.net.Property;
-import echowand.net.InetSubnet;
-import echowand.net.Node;
-import echowand.net.InvalidDataException;
-import echowand.net.SubnetException;
-import echowand.net.Subnet;
-import echowand.common.ESV;
-import echowand.common.EPC;
 import echowand.common.EOJ;
+import echowand.common.EPC;
+import echowand.common.ESV;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import static org.junit.Assert.*;
+import java.util.Enumeration;
+import java.util.LinkedList;
 import org.junit.*;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Yoshiki Makino
  */
-class FrameReceiver extends Thread {
+class FrameReceiver6 extends Thread {
     public Subnet subnet;
     public Frame recvFrame;
 
-    public FrameReceiver(Subnet subnet) {
+    public FrameReceiver6(Subnet subnet) {
         this.subnet = subnet;
     }
     
@@ -55,12 +52,12 @@ class FrameReceiver extends Thread {
     }
 }
 
-public class InetSubnetTest {
-    private InetSubnet subnet;
+public class Inet6SubnetTest {
+    private Inet6Subnet subnet;
     
     @Before
-    public void setUp() {
-        subnet = new InetSubnet();
+    public void setUp() throws SubnetException {
+        subnet = new Inet6Subnet();
     }
     
     @After
@@ -118,11 +115,11 @@ public class InetSubnetTest {
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
         try {
-            Node node = subnet.getRemoteNode(InetAddress.getByName("127.0.0.1"), InetSubnet.ECHONET_PORT);
+            Node node = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("::1"), Inet6Subnet.DEFAULT_PORT);
             sendTest(node, true);
-            Node invalidAddr = subnet.getRemoteNode(InetAddress.getByName("172.21.254.254"), InetSubnet.ECHONET_PORT);
+            Node invalidAddr = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::fe"), Inet6Subnet.DEFAULT_PORT);
             sendTest(invalidAddr, false);
-            Node invalidPort = subnet.getRemoteNode(InetAddress.getByName("127.0.0.1"), 4321);
+            Node invalidPort = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("::1"), 4321);
             sendTest(invalidPort, false);
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -130,19 +127,98 @@ public class InetSubnetTest {
     }
     
     @Test
-    public void testCreation() {
+    public void testCreation() throws SubnetException {
         assertFalse(subnet.enable());
         subnet.disable();
-        subnet = new InetSubnet(true);
+        subnet = new Inet6Subnet(true);
         assertTrue(subnet.isEnabled());
         subnet.disable();
-        subnet = new InetSubnet(false);
+        subnet = new Inet6Subnet(false);
         assertFalse(subnet.isEnabled());
         subnet.disable();
     }
     
+    private LinkedList<Inet6Address> getInet6Addresses() throws SocketException {
+        LinkedList<Inet6Address> inet6addrs = new LinkedList<Inet6Address>();
+        
+        Enumeration<NetworkInterface> nifs = NetworkInterface.getNetworkInterfaces();
+        while (nifs.hasMoreElements()) {
+            NetworkInterface nif = nifs.nextElement();
+            Enumeration<InetAddress> addrs = nif.getInetAddresses();
+            while (addrs.hasMoreElements()) {
+                InetAddress addr = addrs.nextElement();
+                if (addr instanceof Inet6Address) {
+                    inet6addrs.add((Inet6Address)addr);
+                }
+            }
+        }
+        
+        return inet6addrs;
+    }
+    
+    private LinkedList<NetworkInterface> getInet6Interfaces() throws SocketException {
+        LinkedList<NetworkInterface> inet6ifs = new LinkedList<NetworkInterface>();
+        
+        for (Inet6Address addr : getInet6Addresses()) {
+            NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
+            if (!inet6ifs.contains(nif)) {
+                inet6ifs.add(nif);
+            }
+        }
+        
+        return inet6ifs;
+    }
+    
     @Test
-    public void testEnable() {
+    public void testCreationWithNetworkInterface() throws SocketException, SubnetException {
+        subnet.disable();
+
+        for (NetworkInterface nif : getInet6Interfaces()) {
+            subnet = new Inet6Subnet(nif, true);
+            assertTrue(subnet.isEnabled());
+            assertEquals(subnet.getNetworkInterface(), nif);
+            subnet.disable();
+
+            subnet = new Inet6Subnet(nif, false);
+            assertFalse(subnet.isEnabled());
+            assertEquals(subnet.getNetworkInterface(), nif);
+            subnet.disable();
+        }
+    }
+
+    @Test(expected = SubnetException.class)
+    public void testCreationWithNullNetworkInterface() throws SubnetException {
+        subnet.disable();
+        subnet = new Inet6Subnet((NetworkInterface) null, true);
+    }
+
+    @Test
+    public void testCreationWithAddress() throws SocketException, SubnetException {
+        subnet.disable();
+
+        for (Inet6Address addr : getInet6Addresses()) {
+            NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
+            
+            subnet = new Inet6Subnet(addr, true);
+            assertTrue(subnet.isEnabled());
+            assertEquals(subnet.getNetworkInterface(), nif);
+            subnet.disable();
+
+            subnet = new Inet6Subnet(addr, false);
+            assertFalse(subnet.isEnabled());
+            assertEquals(subnet.getNetworkInterface(), nif);
+            subnet.disable();
+        }
+    }
+    
+    @Test(expected=SubnetException.class)
+    public void testCreationWithNullAddress() throws SubnetException {
+        subnet.disable();
+        subnet = new Inet6Subnet((Inet6Address)null, true);
+    }
+    
+    @Test
+    public void testEnable() throws SubnetException {
         assertTrue(subnet.isEnabled());
 
         assertTrue(subnet.disable());
@@ -176,7 +252,7 @@ public class InetSubnetTest {
     }
 
     @Test
-    public void testEnableAfterDisable() {
+    public void testEnableAfterDisable() throws SubnetException {
         try {
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
         } catch (SubnetException e) {
@@ -210,9 +286,9 @@ public class InetSubnetTest {
     @Test
     public void testNodeEquals() {
         try {
-            Node node1 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"));
-            Node node2 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"), 3610);
-            Node node3 = subnet.getRemoteNode(InetAddress.getByName("192.168.1.1"), 3611);
+            Node node1 = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::1"));
+            Node node2 = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::1"), 3610);
+            Node node3 = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::1"), 3611);
             assertEquals(node1, node2);
             assertFalse(node1.equals(node3));
         } catch (UnknownHostException e) {

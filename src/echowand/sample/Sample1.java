@@ -70,10 +70,18 @@ class Sample1Listener implements TransactionListener {
  * @author Yoshiki Makino
  */
 public class Sample1 {
+
     public static void main(String[] args) {
-        // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
-        InetSubnet subnet = new InetSubnet();
-        
+        Inet4Subnet subnet;
+
+        try {
+            // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
+            subnet = new Inet4Subnet();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            return;
+        }
+
         // トランザクション管理オブジェクトを生成
         TransactionManager transactionManager = new TransactionManager(subnet);
         

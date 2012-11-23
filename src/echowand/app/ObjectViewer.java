@@ -6,8 +6,10 @@ import echowand.info.HumiditySensorInfo;
 import echowand.info.NodeProfileInfo;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.*;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
+import echowand.net.Inet6Subnet;
 import echowand.net.Subnet;
+import echowand.net.SubnetException;
 import echowand.object.*;
 import echowand.util.Pair;
 import java.util.LinkedList;
@@ -54,7 +56,7 @@ class IntervalDataUpdater extends Thread {
  */
 public class ObjectViewer implements Runnable {
 
-    private InetSubnet subnet;
+    private Subnet subnet;
     private TransactionManager transactionManager;
     private RemoteObjectManager remoteManager;
     private LocalObjectManager localManager;
@@ -88,15 +90,24 @@ public class ObjectViewer implements Runnable {
         nodeProfileObject.addDelegate(new LocalObjectNotifyDelegate(subnet, transactionManager));
         return nodeProfileObject;
     }
+    
+    private void quitWithErrorFrame(SubnetException ex) {
+        ErrorFrame frame = new ErrorFrame(null, true);
+        if (ex.getInternalException() == null) {
+            frame.setMessage(ex.getMessage());
+        } else {
+            frame.setMessage(ex.getInternalException().getMessage());
+        }
+        frame.setVisible(true);
+    }
 
     private void initialize() {
-        subnet = new InetSubnet();
-        
-        if (!subnet.isEnabled()) {
-            BindErrorFrame frame = new BindErrorFrame(null, true);
-            frame.setVisible(true);
+        try {
+            subnet = new Inet4Subnet();
+        } catch (SubnetException ex) {
+            quitWithErrorFrame(ex);
         }
-        
+
         transactionManager = new TransactionManager(subnet);
         remoteManager = new RemoteObjectManager();
         localManager = new LocalObjectManager();
@@ -110,11 +121,11 @@ public class ObjectViewer implements Runnable {
         loop.setSubnet(subnet);
         loop.addListener(requestDispatcher);
         loop.addListener(transactionManager);
-
+        
         try {
             localManager.add(nodeProfile);
-        } catch (TooManyObjectsException e) {
-            e.printStackTrace();
+        } catch (TooManyObjectsException ex) {
+            Logger.getLogger(ObjectViewer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

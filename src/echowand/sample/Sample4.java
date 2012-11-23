@@ -6,12 +6,12 @@ import echowand.info.HomeAirConditionerInfo;
 import echowand.info.NodeProfileInfo;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.*;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
 import echowand.net.Node;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.object.*;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.logging.Level;
@@ -148,7 +148,16 @@ public class Sample4 {
     }
     
     public static void main(String[] args) throws TooManyObjectsException {
-        InetSubnet subnet = new InetSubnet();
+        Inet4Subnet subnet;
+
+        try {
+            // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
+            subnet = new Inet4Subnet();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            return;
+        }
+        
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager remoteManager = new RemoteObjectManager();
         LocalObjectManager localManager = new LocalObjectManager();
@@ -212,7 +221,7 @@ public class Sample4 {
         }
         
         try {
-            Node node = subnet.getRemoteNode(InetAddress.getByName(peerAddress1), 3610);
+            Node node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName(peerAddress1), 3610);
             EPC epc = EPC.x9E;
             System.out.println(remoteManager.get(node, new EOJ("0ef001")).getData(epc));
             System.out.println(remoteManager.get(node, new EOJ("013001")).getData(epc));
@@ -224,7 +233,7 @@ public class Sample4 {
             remoteObject = remoteManager.get(node, new EOJ("001101"));
             remoteObject.addObserver(new PrintNotifiedDataObserver());
             
-            node = subnet.getRemoteNode(InetAddress.getByName(peerAddress2), 3610);
+            node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName(peerAddress2), 3610);
             epc = EPC.x9E;
             System.out.println(remoteManager.get(node, new EOJ("0ef001")).getData(epc));
             System.out.println(remoteManager.get(node, new EOJ("013001")).getData(epc));

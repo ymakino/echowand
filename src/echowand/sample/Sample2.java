@@ -6,7 +6,7 @@ import echowand.common.EPC;
 import echowand.info.NodeProfileInfo;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.*;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
 import echowand.net.SubnetException;
 import echowand.object.*;
 
@@ -24,8 +24,15 @@ public class Sample2 {
     
     public static void main(String[] args) throws TooManyObjectsException {
         MainLoop loop = new MainLoop();
+        Inet4Subnet subnet;
+
+        try {
+            subnet = new Inet4Subnet();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            return;
+        }
         
-        InetSubnet subnet = new InetSubnet();
         loop.setSubnet(subnet);
         
         LocalObjectManager manager = new LocalObjectManager();

@@ -6,7 +6,7 @@ import echowand.info.TemperatureSensorInfo;
 import echowand.logic.MainLoop;
 import echowand.logic.RequestDispatcher;
 import echowand.logic.TransactionManager;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
 import echowand.object.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class LocalObjectSample {
     public static void main(String[] args) {
         try {
-            final InetSubnet subnet = new InetSubnet();
+            final Inet4Subnet subnet = new Inet4Subnet();
             final TransactionManager transactionManager = new TransactionManager(subnet);
             RemoteObjectManager remoteManager = new RemoteObjectManager();
             LocalObjectManager localManager = new LocalObjectManager();

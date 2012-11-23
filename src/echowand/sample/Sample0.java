@@ -5,7 +5,7 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.ESV;
 import echowand.net.*;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 /**
@@ -89,15 +89,16 @@ public class Sample0 {
         
         //3秒後にプログラムが終了するように設定
         setTimeout(3000);
-        
-        // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
-        InetSubnet subnet = new InetSubnet();
-        
+
         try {
+
+            // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
+            Inet4Subnet subnet = new Inet4Subnet();
+
             //========================= Get =========================
             // メッセージの宛先のNodeを取得
-            Node remoteNode1 = subnet.getRemoteNode(InetAddress.getByName(peerAddress));
-            
+            Node remoteNode1 = subnet.getRemoteNode((Inet4Address) Inet4Address.getByName(peerAddress));
+
             // Getフレームを作成
             Frame frame1 = new Frame(subnet.getLocalNode(), remoteNode1, createCommonFrameGet());
             
@@ -113,7 +114,7 @@ public class Sample0 {
             
             //========================= SetGet =========================
             // メッセージの宛先のNodeを取得
-            Node remoteNode2 = subnet.getRemoteNode(InetAddress.getByName(peerAddress));
+            Node remoteNode2 = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName(peerAddress));
             
             // SetGetフレームを作成
             Frame frame2 = new Frame(subnet.getLocalNode(), remoteNode2, createCommonFrameSetGet());

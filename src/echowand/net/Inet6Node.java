@@ -1,24 +1,24 @@
 package echowand.net;
 
-import java.net.InetAddress;
+import java.net.Inet6Address;
 
 /**
- * IPネットワークのサブネットに存在するノード
+ * IPv6ネットワークのサブネットに存在するノード
  * @author Yoshiki Makino
  */
-public class InetNode implements Node {
-    private InetSubnet subnet;
-    private InetAddress addr;
+public class Inet6Node implements Node {
+    private Inet6Subnet subnet;
+    private Inet6Address addr;
     private int port;
         
     /**
-     * InetNodeを生成する。トランスポートプロトコルは常にUDPになる。
-     * 直接生成は行わずにInetSubnetのgetRemoteNodeメソッドの利用を推奨する。
+     * Inet6Nodeを生成する。トランスポートプロトコルは常にUDPになる。
+     * 直接生成は行わずにInet6SubnetのgetRemoteNodeメソッドの利用を推奨する。
      * @param subnet このノードの存在するサブネット
-     * @param addr このノードのIPアドレス
+     * @param addr このノードのIPv6アドレス
      * @param port このノードのポート番号
      */
-    public InetNode(InetSubnet subnet, InetAddress addr, int port) {
+    public Inet6Node(Inet6Subnet subnet, Inet6Address addr, int port) {
         this.subnet = subnet;
         this.addr = addr;
         this.port = port;
@@ -33,10 +33,10 @@ public class InetNode implements Node {
     }
     
     /**
-     * IPアドレスを返す。
-     * @return IPアドレス
+     * IPv6アドレスを返す。
+     * @return IPv6アドレス
      */
-    public InetAddress getAddress() {
+    public Inet6Address getAddress() {
         return addr;
     }
     
@@ -56,10 +56,10 @@ public class InetNode implements Node {
     
     @Override
     public boolean equals(Object o) {
-        if (! (o instanceof InetNode)) {
+        if (! (o instanceof Inet6Node)) {
             return false;
         }
-        InetNode node = (InetNode)o;
+        Inet6Node node = (Inet6Node)o;
         return (this.addr.equals(node.addr) && this.port == node.port && this.subnet.equals(node.subnet));
     }
 

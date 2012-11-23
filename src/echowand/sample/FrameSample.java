@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class FrameSample {
     public static void main(String[] args) {
         try {
-            InetSubnet subnet = new InetSubnet();
+            Inet4Subnet subnet = new Inet4Subnet();
 
             CommonFrame commonFrame = new CommonFrame(new EOJ("0ef001"), new EOJ("001101"), ESV.Get);
             StandardPayload payload = (StandardPayload) commonFrame.getEDATA();

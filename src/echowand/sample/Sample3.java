@@ -4,12 +4,13 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.logic.MainLoop;
 import echowand.logic.TransactionManager;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
 import echowand.net.Node;
+import echowand.net.SubnetException;
 import echowand.object.EchonetObjectException;
 import echowand.object.ObjectData;
 import echowand.object.RemoteObject;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 /**
@@ -20,7 +21,15 @@ public class Sample3 {
     public static String peerAddress = "192.168.1.1";
     
     public static void main(String[] args) {
-        InetSubnet subnet = new InetSubnet();
+        Inet4Subnet subnet;
+
+        try {
+            subnet = new Inet4Subnet();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            return;
+        }
+        
         TransactionManager transactionManager = new TransactionManager(subnet);
         
         MainLoop loop = new MainLoop();
@@ -34,7 +43,7 @@ public class Sample3 {
         Node node = null;
         
         try {
-            node = subnet.getRemoteNode(InetAddress.getByName(peerAddress), 3610);
+            node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName(peerAddress), 3610);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

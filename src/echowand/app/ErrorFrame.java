@@ -4,12 +4,12 @@ package echowand.app;
  *
  * @author Yoshiki Makino
  */
-public class BindErrorFrame extends javax.swing.JDialog {
+public class ErrorFrame extends javax.swing.JDialog {
 
     /**
      * Creates new form BindErrorFrame
      */
-    public BindErrorFrame(java.awt.Frame parent, boolean modal) {
+    public ErrorFrame(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -23,14 +23,14 @@ public class BindErrorFrame extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        errorMessage = new javax.swing.JLabel();
         QuitButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Fatal Error!!");
         setBounds(new java.awt.Rectangle(300, 200, 0, 0));
 
-        jLabel1.setText("The port number 3610 has been already used.");
+        errorMessage.setText("Error.");
 
         QuitButton.setText("Quit Viewer");
         QuitButton.addActionListener(new java.awt.event.ActionListener() {
@@ -47,10 +47,10 @@ public class BindErrorFrame extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(errorMessage)
                         .add(0, 0, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(0, 0, Short.MAX_VALUE)
+                        .add(0, 186, Short.MAX_VALUE)
                         .add(QuitButton)))
                 .addContainerGap())
         );
@@ -58,7 +58,7 @@ public class BindErrorFrame extends javax.swing.JDialog {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
+                .add(errorMessage)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(QuitButton)
                 .addContainerGap())
@@ -71,6 +71,9 @@ public class BindErrorFrame extends javax.swing.JDialog {
         System.exit(1);
     }//GEN-LAST:event_QuitButtonActionPerformed
 
+    public void setMessage(String message) {
+        errorMessage.setText(message);
+    }
     /**
      * @param args the command line arguments
      */
@@ -92,13 +95,13 @@ public class BindErrorFrame extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(BindErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(BindErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(BindErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(BindErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ErrorFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -108,7 +111,7 @@ public class BindErrorFrame extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                BindErrorFrame dialog = new BindErrorFrame(new javax.swing.JFrame(), true);
+                ErrorFrame dialog = new ErrorFrame(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                     @Override
@@ -122,6 +125,6 @@ public class BindErrorFrame extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton QuitButton;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel errorMessage;
     // End of variables declaration//GEN-END:variables
 }

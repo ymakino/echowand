@@ -5,7 +5,7 @@ import echowand.common.EPC;
 import echowand.info.NodeProfileInfo;
 import echowand.logic.MainLoop;
 import echowand.logic.TransactionManager;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
 import echowand.net.Node;
 import echowand.object.*;
 import java.util.logging.Level;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class RemoteObjectGetSample {
     public static void main(String[] args) {
         try {
-            final InetSubnet subnet = new InetSubnet();
+            final Inet4Subnet subnet = new Inet4Subnet();
             final TransactionManager transactionManager = new TransactionManager(subnet);
             RemoteObjectManager remoteManager = new RemoteObjectManager();
             LocalObjectManager localManager = new LocalObjectManager();

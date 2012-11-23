@@ -6,7 +6,7 @@ import echowand.logic.MainLoop;
 import echowand.logic.RequestDispatcher;
 import echowand.logic.TooManyObjectsException;
 import echowand.logic.TransactionManager;
-import echowand.net.InetSubnet;
+import echowand.net.Inet4Subnet;
 import echowand.net.Node;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
@@ -62,7 +62,16 @@ public class Sample5 {
     }
     
     public static void main(String[] args) throws TooManyObjectsException, BindException {
-        InetSubnet subnet = new InetSubnet();
+        Inet4Subnet subnet;
+
+        try {
+            // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
+            subnet = new Inet4Subnet();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            return;
+        }
+        
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager remoteManager = new RemoteObjectManager();
         LocalObjectManager localManager = new LocalObjectManager();
