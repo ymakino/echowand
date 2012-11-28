@@ -90,12 +90,30 @@ class ReadableConverterReal extends ReadableConverter {
     
     @Override
     public String dataToString(ObjectData data) {
+        boolean is_negative = false;
         int dataSize = data.size();
         BigDecimal up = BigDecimal.valueOf(0x0100);
         BigDecimal dec = new BigDecimal(0);
+        
         for (int i=0; i<dataSize; i++) {
-            BigDecimal cur = BigDecimal.valueOf(data.get(i));
+            if ((i == 0) && (data.get(i) < 0)) {
+                is_negative = true;
+            }
+            
+            int pos_data;
+            if (is_negative) {
+                pos_data = 0xff & ((int)((byte)-1) ^ data.get(i));
+            } else {
+                pos_data = 0x00ff & (int)data.get(i);
+            }
+            
+            BigDecimal cur = BigDecimal.valueOf(pos_data);
             dec = dec.multiply(up).add(cur);
+        }
+        
+        if (is_negative) {
+            dec = dec.add(BigDecimal.valueOf(1));
+            dec = dec.negate();
         }
         
         dec = dec.divide(BigDecimal.valueOf(precision));
