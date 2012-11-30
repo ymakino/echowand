@@ -91,7 +91,7 @@ public class ObjectViewer implements Runnable {
         return nodeProfileObject;
     }
     
-    private void quitWithErrorFrame(SubnetException ex) {
+    private static void quitWithErrorFrame(SubnetException ex) {
         ErrorFrame frame = new ErrorFrame(null, true);
         if (ex.getInternalException() == null) {
             frame.setMessage(ex.getMessage());
@@ -102,12 +102,7 @@ public class ObjectViewer implements Runnable {
     }
 
     private void initialize() {
-        try {
-            subnet = new Inet4Subnet();
-        } catch (SubnetException ex) {
-            quitWithErrorFrame(ex);
-        }
-
+        
         transactionManager = new TransactionManager(subnet);
         remoteManager = new RemoteObjectManager();
         localManager = new LocalObjectManager();
@@ -127,6 +122,10 @@ public class ObjectViewer implements Runnable {
         } catch (TooManyObjectsException ex) {
             Logger.getLogger(ObjectViewer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public ObjectViewer(Subnet subnet) {
+        this.subnet = subnet;
     }
     
     public void openViewerFrame() {
@@ -234,7 +233,7 @@ public class ObjectViewer implements Runnable {
 
     public static void main(String[] args) {
         boolean trace = false;
-        
+
         handler = new ConsoleHandler();
         handler.setLevel(Level.ALL);
 
@@ -262,7 +261,6 @@ public class ObjectViewer implements Runnable {
             changeLogLevelAll(BaseObjectInfo.class.getName());
         }
 
-        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -280,6 +278,11 @@ public class ObjectViewer implements Runnable {
             java.util.logging.Logger.getLogger(ViewerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
-        java.awt.EventQueue.invokeLater(new ObjectViewer());
+        try {
+            ObjectViewer viewer = new ObjectViewer(new Inet4Subnet());
+            java.awt.EventQueue.invokeLater(viewer);
+        } catch (SubnetException ex) {
+            quitWithErrorFrame(ex);
+        }
     }
 }
