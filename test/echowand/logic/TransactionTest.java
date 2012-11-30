@@ -15,6 +15,7 @@ import echowand.logic.TransactionConfig;
 import echowand.logic.Transaction;
 import echowand.common.EOJ;
 import echowand.common.EPC;
+import echowand.net.Inet4Subnet;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -110,10 +111,11 @@ public class TransactionTest {
         }
     }
     
+    
     @Test(expected = SubnetException.class)
     public void testSetInvalidSender() throws SubnetException {
         Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
-        LocalSubnet ls = new LocalSubnet();
+        Inet4Subnet ls = new Inet4Subnet();
         transactionConfig1.setSenderNode(ls.getLocalNode());
         t.execute();
     }
@@ -121,7 +123,7 @@ public class TransactionTest {
     @Test(expected = SubnetException.class)
     public void testSetInvalidReceiver() throws SubnetException {
         Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
-        LocalSubnet ls = new LocalSubnet();
+        Inet4Subnet ls = new Inet4Subnet();
         transactionConfig1.setReceiverNode(ls.getLocalNode());
         t.execute();
     }
