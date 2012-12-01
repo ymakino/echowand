@@ -1,84 +1,5 @@
 package echowand.net;
 
-import java.util.LinkedList;
-import java.util.concurrent.LinkedBlockingQueue;
-
-class LocalNetwork {
-    private static LocalNetwork network;
-    
-    public static LocalNetwork getInstance() {
-        if (network == null) {
-            network = new LocalNetwork();
-        }
-        
-        return network;
-    }
-    
-    private LinkedList<LocalSubnetPort> ports;
-    
-    private LocalNetwork() {
-        ports = new LinkedList<LocalSubnetPort>();
-    }
-    
-    public boolean addLocalSubnet(LocalSubnetPort port) {
-        return ports.add(port);
-    }
-    
-    public boolean removeLocalSubnet(LocalSubnetPort port) {
-        return ports.remove(port);
-    }
-    
-    public synchronized void broadcast(Frame frame) throws SubnetException {
-        for (LocalSubnetPort port : ports) {
-            port.enqueue(frame);
-        }
-    }
-}
-
-class LocalSubnetPort {
-    private LinkedBlockingQueue<Frame> loopbackQueue = new LinkedBlockingQueue<Frame>();
-
-    public Frame cloneFrame(Frame frame) throws InvalidDataException {
-        CommonFrame cf = new CommonFrame(frame.getCommonFrame().toBytes());
-        return new Frame(frame.getSender(), frame.getReceiver(), cf);
-    }
-    
-    public boolean enqueue(Frame frame) throws SubnetException {
-        try {
-                loopbackQueue.put(cloneFrame(frame));
-                return true;
-        } catch (InterruptedException e) {
-            throw new SubnetException("catched exception", e);
-        } catch (InvalidDataException e) {
-            throw new SubnetException("invalid frame", e);
-        }
-    }
-    
-    public boolean send(Frame frame) throws SubnetException {
-        try {
-            LocalNetwork.getInstance().broadcast(cloneFrame(frame));
-            return true;
-        } catch (InvalidDataException e) {
-            throw new SubnetException("invalid frame", e);
-        }
-    }
-    
-    public Frame recv() throws SubnetException {
-        try {
-            return loopbackQueue.take();
-        } catch (InterruptedException e) {
-            throw new SubnetException("catched exception", e);
-        }
-    }
-    
-    public Frame recvNoWait() throws SubnetException {
-        if (loopbackQueue.isEmpty()) {
-            return null;
-        }
-        return recv();
-    }
-}
-
 class LocalSubnetNode implements Node{
     private LocalSubnet subnet;
     private String name;
@@ -111,10 +32,13 @@ class LocalSubnetNode implements Node{
 
 /**
  * ローカルのサブネット
+ * LocalSubnetを生成する度にユニークなIDが割り振られる。
  * @author Yoshiki Makino
  */
 public class LocalSubnet implements Subnet {
     private static int nextId = 0;
+    
+    private LocalNetwork network;
     private int id;
     
     private synchronized static int getNextId() {
@@ -123,23 +47,36 @@ public class LocalSubnet implements Subnet {
     
     private Node localNode;
     private static Node groupNode;
-    private LocalSubnetPort port;
+    private LocalNetworkPort port;
     
+    /**
+     * LocalSubnetを生成する。
+     * デフォルトのLocalNetworkに接続する。
+     */
     public LocalSubnet() {
+        initialize(LocalNetwork.getDefault());
+    }
+    
+    /**
+     * LocalSubnetを生成する。
+     * 指定された名前のLocalNetworkに接続する。
+     * param networkName 接続するLocalNetworkの名前
+     */
+    public LocalSubnet(String networkName) {
+        initialize(LocalNetwork.getByName(networkName));
+    }
+    
+    private void initialize(LocalNetwork network) {
         id = getNextId();
-        port = new LocalSubnetPort();
-        LocalNetwork.getInstance().addLocalSubnet(port);
+        port = new LocalNetworkPort();
+        this.network = network;
+        network.addPort(port);
     }
     
     private void validatesSender(Frame frame) throws SubnetException {
         if (!frame.getSender().isMemberOf(this)) {
             throw new SubnetException("invalid sender");
         }
-    }
-
-    private Frame cloneFrame(Frame frame) throws InvalidDataException {
-        CommonFrame cf = new CommonFrame(frame.getCommonFrame().toBytes());
-        return new Frame(frame.getSender(), frame.getReceiver(), cf);
     }
     
     private boolean shouldLocalNodeReceive(Frame frame) {
@@ -221,7 +158,11 @@ public class LocalSubnet implements Subnet {
         }
         return groupNode;
     }
-    
+
+    /**
+     * このLocalSubnetのIDを返す。
+     * @return このLocalSubnetのID
+     */
     public int getId() {
         return id;
     }
