@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 abstract class ListDataGenerator<DataType> {
 
-    protected LinkedList<DataType> dataList = new LinkedList<DataType>();
+    private LinkedList<DataType> dataList = new LinkedList<DataType>();
 
     protected abstract DataType extractData(LocalObject object);
 
@@ -269,8 +269,9 @@ public class NodeProfileObjectDelegate implements LocalObjectDelegate {
      * 特に処理は行わない。
      * @param object プロパティデータが更新されたオブジェクト
      * @param epc 更新されたプロパティのEPC
-     * @param data 更新されたデータ
+     * @param newData 新しいプロパティデータ
+     * @param oldData 古いプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData data) {}
+    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {}
 }
