@@ -49,11 +49,12 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
      * 特に何も処理を行わずにfalseを返す。
      * @param object プロパティデータの変更を要求されているオブジェクト
      * @param epc 変更するプロパティデータのEPC
-     * @param data 変更するデータの指定
+     * @param newData 設定するプロパティデータ
+     * @param curData 現在のプロパティデータ
      * @return 常にfalse
      */
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData data) {
+    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
         return false;
     }
     
@@ -61,16 +62,17 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
      * 指定されたEPCのプロパティが指定されたデータで更新されたことをサブネットに通知する。
      * @param object プロパティデータの変更通知を行っているオブジェクト
      * @param epc プロパティデータに変更のあったEPC
-     * @param data 新しいプロパティデータ
+     * @param curData 現在のプロパティデータ
+     * @param oldData 以前のプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData data) {
-        logger.entering(className, "notifyDataChanged", new Object[]{object, epc, data});
+    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+        logger.entering(className, "notifyDataChanged", new Object[]{object, epc, curData, oldData});
         
-        if (object.isObservable(epc)) {
+        if (object.isObservable(epc) && !curData.equals(oldData)) {
             try {
                 AnnounceTransactionConfig transactionConfig = new AnnounceTransactionConfig();
-                transactionConfig.addAnnounce(epc, data.getData());
+                transactionConfig.addAnnounce(epc, curData.getData());
                 transactionConfig.setResponseRequired(false);
                 transactionConfig.setSenderNode(subnet.getLocalNode());
                 transactionConfig.setReceiverNode(subnet.getGroupNode());

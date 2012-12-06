@@ -34,7 +34,7 @@ public class LocalObjectNotifyDelegateTest {
         objectInfo.add(EPC.x80, true, true, true, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
-        delegate.notifyDataChanged(object, EPC.x80, new ObjectData((byte)0x41));
+        delegate.notifyDataChanged(object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
         Frame frame = subnet.recvNoWait();
         assertTrue(frame != null);
         CommonFrame cf = frame.getCommonFrame();
@@ -53,6 +53,20 @@ public class LocalObjectNotifyDelegateTest {
     }
     
     @Test
+    public void testNoAnnounceWithoutChanges() throws SubnetException {
+        LocalSubnet subnet = new LocalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
+        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        objectInfo.add(EPC.x80, true, true, true, new byte[]{(byte)0x42});
+        LocalObject object = new LocalObject(objectInfo);
+        
+        delegate.notifyDataChanged(object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x41));
+        Frame frame = subnet.recvNoWait();
+        assert(frame == null);
+    }
+    
+    @Test
     public void testNotAnnounce() throws SubnetException {
         LocalSubnet subnet = new LocalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
@@ -61,7 +75,7 @@ public class LocalObjectNotifyDelegateTest {
         objectInfo.add(EPC.x80, true, true, false, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
-        delegate.setData(object, EPC.x80, new ObjectData((byte)0x41));
+        delegate.setData(object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
         Frame frame = subnet.recvNoWait();
         assertTrue(frame == null);
     }

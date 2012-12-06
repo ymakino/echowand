@@ -20,10 +20,12 @@ import org.junit.*;
  */
 
 class DummyDelegate implements LocalObjectDelegate {
-    public ObjectData data;
+    private ObjectData data;
+    
     public DummyDelegate(ObjectData data) {
         this.data = data;
     }
+    
     @Override
     public ObjectData getData(LocalObject object, EPC epc) {
         return data;
@@ -32,17 +34,27 @@ class DummyDelegate implements LocalObjectDelegate {
     public LocalObject lastObject;
     public EPC lastEPC;
     public ObjectData lastData;
+    
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData data) {
+    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
         lastObject = object;
         lastEPC = epc;
-        lastData = data;
-        object.notifyDataChanged(epc, data);
+        lastData = newData;
+        
+        if (data != null) {
+            assertEquals(data, oldData);
+        }
+        
+        assertEquals(object.getData(epc), oldData);
+        
+        data = newData;
+        
+        object.notifyDataChanged(epc, newData, oldData);
         return true;
     }
 
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData data) {
+    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
     }
 }
 

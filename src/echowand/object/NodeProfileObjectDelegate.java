@@ -256,11 +256,12 @@ public class NodeProfileObjectDelegate implements LocalObjectDelegate {
      * 特に処理を行わずにfalseを返す。
      * @param object プロパティのデータの設定を要求されているオブジェクト
      * @param epc 要求されているプロパティのEPC
-     * @param data プロパティの更新データ
+     * @param newData 設定するプロパティデータ
+     * @param oldData 現在のプロパティデータ
      * @return 常にfalse
      */
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData data) {
+    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
         return false;
     }
     
@@ -269,9 +270,9 @@ public class NodeProfileObjectDelegate implements LocalObjectDelegate {
      * 特に処理は行わない。
      * @param object プロパティデータが更新されたオブジェクト
      * @param epc 更新されたプロパティのEPC
-     * @param newData 新しいプロパティデータ
-     * @param oldData 古いプロパティデータ
+     * @param curData 現在のプロパティデータ
+     * @param oldData 以前のプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {}
+    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {}
 }

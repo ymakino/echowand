@@ -75,7 +75,7 @@ public class LocalObjectDateTimeDelegateTest {
     public void testSetData() {
         LocalObject object = new LocalObject(new TemperatureSensorInfo());
         LocalObjectDateTimeDelegate delegate = new LocalObjectDateTimeDelegate();
-        assertEquals(false, delegate.setData(object, EPC.x97, new ObjectData((byte)0x41)));
-        assertEquals(false, delegate.setData(object, EPC.x98, new ObjectData((byte)0x41)));
+        assertEquals(false, delegate.setData(object, EPC.x97, new ObjectData((byte)0x41), new ObjectData((byte)0x40)));
+        assertEquals(false, delegate.setData(object, EPC.x98, new ObjectData((byte)0x41), new ObjectData((byte)0x40)));
     }
 }

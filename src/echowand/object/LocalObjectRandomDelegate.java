@@ -56,11 +56,12 @@ public class LocalObjectRandomDelegate implements LocalObjectDelegate {
      * 何も処理せずにfalseを返す。
      * @param object プロパティデータの変更を要求されているオブジェクト
      * @param epc EPCの指定
-     * @param data セットするデータの指定
+     * @param newData 設定するプロパティデータ
+     * @param curData 現在のプロパティデータ
      * @return 常にfalse
      */
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData data) {
+    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
         return false;
     }
 
@@ -68,9 +69,10 @@ public class LocalObjectRandomDelegate implements LocalObjectDelegate {
      * 何も処理を行わない。
      * @param object プロパティデータの変更通知を行っているオブジェクト
      * @param epc プロパティデータに変更のあったEPC
-     * @param data 新しいプロパティデータ
+     * @param curData 現在のプロパティデータ
+     * @param oldData 以前のプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData data) {
+    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
     }
 }

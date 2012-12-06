@@ -20,16 +20,18 @@ public interface LocalObjectDelegate {
      * 指定されたEPCのデータを指定されたデータの内容に変更する。
      * @param object プロパティデータの変更を要求されているオブジェクト
      * @param epc 変更するプロパティデータのEPC
-     * @param data 変更するデータの指定
+     * @param newData 設定するプロパティデータ
+     * @param curData 現在のプロパティデータ
      * @return 変更に成功したらtrue、そうでなければfalse
      */
-    public boolean setData(LocalObject object, EPC epc, ObjectData data);
+    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData curData);
     
     /**
      * 指定されたEPCのプロパティが指定されたデータで更新された際の処理を行う。
      * @param object プロパティデータの変更通知を行っているオブジェクト
      * @param epc プロパティデータに変更のあったEPC
-     * @param data 新しいプロパティデータ
+     * @param curData 現在のプロパティデータ
+     * @param oldData 以前のプロパティデータ
      */
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData data);
+    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData);
 }

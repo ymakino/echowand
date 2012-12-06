@@ -85,13 +85,15 @@ public class LocalObject implements EchonetObject {
      */
     public boolean forceSetData(EPC epc, ObjectData data) {
         logger.entering(className, "forceSetData", new Object[]{epc, data});
+        
+        ObjectData oldData = this.getData(epc);
 
-        boolean success = setDataDelegate(epc, data);
+        boolean success = setDataDelegate(epc, data, oldData);
 
         if (!success) {
             success = setInternalData(epc, data);
             if (success) {
-                notifyDataChanged(epc, data);
+                notifyDataChanged(epc, data, oldData);
             }
         }
 
@@ -238,24 +240,25 @@ public class LocalObject implements EchonetObject {
     /**
      * 指定されたEPCのプロパティデータが変化したことを通知する。
      * @param epc 変化したプロパティのEPC
-     * @param data 変化後のプロパティデータの値
+     * @param curData 現在のプロパティデータ
+     * @param oldData 以前のプロパティデータ
      */
-    public void notifyDataChanged(EPC epc, ObjectData data) {
-        logger.entering(className, "notifyDataChanged", new Object[]{epc, data});
+    public void notifyDataChanged(EPC epc, ObjectData curData, ObjectData oldData) {
+        logger.entering(className, "notifyDataChanged", new Object[]{epc, curData, oldData});
         
         for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
-            delegate.notifyDataChanged(this, epc, data);
+            delegate.notifyDataChanged(this, epc, curData, oldData);
         }
         
         logger.exiting(className, "notifyDataChanged");
     }
     
-    private boolean setDataDelegate(EPC epc, ObjectData data) {
-        logger.entering(className, "setDataDelegate", new Object[]{epc, data});
+    private boolean setDataDelegate(EPC epc, ObjectData newData, ObjectData curData) {
+        logger.entering(className, "setDataDelegate", new Object[]{epc, newData, curData});
         
         boolean success = false;
         for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
-            success |= delegate.setData(this, epc, data);
+            success |= delegate.setData(this, epc, newData, curData);
         }
         
         logger.exiting(className, "setDataDelegate", success);
