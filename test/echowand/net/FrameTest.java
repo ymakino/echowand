@@ -3,7 +3,7 @@ package echowand.net;
 import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Node;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.common.ESV;
 import echowand.common.EOJ;
@@ -18,7 +18,7 @@ public class FrameTest {
     
     @Test
     public void testCreation() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         
         Node node = subnet.getGroupNode();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("002201"), ESV.Get);

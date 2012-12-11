@@ -4,7 +4,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Property;
 import echowand.net.Frame;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.common.Data;
@@ -49,14 +49,14 @@ class DummyTransactionConfig extends TransactionConfig {
     
 }
 public class TransactionTest {
-    public LocalSubnet subnet;
+    public InternalSubnet subnet;
     public TransactionManager transactionManager;
     public DummyTransactionConfig transactionConfig1;
     public DummyTransactionConfig transactionConfig2;
     
     @Before
     public void setUp() {
-        subnet = new LocalSubnet();
+        subnet = new InternalSubnet();
         transactionManager = new TransactionManager(subnet);
         transactionConfig1 = new DummyTransactionConfig(ESV.Get, 1);
         transactionConfig1.setSenderNode(subnet.getLocalNode());

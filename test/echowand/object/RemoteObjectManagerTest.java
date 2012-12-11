@@ -5,7 +5,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.common.EOJ;
@@ -62,7 +62,7 @@ public class RemoteObjectManagerTest {
 
     @Test
     public void testCreateRemoteObject() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
         RemoteObject object = manager.get(subnet.getLocalNode(), new EOJ("001101"));
@@ -71,7 +71,7 @@ public class RemoteObjectManagerTest {
     
     @Test
     public void testCreationAndGetRemoteObject() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
@@ -96,7 +96,7 @@ public class RemoteObjectManagerTest {
     
     @Test
     public void testUpdateObjects() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
         RemoteObject object1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
@@ -118,7 +118,7 @@ public class RemoteObjectManagerTest {
 
     @Test
     public void testGetWithSelector() {
-        final LocalSubnet subnet = new LocalSubnet();
+        final InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
         RemoteObject object1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
@@ -159,7 +159,7 @@ public class RemoteObjectManagerTest {
     
     @Test
     public void testGetAtNode() {
-        final LocalSubnet subnet = new LocalSubnet();
+        final InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
         
@@ -174,7 +174,7 @@ public class RemoteObjectManagerTest {
     
     @Test
     public void testGetNodes() {
-        final LocalSubnet subnet = new LocalSubnet();
+        final InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
         

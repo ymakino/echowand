@@ -4,7 +4,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.common.Data;
@@ -28,14 +28,14 @@ import static org.junit.Assert.*;
  */
 public class SetGetRequestProcessorTest {
     public LocalObjectManager manager;
-    public LocalSubnet subnet;
+    public InternalSubnet subnet;
     public SetGetRequestProcessor processor;
     public LocalObject object;
     
     @Before
     public void setUp() {
         manager = new LocalObjectManager();
-        subnet = new LocalSubnet();
+        subnet = new InternalSubnet();
         processor = new SetGetRequestProcessor(manager);
         
         BaseObjectInfo objectInfo = new TemperatureSensorInfo();
@@ -126,7 +126,7 @@ public class SetGetRequestProcessorTest {
         return frame;
     }
     
-    public Frame recvWithoutError(LocalSubnet subnet) {
+    public Frame recvWithoutError(InternalSubnet subnet) {
         try {
             Frame frame = subnet.recvNoWait();
             if (frame == null) {

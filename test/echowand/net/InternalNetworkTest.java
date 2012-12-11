@@ -11,34 +11,34 @@ import static org.junit.Assert.*;
  *
  * @author Yoshiki Makino
  */
-public class LocalNetworkTest {
+public class InternalNetworkTest {
     
     @Test
     public void creationTest() {
-        LocalNetwork network1 = new LocalNetwork();
-        LocalNetwork network2 = new LocalNetwork();
+        InternalNetwork network1 = new InternalNetwork();
+        InternalNetwork network2 = new InternalNetwork();
         assertFalse(network1.equals(network2));
-        assertFalse(network1.equals(LocalNetwork.getDefault()));
-        assertFalse(network2.equals(LocalNetwork.getDefault()));
+        assertFalse(network1.equals(InternalNetwork.getDefault()));
+        assertFalse(network2.equals(InternalNetwork.getDefault()));
     }
     
     @Test
     public void nameTest() {
-        LocalNetwork defaultNetwork = LocalNetwork.getDefault();
-        assertEquals(defaultNetwork, LocalNetwork.getDefault());
+        InternalNetwork defaultNetwork = InternalNetwork.getDefault();
+        assertEquals(defaultNetwork, InternalNetwork.getDefault());
         
-        LocalNetwork t1 = LocalNetwork.getByName("TEST1");
-        assertEquals(t1, LocalNetwork.getByName("TEST1"));
-        LocalNetwork t2 = LocalNetwork.getByName("TEST2");
-        assertEquals(t2, LocalNetwork.getByName("TEST2"));
-        assertFalse(t2.equals(LocalNetwork.getByName("TEST1")));
+        InternalNetwork t1 = InternalNetwork.getByName("TEST1");
+        assertEquals(t1, InternalNetwork.getByName("TEST1"));
+        InternalNetwork t2 = InternalNetwork.getByName("TEST2");
+        assertEquals(t2, InternalNetwork.getByName("TEST2"));
+        assertFalse(t2.equals(InternalNetwork.getByName("TEST1")));
     }
     
     @Test
     public void broadcastTest() throws SubnetException {
-        LocalNetwork network = new LocalNetwork();
-        LocalNetworkPort port1 = new LocalNetworkPort();
-        LocalNetworkPort port2 = new LocalNetworkPort();
+        InternalNetwork network = new InternalNetwork();
+        InternalNetworkPort port1 = new InternalNetworkPort();
+        InternalNetworkPort port2 = new InternalNetworkPort();
         
         network.addPort(port1);
         network.addPort(port2);

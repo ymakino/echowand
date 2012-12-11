@@ -6,7 +6,7 @@ import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.net.SimplePayload;
 import echowand.net.Node;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.logic.RequestProcessor;
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  */
 public class RequestDispatcherTest {
     
-    public Frame recvWithoutError(LocalSubnet subnet) {
+    public Frame recvWithoutError(InternalSubnet subnet) {
         try {
             return subnet.recvNoWait();
         } catch (SubnetException e) {
@@ -56,7 +56,7 @@ public class RequestDispatcherTest {
             fail();
         }
         SetGetRequestProcessor processor = new SetGetRequestProcessor(manager);
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         CommonFrame frame = new CommonFrame();
@@ -164,7 +164,7 @@ public class RequestDispatcherTest {
     
     @Test
     public void testNotStandardPayload() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         CommonFrame commonFrame = new CommonFrame(new EOJ("001101"), new EOJ("001101"), ESV.Invalid);
         
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), commonFrame);

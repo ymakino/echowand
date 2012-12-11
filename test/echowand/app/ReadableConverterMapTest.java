@@ -3,7 +3,7 @@ package echowand.app;
 import echowand.common.ClassEOJ;
 import echowand.common.EOJ;
 import echowand.common.EPC;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.Node;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -23,7 +23,7 @@ public class ReadableConverterMapTest {
 
     @Test
     public void testPut() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");
@@ -42,7 +42,7 @@ public class ReadableConverterMapTest {
     
     @Test
     public void testPutWildcard() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");
@@ -87,7 +87,7 @@ public class ReadableConverterMapTest {
     
     @Test
     public void testPutMultiple() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");
@@ -140,7 +140,7 @@ public class ReadableConverterMapTest {
     
     @Test
     public void testClear() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node node = subnet.getLocalNode();
         EOJ eoj = new EOJ("001101");
         EPC epc = EPC.x80;
@@ -158,7 +158,7 @@ public class ReadableConverterMapTest {
     
     @Test
     public void testDefaultConverter() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");

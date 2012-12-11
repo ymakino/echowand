@@ -10,18 +10,18 @@ import static org.junit.Assert.*;
  *
  * @author Yoshiki Makino
  */
-public class LocalSubnetTest {
+public class InternalSubnetTest {
     
     @Test
     public void testCreation() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         
         assertTrue(local.isMemberOf(subnet));
         assertTrue(group.isMemberOf(subnet));
-        assertFalse(local.isMemberOf(new LocalSubnet()));
-        assertFalse(group.isMemberOf(new LocalSubnet()));
+        assertFalse(local.isMemberOf(new InternalSubnet()));
+        assertFalse(group.isMemberOf(new InternalSubnet()));
     }
     
     public CommonFrame createFrame() {
@@ -38,7 +38,7 @@ public class LocalSubnetTest {
     
     @Test
     public void testSendAndRecv() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
 
@@ -71,7 +71,7 @@ public class LocalSubnetTest {
     
     @Test
     public void testRecvNoWait() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         try {
             Frame frame = subnet.recvNoWait();
             assertEquals(null, frame);
@@ -79,5 +79,24 @@ public class LocalSubnetTest {
             e.printStackTrace();
             fail();
         }
+    }
+    
+    @Test
+    public void testGetRemoteNode() {
+        InternalSubnet subnet1 = new InternalSubnet();
+        InternalSubnet subnet2 = new InternalSubnet();
+        InternalSubnet subnet3 = new InternalSubnet("OTHER");
+        
+        Node node1local = subnet1.getLocalNode();
+        String node1name = ((InternalNode)node1local).getName();
+        Node node1remote = subnet2.getRemoteNode(node1name);
+        
+        assertEquals(node1local, node1remote);
+        
+        Node node1other = subnet3.getRemoteNode(node1name);
+        
+        assertFalse(node1local.equals(node1other));
+        
+        
     }
 }

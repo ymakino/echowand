@@ -3,11 +3,11 @@ package echowand.net;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * LocalNetworkと他のクラスの接続ポイント
+ * InternalNetworkと他のクラスの接続ポイント
  * @author Yoshiki Makino
  */
-public class LocalNetworkPort {
-    private LocalNetwork network;
+public class InternalNetworkPort {
+    private InternalNetwork network;
     private LinkedBlockingQueue<Frame> loopbackQueue = new LinkedBlockingQueue<Frame>();
 
     private Frame cloneFrame(Frame frame) throws InvalidDataException {
@@ -16,12 +16,12 @@ public class LocalNetworkPort {
     }
     
     /**
-     * 接続先のLocalNetworkを設定する。
-     * nullが指定された場合にはLocalNetworkとの接続を切断する。
-     * @param network 接続するLocalNetwork、もしくはnull
+     * 接続先のInternalNetworkを設定する。
+     * nullが指定された場合にはInternalNetworkとの接続を切断する。
+     * @param network 接続するInternalNetwork、もしくはnull
      * @return 設定に精巧した場合はtrue、失敗した場合にはfalse
      */
-    public synchronized boolean setNetwork(LocalNetwork network) {
+    public synchronized boolean setNetwork(InternalNetwork network) {
         if (this.network != null) {
             network.removePort(this);
         }
@@ -36,10 +36,10 @@ public class LocalNetworkPort {
     }
     
     /**
-     * このLocalNetworkPortが接続しているLocalNetworkを返す。
-     * @return このポートが接続しているLocalNetwork
+     * このInternalNetworkPortが接続しているInternalNetworkを返す。
+     * @return このポートが接続しているInternalNetwork
      */
-    public LocalNetwork getNetwork() {
+    public InternalNetwork getNetwork() {
         return network;
     }
     
@@ -62,7 +62,7 @@ public class LocalNetworkPort {
     
     /**
      * このポートを用いてフレームを送信する。
-     * 指定されたフレームはこのポートが関連付けられたLocalNetworkを経由して他のポートに転送される。
+     * 指定されたフレームはこのポートが関連付けられたInternalNetworkを経由して他のポートに転送される。
      * @param frame 転送するフレーム
      * @return  キューへの追加が成功した場合にはtrue、それ以外の場合はfalse
      * @throws SubnetException 転送に失敗した場合

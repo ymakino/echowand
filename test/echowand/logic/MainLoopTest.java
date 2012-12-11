@@ -4,7 +4,7 @@ import echowand.logic.MainLoop;
 import echowand.logic.Listener;
 import echowand.object.LocalObjectManager;
 import echowand.net.Frame;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.Subnet;
 import static org.junit.Assert.assertEquals;
 import org.junit.*;
@@ -24,7 +24,7 @@ public class MainLoopTest {
     @Test
     public void testCreation() {
         MainLoop echonet = new MainLoop();
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         echonet.setSubnet(subnet);
         assertEquals(subnet, echonet.getSubnet());
         

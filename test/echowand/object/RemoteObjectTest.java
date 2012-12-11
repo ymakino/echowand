@@ -8,7 +8,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.common.EOJ;
@@ -141,7 +141,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testGet() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertEquals(subnet, object.getSubnet());
@@ -164,7 +164,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testSet() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertEquals(subnet, object.getSubnet());
@@ -189,7 +189,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testInvalidSet() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
 
@@ -208,7 +208,7 @@ public class RemoteObjectTest {
     
     @Test
     public void setTimeout() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertTrue(object.setTimeout(1));
@@ -230,7 +230,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testAddAndRemoveObserver() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         RemoteObjectObserver observer1 = new DummyRemoteObjectObserver();
@@ -247,7 +247,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testAnno() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         DummyRemoteObjectObserver observer = new DummyRemoteObjectObserver();
@@ -260,7 +260,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testObserveData() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         
@@ -283,7 +283,7 @@ public class RemoteObjectTest {
     
     @Test
     public void testAccessPermission() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         try {

@@ -4,7 +4,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Property;
 import echowand.net.Frame;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.common.Data;
 import echowand.common.ESV;
@@ -29,7 +29,7 @@ public class NodeProfileObjectListenerTest {
      */
     @Test
     public void testTransaction() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);
@@ -50,7 +50,7 @@ public class NodeProfileObjectListenerTest {
     
     @Test
     public void testINF_SNA() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);
@@ -68,7 +68,7 @@ public class NodeProfileObjectListenerTest {
     
     @Test
     public void testAdditionOfSameEOJs() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);

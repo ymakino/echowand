@@ -7,7 +7,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.common.ESV;
 import echowand.common.EOJ;
@@ -27,7 +27,7 @@ public class LocalObjectNotifyDelegateTest {
     
     @Test
     public void testAnnounce() throws SubnetException {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
         BaseObjectInfo objectInfo = new TemperatureSensorInfo();
@@ -54,7 +54,7 @@ public class LocalObjectNotifyDelegateTest {
     
     @Test
     public void testNoAnnounceWithoutChanges() throws SubnetException {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
         BaseObjectInfo objectInfo = new TemperatureSensorInfo();
@@ -68,7 +68,7 @@ public class LocalObjectNotifyDelegateTest {
     
     @Test
     public void testNotAnnounce() throws SubnetException {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
         BaseObjectInfo objectInfo = new TemperatureSensorInfo();

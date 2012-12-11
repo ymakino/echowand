@@ -3,7 +3,7 @@ package echowand.logic;
 import echowand.common.EOJ;
 import echowand.logic.TransactionConfig;
 import echowand.common.ESV;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.StandardPayload;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -34,7 +34,7 @@ public class TransactionConfigTest {
     
     @Test
     public void testSetSenderAndReceiver() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TestTransactionConfig config = new TestTransactionConfig();
         assertEquals(null, config.getSenderNode());
         assertEquals(null, config.getReceiverNode());
@@ -46,7 +46,7 @@ public class TransactionConfigTest {
     
     @Test
     public void testSetSourceAndDestination() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TestTransactionConfig config = new TestTransactionConfig();
         assertEquals(null, config.getSourceEOJ());
         assertEquals(null, config.getDestinationEOJ());

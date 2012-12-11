@@ -4,7 +4,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.StandardPayload;
 import echowand.net.Node;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.common.ESV;
@@ -37,7 +37,7 @@ public class TransactionManagerTest {
     
     @Test
     public void testGetResponse() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         CommonFrame frame = new CommonFrame();
@@ -53,7 +53,7 @@ public class TransactionManagerTest {
     
     @Test
     public void testGetResponseSNA() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         CommonFrame frame = new CommonFrame();
@@ -68,7 +68,7 @@ public class TransactionManagerTest {
     
     @Test
     public void testCreateTransaction() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         TransactionConfig config = new SetGetTransactionConfig();
         Transaction t = transactionManager.createTransaction(config);

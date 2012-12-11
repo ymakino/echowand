@@ -2,7 +2,7 @@ package echowand.app;
 
 import echowand.common.EOJ;
 import echowand.logic.TransactionManager;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.Node;
 import echowand.object.RemoteObject;
 import echowand.object.RemoteObjectManager;
@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
  * @author Yoshiki Makino
  */
 public class ObjectListModelTest {
-    public static LocalSubnet subnet;
+    public static InternalSubnet subnet;
     public static Node node;
     public static TransactionManager transactionManager;
     
@@ -26,7 +26,7 @@ public class ObjectListModelTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        subnet = new LocalSubnet();
+        subnet = new InternalSubnet();
         node = subnet.getLocalNode();
         transactionManager = new TransactionManager(subnet);
     }

@@ -15,20 +15,20 @@ import static org.junit.Assert.*;
  *
  * @author Yoshiki Makino
  */
-public class LocalNetworkPortTest {
+public class InternalNetworkPortTest {
     
     @Test
     public void setGetNetworkTest() {
-        LocalNetworkPort port = new LocalNetworkPort();
+        InternalNetworkPort port = new InternalNetworkPort();
         
-        LocalNetwork network = new LocalNetwork();
+        InternalNetwork network = new InternalNetwork();
         port.setNetwork(network);
         assertEquals(network, port.getNetwork());
     }
     
     @Test
     public void enqueueAndRecvTest() throws SubnetException {
-        LocalNetworkPort port = new LocalNetworkPort();
+        InternalNetworkPort port = new InternalNetworkPort();
         
         Frame frame = new Frame(null, null, new CommonFrame());
         port.enqueue(frame);
@@ -38,7 +38,7 @@ public class LocalNetworkPortTest {
     
     @Test
     public void recvNoWaitTest() throws SubnetException {
-        LocalNetworkPort port = new LocalNetworkPort();
+        InternalNetworkPort port = new InternalNetworkPort();
         
         Frame frame = new Frame(null, null, new CommonFrame());
         port.enqueue(frame);
@@ -48,14 +48,14 @@ public class LocalNetworkPortTest {
     
     @Test
     public void sendTest() throws SubnetException {
-        LocalNetworkPort port1 = new LocalNetworkPort();
-        LocalNetworkPort port2 = new LocalNetworkPort();
+        InternalNetworkPort port1 = new InternalNetworkPort();
+        InternalNetworkPort port2 = new InternalNetworkPort();
         
         Frame frame = new Frame(null, null, new CommonFrame());
         port1.send(frame);
         assertTrue(port1.recvNoWait() == null);
         
-        LocalNetwork network = new LocalNetwork();
+        InternalNetwork network = new InternalNetwork();
         network.addPort(port1);
         network.addPort(port2);
         

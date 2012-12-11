@@ -24,7 +24,7 @@ public class ObjectTableModelTest {
     
     @Before
     public void setUp() {
-        subnet = new LocalSubnet();
+        subnet = new InternalSubnet();
         transactionManager = new TransactionManager(subnet);
         remoteObject1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("0ef001"), transactionManager);
         remoteObject2 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);

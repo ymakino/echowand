@@ -4,7 +4,7 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.net.LocalSubnet;
+import echowand.net.InternalSubnet;
 import echowand.net.SubnetException;
 import echowand.common.Data;
 import echowand.common.ESV;
@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  */
 public class AnnounceRequestProcessorTest {
     
-    public Frame processFrame(LocalSubnet subnet, AnnounceRequestProcessor listener, EOJ seoj, EOJ deoj, ESV esv) {
+    public Frame processFrame(InternalSubnet subnet, AnnounceRequestProcessor listener, EOJ seoj, EOJ deoj, ESV esv) {
         CommonFrame cf = new CommonFrame(seoj, deoj, esv);
         StandardPayload payload = (StandardPayload)cf.getEDATA();
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x42)));
@@ -50,7 +50,7 @@ public class AnnounceRequestProcessorTest {
     
     @Test
     public void testProcessFrameToInvalidEOJ() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         LocalObjectManager localManager = new LocalObjectManager();
         RemoteObjectManager remoteManager = new RemoteObjectManager();
         AnnounceRequestProcessor listener = new AnnounceRequestProcessor(localManager, remoteManager);
@@ -65,7 +65,7 @@ public class AnnounceRequestProcessorTest {
     
     @Test
     public void testProcessFrame() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         LocalObjectManager localManager = new LocalObjectManager();
         try {
             localManager.add(new LocalObject(new NodeProfileInfo()));
@@ -98,7 +98,7 @@ public class AnnounceRequestProcessorTest {
     
     @Test
     public void testProcessFrameToMulti() {
-        LocalSubnet subnet = new LocalSubnet();
+        InternalSubnet subnet = new InternalSubnet();
         LocalObjectManager localManager = new LocalObjectManager();
         TemperatureSensorInfo info = new TemperatureSensorInfo();
         try {
