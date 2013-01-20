@@ -11,10 +11,10 @@ import echowand.util.ConstraintUnion;
  * @author Yoshiki Makino
  */
 public class PropertyConstraintTemperature implements Constraint {
-    private static final short MIN_VALUE = (byte)0xf554;
-    private static final short MAX_VALUE = (byte)0x7ffd;
-    private static final short OVERFLOW = (byte)0x8000;
-    private static final short UNDERFLOW = (byte)0x7fff;
+    private static final short MIN_VALUE = (short)0xf554;
+    private static final short MAX_VALUE = (short)0x7ffd;
+    private static final short OVERFLOW = (short)0x8000;
+    private static final short UNDERFLOW = (short)0x7fff;
     
     private ConstraintUnion constraint;
     
