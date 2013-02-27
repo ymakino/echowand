@@ -99,4 +99,41 @@ public class PropertyMapTest {
         assertTrue(map2.isSet(EPC.xDA));
         assertTrue(map2.isSet(EPC.xFF));
     }
+    
+    @Test
+    public void testSupportInvalid17MapAllZero() {
+        byte[] data1 = new byte[]{
+            0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        PropertyMap map1 = new PropertyMap(data1);
+        
+        assertEquals(0, map1.count());
+        
+        for (int i=0x80; i<=0xff; i++) {
+            assertFalse(map1.isSet(EPC.fromByte((byte)i)));
+        }
+    }
+    
+    @Test
+    public void testSupportInvalid17Map() {
+        byte[] data1 = new byte[]{
+            0x0f,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00};
+        PropertyMap map1 = new PropertyMap(data1);
+        
+        assertEquals(15, map1.count());
+        
+        for (int i=0x80; i<=0x8f; i++) {
+            if (i == 0x8f) {
+                assertFalse(map1.isSet(EPC.fromByte((byte)0x8f)));
+            } else {
+                assertTrue(map1.isSet(EPC.fromByte((byte)i)));
+            }
+        }
+        for (int i=0x90; i<=0xff; i++) {
+            assertFalse(map1.isSet(EPC.fromByte((byte)i)));
+        }
+    }
 }

@@ -22,14 +22,17 @@ public class PropertyMap {
      */
     public PropertyMap(byte[] newMap) {
         this();
-        int len = byteToInt(newMap[0]);
-        if (len < 16) {
-            for (int i=1; i<=len; i++) {
-                setBit(EPC.fromByte(newMap[i]), true);
-            }
-        } else {
+        
+        if (newMap.length == 17) {
             System.arraycopy(newMap, 0, this.map, 0, 17);
             newMap[0] = countEPC();
+        } else {
+            int len = byteToInt(newMap[0]);
+            if (len < 16) {
+                for (int i=1; i<=len; i++) {
+                    setBit(EPC.fromByte(newMap[i]), true);
+                }
+            }
         }
     }
     
