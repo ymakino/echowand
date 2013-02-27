@@ -24,7 +24,7 @@ public class NodeProfileInfo extends BaseObjectInfo {
         ConstraintUnion c = new ConstraintUnion(size1, size2);
         add(EPC.x83, true, false, false, 9, c);
         
-        add(EPC.xBF, true, true, false, 2);
+        add(EPC.xBF, true, true, false, new byte[]{(byte)0x80, (byte)0x00});
         add(EPC.xD3, true, false, false, 3);
         add(EPC.xD4, true, false, false, 2);
         add(EPC.xD5, false, false, true, 1, new ConstraintSize(1, 253));
