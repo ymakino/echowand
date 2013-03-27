@@ -487,4 +487,9 @@ public class RemoteObject implements EchonetObject {
         
         logger.exiting(className, "notifyData");
     }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{Node: " + node + ", EOJ: " + eoj + "}";
+    }
 }

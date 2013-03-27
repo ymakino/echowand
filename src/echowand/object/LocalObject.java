@@ -303,4 +303,9 @@ public class LocalObject implements EchonetObject {
         
         logger.entering(className, "removeDelegate");
     }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{EOJ: " + eoj + "}";
+    }
 }
