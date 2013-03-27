@@ -9,10 +9,6 @@ import echowand.net.SubnetException;
 import echowand.net.Subnet;
 import echowand.common.Data;
 import echowand.common.ESV;
-import echowand.logic.TransactionManager;
-import echowand.logic.TransactionListener;
-import echowand.logic.TransactionConfig;
-import echowand.logic.Transaction;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.net.Inet4Subnet;
@@ -53,9 +49,10 @@ public class TransactionTest {
     public TransactionManager transactionManager;
     public DummyTransactionConfig transactionConfig1;
     public DummyTransactionConfig transactionConfig2;
+    public Inet4Subnet inet4Subnet;
     
     @Before
-    public void setUp() {
+    public void setUp() throws SubnetException {
         subnet = new InternalSubnet();
         transactionManager = new TransactionManager(subnet);
         transactionConfig1 = new DummyTransactionConfig(ESV.Get, 1);
@@ -69,6 +66,12 @@ public class TransactionTest {
         transactionConfig2.setReceiverNode(subnet.getGroupNode());
         transactionConfig2.setSourceEOJ(new EOJ("001101"));
         transactionConfig2.setDestinationEOJ(new EOJ("0ef001"));
+        inet4Subnet = new Inet4Subnet();
+    }
+    
+    @After
+    public void tearDown() {
+        inet4Subnet.disable();
     }
     
     @Test
@@ -110,24 +113,21 @@ public class TransactionTest {
             fail();
         }
     }
-    
-    
+
     @Test(expected = SubnetException.class)
     public void testSetInvalidSender() throws SubnetException {
         Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
-        Inet4Subnet ls = new Inet4Subnet();
-        transactionConfig1.setSenderNode(ls.getLocalNode());
+        transactionConfig1.setSenderNode(inet4Subnet.getLocalNode());
         t.execute();
     }
 
     @Test(expected = SubnetException.class)
     public void testSetInvalidReceiver() throws SubnetException {
         Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
-        Inet4Subnet ls = new Inet4Subnet();
-        transactionConfig1.setReceiverNode(ls.getLocalNode());
+        transactionConfig1.setReceiverNode(inet4Subnet.getLocalNode());
         t.execute();
     }
-    
+
     public Frame createReplyFrame(Frame frame) {
         CommonFrame commonFrame = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload)commonFrame.getEDATA();

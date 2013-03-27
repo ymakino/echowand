@@ -43,9 +43,15 @@ public class InternalSubnet implements Subnet {
         network.addPort(port);
     }
     
-    private void validatesSender(Frame frame) throws SubnetException {
+    private void validateSender(Frame frame) throws SubnetException {
         if (!frame.getSender().isMemberOf(this)) {
             throw new SubnetException("invalid sender");
+        }
+    }
+    
+    private void validateReceiver(Frame frame) throws SubnetException {
+        if (! (frame.getReceiver() instanceof InternalNode)) {
+            throw new SubnetException("invalid receiver");
         }
     }
     
@@ -71,7 +77,8 @@ public class InternalSubnet implements Subnet {
      */
     @Override
     public boolean send(Frame frame) throws SubnetException {
-        validatesSender(frame);
+        validateSender(frame);
+        validateReceiver(frame);
         return port.send(frame);
     }
 
