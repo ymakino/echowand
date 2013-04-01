@@ -36,6 +36,7 @@ public class Inet4Subnet implements Subnet {
     /**
      * Inet4Subnetを生成する。
      * ソケットの初期化も同時に行い、このInet4Subnetを有効にする。
+     * @throws SubnetException 生成に失敗した場合
      */
     public Inet4Subnet() throws SubnetException {
         initInet4Subnet(true);
@@ -46,6 +47,7 @@ public class Inet4Subnet implements Subnet {
      * 与えられたdoInitがtrueであればソケットの初期化も行い、このInet4Subnetを有効にする。
      * doInitがfalseであればソケットの初期化は行わず、enableが呼ばれるまで無効状態になる。
      * @param doInit ソケットの初期化処理の有無
+     * @throws SubnetException 生成に失敗した場合
      */
     public Inet4Subnet(boolean doInit) throws SubnetException {
         initInet4Subnet(doInit);
@@ -57,6 +59,7 @@ public class Inet4Subnet implements Subnet {
      * doInitがfalseであればソケットの初期化は行わず、enableが呼ばれるまで無効状態になる。
      * addressにより利用するネットワークインタフェースの指定を行う。
      * @param address 利用するネットワークインタフェースにつけられたアドレス
+     * @param doInit 初期化処理を行うかどうかの指定
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet4Subnet(Inet4Address address, boolean doInit) throws SubnetException {

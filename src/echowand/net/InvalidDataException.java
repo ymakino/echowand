@@ -1,7 +1,7 @@
 package echowand.net;
 
 /**
- *
+ * 
  * @author Yoshiki Makino
  */
 public class InvalidDataException extends Exception {

@@ -2,10 +2,20 @@ package echowand.util;
 
 /**
  * ペアの表現
+ * @param <T1> 一番目の値の型
+ * @param <T2> 二番目の値の型
  * @author Yoshiki Makino
  */
 public class Pair<T1, T2> {
+    
+    /**
+     * ペアの一番目の値
+     */
     public T1 first;
+    
+    /**
+     * ペアの二番目番の値
+     */
     public T2 second;
     
     /**

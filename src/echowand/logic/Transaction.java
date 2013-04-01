@@ -83,6 +83,12 @@ public class Transaction {
         }
     }
     
+    /**
+     * 指定されたリクエストESVに対応するレスポンスESVの登録を行う。
+     * エラーレスポンス等の登録も行う必要があるため、一つのリクエストに対して複数のレスポンスを対応させることができる。
+     * @param req リクエストESVの指定
+     * @param res レスポンスESVの指定
+     */
     protected void addResponseESVMap(ESV req, ESV res) {
         LinkedList<ESV> esvs;
         if (responseESVMap.containsKey(req)) {

@@ -133,6 +133,7 @@ public class BaseObjectInfo implements ObjectInfo {
      * @param gettable Setの可否
      * @param settable Getの可否
      * @param observable 通知の有無
+     * @param size プロパティのデータサイズ
      * @param constraint プロパティの制約
      * @return 追加が成功した場合にはtrue、失敗した場合にはfalse
      */

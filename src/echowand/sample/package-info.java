@@ -1,0 +1,4 @@
+/**
+ * サンプルプログラム。
+ */
+package echowand.sample;

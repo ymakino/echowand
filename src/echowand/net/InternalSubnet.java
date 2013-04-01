@@ -31,6 +31,7 @@ public class InternalSubnet implements Subnet {
      * InternalSubnetを生成する。
      * 指定された名前のInternalNetworkに接続する。
      * param networkName 接続するInternalNetworkの名前
+     * @param networkName 接続するInternalNetworkの名前の指定
      */
     public InternalSubnet(String networkName) {
         initialize(InternalNetwork.getByName(networkName));

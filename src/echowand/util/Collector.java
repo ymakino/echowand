@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 /**
  * コレクションから指定された要素のみを抽出したリストを作成
+ * @param <T> 要素の型
  * @author Yoshiki Makino
  */
 public class Collector<T> {

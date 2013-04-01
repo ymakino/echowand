@@ -34,7 +34,7 @@ public class PropertyConstraintHumidity implements Constraint {
     public boolean isValid(byte[] data) {
         return constraint.isValid(data);
     }
-
+    
     @Override
     public String toString() {
         return constraint.toString();

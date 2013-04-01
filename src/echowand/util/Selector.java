@@ -2,6 +2,7 @@ package echowand.util;
 
 /**
  * 指定されたオブジェクトの選択
+ * @param <T> 指令されるオブジェクトの型
  * @author Yoshiki Makino
  */
 public interface Selector<T> {

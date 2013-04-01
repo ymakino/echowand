@@ -7,6 +7,11 @@ import echowand.common.ESV;
  * @author Yoshiki Makino
  */
 public class StandardPayloadValidator {
+    /**
+     * ペイロードに問題がないかを確認する
+     * @param payload 確認を行うペイロード
+     * @return 問題がなければtrue、そうでなければfalse
+     */
     public boolean validate(StandardPayload payload) {
         return validateSEOJ(payload) &&
                 validateDEOJ(payload) &&
