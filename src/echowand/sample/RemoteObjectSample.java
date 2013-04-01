@@ -46,20 +46,18 @@ public class RemoteObjectSample {
 
             for (Node node : remoteManager.getNodes()) {
                 RemoteObject remoteObject = remoteManager.get(node, new EOJ("001101"));
-                if (remoteObject != null) {
-                    remoteObject.addObserver(new RemoteObjectObserver() {
-                        @Override
-                        public void notifyData(RemoteObject object, EPC epc, ObjectData data) {
-                            System.out.println(object.getNode() + " " + object.getEOJ() + " " + epc + " " + data);
-                        }
-                    });
-
-                    System.out.print(node + "\n");
-                    for (int i = 0x80; i <= 0xff; i++) {
-                        EPC epc = EPC.fromByte((byte) i);
-                        if (remoteObject.isGettable(epc)) {
-                            System.out.println("\t" + epc + " " + remoteObject.getData(epc));
-                        }
+                remoteObject.addObserver(new RemoteObjectObserver() {
+                    @Override
+                    public void notifyData(RemoteObject object, EPC epc, ObjectData data) {
+                        System.out.println(object.getNode() + " " + object.getEOJ() + " " + epc + " " + data);
+                    }
+                });
+                
+                System.out.print(node + "\n");
+                for (int i = 0x80; i <= 0xff; i++) {
+                    EPC epc = EPC.fromByte((byte) i);
+                    if (remoteObject.isGettable(epc)) {
+                        System.out.println("\t" + epc + " " + remoteObject.getData(epc));
                     }
                 }
             }
