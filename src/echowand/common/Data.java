@@ -9,59 +9,12 @@ import java.util.Arrays;
 public class Data {
     private byte[] data;
     
-    
     /**
-     * 大きさ0のDataを生成する。
-     */
-    public Data() {
-        this.data = new byte[0];
-    }
-    
-    
-    /**
-     * 指定されたバイト配列を用いてDataを生成する。
+     * 指定されたバイト列を用いてDataを生成する。
      * @param data データのバイト配列
      */
-    public Data(byte[] data) {
+    public Data(byte... data) {
         this.data = Arrays.copyOf(data, data.length);
-    }
-    
-    /**
-     * 指定されたバイトを用いて、1バイト長のDataを生成する。
-     * @param data1 データの1バイト目
-     */
-    public Data(byte data1) {
-        this.data = new byte[]{data1};
-    }
-    
-    /**
-     * 指定されたバイトを用いて、2バイト長のDataを生成する。
-     * @param data1 データの1バイト目
-     * @param data2 データの2バイト目
-     */
-    public Data(byte data1, byte data2) {
-        this.data = new byte[]{data1, data2};
-    }
-    
-    /**
-     * 指定されたバイトを用いて、3バイト長のDataを生成する。
-     * @param data1 データの1バイト目
-     * @param data2 データの2バイト目
-     * @param data3 データの3バイト目
-     */
-    public Data(byte data1, byte data2, byte data3) {
-        this.data = new byte[]{data1, data2, data3};
-    }
-    
-    /**
-     * 指定されたバイトを用いて、4バイト長のDataを生成する。
-     * @param data1 データの1バイト目
-     * @param data2 データの2バイト目
-     * @param data3 データの3バイト目
-     * @param data4 データの4バイト目
-     */
-    public Data(byte data1, byte data2, byte data3, byte data4) {
-        this.data = new byte[]{data1, data2, data3, data4};
     }
     
     

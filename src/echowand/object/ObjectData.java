@@ -69,50 +69,12 @@ public class ObjectData {
     }
     
     /**
-     * 指定されたバイト配列を用いてObjectDataを生成する。
+     * 指定されたバイト列を用いてObjectDataを生成する。
      * @param data データのバイト配列
      */
-    public ObjectData(byte[] data) {
+    public ObjectData(byte... data) {
         this.data = new Data(data);
         this.extraData = new ExtraData();
-    }
-    
-    /**
-     * 指定されたバイトを用いて、1バイト長のObjectDataを生成する。
-     * @param data1 データの1バイト目
-     */
-    public ObjectData(byte data1) {
-        this(new Data(data1));
-    }
-    
-    /**
-     * 指定されたバイトを用いて、2バイト長のObjectDataを生成する。
-     * @param data1 データの1バイト目
-     * @param data2 データの2バイト目
-     */
-    public ObjectData(byte data1, byte data2) {
-        this(new Data(data1, data2));
-    }
-    
-    /**
-     * 指定されたバイトを用いて、3バイト長のObjectDataを生成する。
-     * @param data1 データの1バイト目
-     * @param data2 データの2バイト目
-     * @param data3 データの3バイト目
-     */
-    public ObjectData(byte data1, byte data2, byte data3) {
-        this(new Data(data1, data2, data3));
-    }
-    
-    /**
-     * 指定されたバイトを用いて、4バイト長のObjectDataを生成する。
-     * @param data1 データの1バイト目
-     * @param data2 データの2バイト目
-     * @param data3 データの3バイト目
-     * @param data4 データの4バイト目
-     */
-    public ObjectData(byte data1, byte data2, byte data3, byte data4) {
-        this(new Data(data1, data2, data3, data4));
     }
     
     /**
