@@ -8,7 +8,7 @@ import echowand.common.EPC;
  * 家庭用エアコンクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class HomeAirConditionerInfo extends BaseObjectInfo {
+public class HomeAirConditionerInfo extends DeviceObjectInfo {
     /**
      * HomeAirConditionerInfoを生成する
      */

@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 地震センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class EarthquakeSensorInfo extends BaseObjectInfo {
+public class EarthquakeSensorInfo extends DeviceObjectInfo {
     /**
      * EarthquakeSensorInfoを生成する
      */

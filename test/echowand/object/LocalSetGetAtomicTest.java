@@ -2,7 +2,7 @@ package echowand.object;
 
 import echowand.common.Data;
 import echowand.common.EPC;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.NodeProfileInfo;
 import echowand.net.Property;
 import echowand.object.ObjectData;
@@ -24,6 +24,12 @@ public class LocalSetGetAtomicTest {
         t.add(EPC.x80, true, true, true, 1);
         t.add(EPC.x81, true, true, false, 2);
         t.add(EPC.xE0, true, true, false, 2);
+        return t;
+    }
+    
+    public TemperatureSensorInfo getTemperatureSensorInfoWitnNoLocationInfo() {
+        TemperatureSensorInfo t = new TemperatureSensorInfo();
+        t.add(EPC.x81, false, false, false, 2);
         return t;
     }
     
@@ -95,7 +101,7 @@ public class LocalSetGetAtomicTest {
         assertEquals(EPC.x88, getResult.get(0).getEPC());
         assertEquals(1, getResult.get(0).getPDC());
         assertEquals(EPC.x9D, getResult.get(1).getEPC());
-        assertEquals(4, getResult.get(1).getPDC());
+        assertEquals(5, getResult.get(1).getPDC());
         
         assertTrue(localSetGetAtomic.isSuccess());
     }
@@ -114,7 +120,7 @@ public class LocalSetGetAtomicTest {
         assertEquals(1, setResult.get(0).getPDC());
         assertFalse(localSetAtomic.isSuccess());
         
-        LocalObject getObject = new LocalObject(new TemperatureSensorInfo());
+        LocalObject getObject = new LocalObject(getTemperatureSensorInfoWitnNoLocationInfo());
         LocalSetGetAtomic localGetAtomic = new LocalSetGetAtomic(getObject);
         localGetAtomic.addGet(new Property(EPC.x81));
         assertFalse(localGetAtomic.isDone());
@@ -126,7 +132,7 @@ public class LocalSetGetAtomicTest {
         assertEquals(0, getResult.get(0).getPDC());
         assertFalse(localGetAtomic.isSuccess());
         
-        LocalObject object = new LocalObject(new TemperatureSensorInfo());
+        LocalObject object = new LocalObject(getTemperatureSensorInfoWitnNoLocationInfo());
         LocalSetGetAtomic localAtomic = new LocalSetGetAtomic(object);
         localAtomic.addSet(new Property(EPC.x81, new Data((byte)0x11, (byte)0x22)));
         localAtomic.addGet(new Property(EPC.x81));
@@ -181,7 +187,7 @@ public class LocalSetGetAtomicTest {
         assertEquals(EPC.x88, getResult.get(0).getEPC());
         assertEquals(1, getResult.get(0).getPDC());
         assertEquals(EPC.x9D, getResult.get(1).getEPC());
-        assertEquals(3, getResult.get(1).getPDC());
+        assertEquals(4, getResult.get(1).getPDC());
         
         assertEquals((byte)0x42, object.getData(EPC.x80).get(0));
         assertEquals((byte)0xab, object.getData(EPC.xE0).get(0));
@@ -192,7 +198,7 @@ public class LocalSetGetAtomicTest {
     
     @Test
     public void testAnnounce() {
-        BaseObjectInfo objectInfo = getWritableTemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = getWritableTemperatureSensorInfo();
         objectInfo.add(EPC.xE1, false, false, true, 1);
         LocalObject object = new LocalObject(objectInfo);
         object.forceSetData(EPC.x80, new ObjectData((byte)0x41));

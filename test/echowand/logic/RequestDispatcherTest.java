@@ -17,7 +17,7 @@ import echowand.logic.RequestDispatcher;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.object.SetGetRequestProcessor;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.object.LocalObjectManager;
 import echowand.object.LocalObject;
 import echowand.info.TemperatureSensorInfo;
@@ -46,7 +46,7 @@ public class RequestDispatcherTest {
     
     public void doTestSetGetRequest(ESV reqESV, ESV resESV, EPC epc1, Data data1, EPC epc2, boolean useValidEOJ) {
         LocalObjectManager manager = new LocalObjectManager();
-        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
         objectInfo.add(EPC.x80, true, true, false, 1);
         LocalObject object = new LocalObject(objectInfo);
         try {
@@ -131,14 +131,14 @@ public class RequestDispatcherTest {
     
     @Test
     public void testInvalidSetIRequest() {
-        doTestSetGetRequest(ESV.SetGet, ESV.SetGet_SNA, EPC.x81, new Data((byte)0x42), EPC.xE0);
-        doTestSetGetRequest(ESV.SetGet, ESV.SetGet_SNA, EPC.x80, new Data((byte)0x42), EPC.xE1);
+        // doTestSetGetRequest(ESV.SetI, ESV.SetI_SNA, EPC.x80, new Data((byte)0x42), null);
+        doTestSetGetRequest(ESV.SetI, ESV.SetI_SNA, EPC.x80, new Data(new byte[]{0x42, 0x11}), null);
     }
     
     @Test
     public void testInvalidSetGetRequest() {
-        doTestSetGetRequest(ESV.SetI, ESV.SetI_SNA, EPC.x81, new Data((byte)0x42), null);
-        // doTestSetGetRequest(ESV.SetI, ESV.SetI_SNA, EPC.x80, new byte[]{0x42, 0x11}, null);
+        doTestSetGetRequest(ESV.SetGet, ESV.SetGet_SNA, EPC.x83, new Data((byte)0x42), EPC.xE0);
+        doTestSetGetRequest(ESV.SetGet, ESV.SetGet_SNA, EPC.x80, new Data((byte)0x42), EPC.xE1);
     }
     
     

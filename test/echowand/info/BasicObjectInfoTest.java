@@ -1,7 +1,7 @@
 package echowand.info;
 
 import echowand.common.EPC;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.ObjectInfo;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -10,11 +10,11 @@ import static org.junit.Assert.*;
  *
  * @author Yoshiki Makino
  */
-public class BaseObjectInfoTest {
+public class BasicObjectInfoTest {
     
     @Test
     public void testBase() {
-        BaseObjectInfo objectInfo = new BaseObjectInfo();
+        DeviceObjectInfo objectInfo = new DeviceObjectInfo();
         assertEquals(EPC.x80, objectInfo.getAtIndex(0).epc);
         assertEquals(1, objectInfo.getAtIndex(0).initialData.length);
         assertEquals((byte)0x30, objectInfo.getAtIndex(0).initialData[0]);
@@ -30,17 +30,20 @@ public class BaseObjectInfoTest {
 
     @Test
     public void testInvalidEPC() {
-        BaseObjectInfo objectInfo = new BaseObjectInfo();
+        DeviceObjectInfo objectInfo = new DeviceObjectInfo();
         assertFalse(objectInfo.get(EPC.xFF).gettable);
         assertFalse(objectInfo.get(EPC.xFF).settable);
         assertFalse(objectInfo.get(EPC.xFF).observable);
         
         byte[] getMap = objectInfo.get(EPC.x9F).initialData;
-        assertEquals(5, getMap[0]);
+        assertEquals(8, getMap[0]);
         assertEquals((byte)0x80, getMap[1]);
-        assertEquals((byte)0x88, getMap[2]);
-        assertEquals((byte)0x9D, getMap[3]);
-        assertEquals((byte)0x9E, getMap[4]);
-        assertEquals((byte)0x9F, getMap[5]);
+        assertEquals((byte)0x81, getMap[2]);
+        assertEquals((byte)0x82, getMap[3]);
+        assertEquals((byte)0x88, getMap[4]);
+        assertEquals((byte)0x8A, getMap[5]);
+        assertEquals((byte)0x9D, getMap[6]);
+        assertEquals((byte)0x9E, getMap[7]);
+        assertEquals((byte)0x9F, getMap[8]);
     }
 }

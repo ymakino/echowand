@@ -9,7 +9,6 @@ import echowand.logic.Transaction;
 import echowand.logic.TransactionListener;
 import echowand.logic.TransactionManager;
 import echowand.net.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
@@ -68,6 +67,10 @@ public class RemoteObject implements EchonetObject {
         this.timeout = TRANSACTION_TIMEOUT;
         
         logger.entering(className, "RemoteObject");
+    }
+    
+    private synchronized LinkedList<RemoteObjectObserver> cloneObservers() {
+        return new LinkedList<RemoteObjectObserver>(observers);
     }
     
     /**
@@ -445,7 +448,7 @@ public class RemoteObject implements EchonetObject {
      * プロパティデータ変更通知オブザーバを登録する。
      * @param observer 登録するオブザーバ
      */
-    public void addObserver(RemoteObjectObserver observer) {
+    public synchronized void addObserver(RemoteObjectObserver observer) {
         logger.entering(className, "addObserver", observer);
         
         observers.add(observer);
@@ -457,7 +460,7 @@ public class RemoteObject implements EchonetObject {
      * プロパティデータ変更通知オブザーバの登録を抹消する。
      * @param observer 登録を抹消するオブザーバ
      */
-    public void removeObserver(RemoteObjectObserver observer) {
+    public synchronized void removeObserver(RemoteObjectObserver observer) {
         logger.entering(className, "removeObserver", observer);
         
         observers.remove(observer);
@@ -469,7 +472,7 @@ public class RemoteObject implements EchonetObject {
      * プロパティデータ変更通知オブザーバの数を返す。
      * @return オブザーバの数
      */
-    public int countObservers() {
+    public synchronized int countObservers() {
         return observers.size();
     }
     
@@ -481,7 +484,7 @@ public class RemoteObject implements EchonetObject {
     public void notifyData(EPC epc, ObjectData data) {
         logger.entering(className, "notifyData", new Object[]{epc, data});
         
-        for (RemoteObjectObserver observer : new ArrayList<RemoteObjectObserver>(observers)) {
+        for (RemoteObjectObserver observer : cloneObservers()) {
             observer.notifyData(this, epc, data);
         }
         

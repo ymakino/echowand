@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 人体検知センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class HumanDetectionSensorInfo extends BaseObjectInfo {
+public class HumanDetectionSensorInfo extends DeviceObjectInfo {
     /**
      * HumanDetectionSensorInfoを生成する
      */

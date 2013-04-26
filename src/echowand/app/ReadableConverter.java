@@ -152,7 +152,7 @@ class ReadableConverterDate extends ReadableConverter {
         int d1 = b2i(data.get(1));
         int d2 = b2i(data.get(2));
         int d3 = b2i(data.get(3));
-        return String.format("%d-%d-%d", (d0<<8) + d1, d2, d3);
+        return String.format("%04d-%02d-%02d", (d0<<8) + d1, d2, d3);
     }
 }
 
@@ -171,7 +171,7 @@ class ReadableConverterTime extends ReadableConverter {
         
         int d0 = b2i(data.get(0));
         int d1 = b2i(data.get(1));
-        return String.format("%d:%d", d0, d1);
+        return String.format("%02d:%02d", d0, d1);
     }
 }
 

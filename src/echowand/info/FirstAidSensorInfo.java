@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 救急用センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class FirstAidSensorInfo extends BaseObjectInfo {
+public class FirstAidSensorInfo extends DeviceObjectInfo {
     /**
      * FirstAidSensorInfoを生成する
      */

@@ -4,7 +4,7 @@ import echowand.object.LocalObjectDateTimeDelegate;
 import echowand.object.LocalObject;
 import echowand.object.ObjectData;
 import echowand.common.EPC;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.TemperatureSensorInfo;
 import java.util.Calendar;
 import org.junit.*;
@@ -21,7 +21,7 @@ public class LocalObjectDateTimeDelegateTest {
      */
     @Test
     public void testGetData() {
-        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
         objectInfo.add(EPC.x97, true, false, false, 2);
         objectInfo.add(EPC.x98, true, false, false, 4);
         LocalObject object = new LocalObject(objectInfo);

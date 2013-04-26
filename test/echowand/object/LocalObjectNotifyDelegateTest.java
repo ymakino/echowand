@@ -13,7 +13,7 @@ import echowand.common.ESV;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.logic.TransactionManager;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.ObjectInfo;
 import echowand.info.TemperatureSensorInfo;
 import org.junit.*;
@@ -30,7 +30,7 @@ public class LocalObjectNotifyDelegateTest {
         InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
-        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
         objectInfo.add(EPC.x80, true, true, true, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
@@ -57,7 +57,7 @@ public class LocalObjectNotifyDelegateTest {
         InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
-        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
         objectInfo.add(EPC.x80, true, true, true, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
@@ -71,7 +71,7 @@ public class LocalObjectNotifyDelegateTest {
         InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
-        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
         objectInfo.add(EPC.x80, true, true, false, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         

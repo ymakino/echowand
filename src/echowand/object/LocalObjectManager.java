@@ -75,7 +75,7 @@ public class LocalObjectManager {
      * @param eoj EOJの指定
      * @return 指定されたEOJのローカルオブジェクト
      */
-    public LocalObject get(EOJ eoj) {
+    public synchronized LocalObject get(EOJ eoj) {
         logger.entering(className, "get", eoj);
         
         LocalObject object = objectsMap.get(eoj);
@@ -89,7 +89,7 @@ public class LocalObjectManager {
      * @param selector ローカルオブジェクトの選択
      * @return 選択したローカルオブジェクトのリスト
      */
-    public LinkedList<LocalObject> get(Selector<LocalObject> selector) {
+    public synchronized LinkedList<LocalObject> get(Selector<LocalObject> selector) {
         logger.entering(className, "get", selector);
         
         Collector<LocalObject> collector = new Collector<LocalObject>(selector);
@@ -104,7 +104,7 @@ public class LocalObjectManager {
      * @param index ローカルオブジェクトのインデックス
      * @return index番目のローカルオブジェクト
      */
-    public LocalObject getAtIndex(int index) {
+    public synchronized LocalObject getAtIndex(int index) {
         logger.entering(className, "getAtIndex", index);
         
         LocalObject object = objects.get(index);
@@ -118,7 +118,7 @@ public class LocalObjectManager {
      * @param ceoj ClassEOJの指定
      * @return 指定されたClassEOJに属するローカルオブジェクトリスト
      */
-    public LinkedList<LocalObject> getWithClassEOJ(final ClassEOJ ceoj) {
+    public synchronized LinkedList<LocalObject> getWithClassEOJ(final ClassEOJ ceoj) {
         logger.entering(className, "getWithClassEOJ", ceoj);
         
         LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {
@@ -137,7 +137,7 @@ public class LocalObjectManager {
      * 機器オブジェクトに属するローカルオブジェクトのリストを返す。
      * @return 機器オブジェクトのリスト
      */
-    public LinkedList<LocalObject> getDeviceObjects() {
+    public synchronized LinkedList<LocalObject> getDeviceObjects() {
         logger.entering(className, "getDeviceObjects");
         
         LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {

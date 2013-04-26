@@ -30,6 +30,10 @@ public class TransactionManager implements Listener {
         logger.exiting(className, "TransactionManager");
     }
     
+    private synchronized LinkedList<Transaction> cloneTransactions() {
+        return new LinkedList<Transaction>(transactions);
+    }
+    
     /**
      * Transactionを処理中として登録する。
      * @param t 登録するトランザクション
@@ -71,7 +75,7 @@ public class TransactionManager implements Listener {
      * @return 指定されたフレームを処理した場合にはtrue、そうでなければfalse
      */
     @Override
-    public synchronized boolean process(Subnet subnet, Frame frame, boolean processed) {
+    public boolean process(Subnet subnet, Frame frame, boolean processed) {
         logger.entering(className, "process", new Object[]{subnet, frame, processed});
         
         boolean ret = false;
@@ -81,7 +85,7 @@ public class TransactionManager implements Listener {
             return ret;
         }
         
-        for (Transaction transaction : new ArrayList<Transaction>(transactions)) {
+        for (Transaction transaction : cloneTransactions()) {
             if (frame.getCommonFrame().getTID() == transaction.getTID()) {
                 ret |= transaction.recvResponse(frame);
             }

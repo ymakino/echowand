@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 防犯センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class CrimePreventionSensorInfo extends BaseObjectInfo {
+public class CrimePreventionSensorInfo extends DeviceObjectInfo {
     /**
      * CrimePreventionSensorInfoを生成する
      */

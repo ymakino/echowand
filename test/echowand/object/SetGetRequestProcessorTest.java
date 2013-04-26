@@ -12,7 +12,7 @@ import echowand.common.ESV;
 import echowand.common.EPC;
 import echowand.common.EOJ;
 import echowand.object.SetGetRequestProcessor;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.object.LocalObjectManager;
 import echowand.object.ObjectData;
 import echowand.object.LocalObject;
@@ -38,7 +38,7 @@ public class SetGetRequestProcessorTest {
         subnet = new InternalSubnet();
         processor = new SetGetRequestProcessor(manager);
         
-        BaseObjectInfo objectInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
         objectInfo.add(EPC.x80, true, true, true, 1);
         objectInfo.add(EPC.xE0, true, true, false, 1);
         object = new LocalObject(objectInfo);

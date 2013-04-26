@@ -1,7 +1,7 @@
 package echowand.app;
 
 import echowand.common.EPC;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.HumiditySensorInfo;
 import echowand.info.NodeProfileInfo;
 import echowand.info.TemperatureSensorInfo;
@@ -177,7 +177,7 @@ public class ObjectViewer implements Runnable {
     public void run() {
         initialize();
 
-        BaseObjectInfo temperatureSensorInfo = new TemperatureSensorInfo();
+        DeviceObjectInfo temperatureSensorInfo = new TemperatureSensorInfo();
         temperatureSensorInfo.add(EPC.x97, true, false, false, 2);
         temperatureSensorInfo.add(EPC.x98, true, false, false, 4);
         LocalObject temperatureSensor = new LocalObject(temperatureSensorInfo);
@@ -196,7 +196,7 @@ public class ObjectViewer implements Runnable {
         updater1.start();
         
         
-        BaseObjectInfo humiditySensorInfo = new HumiditySensorInfo();
+        DeviceObjectInfo humiditySensorInfo = new HumiditySensorInfo();
         humiditySensorInfo.add(EPC.x97, true, false, false, 2);
         humiditySensorInfo.add(EPC.x98, true, false, false, 4);
         LocalObject humiditySensor = new LocalObject(humiditySensorInfo);
@@ -258,7 +258,7 @@ public class ObjectViewer implements Runnable {
             changeLogLevelAll(RemoteObject.class.getName());
             changeLogLevelAll(RemoteObjectManager.class.getName());
             changeLogLevelAll(SetGetRequestProcessor.class.getName());
-            changeLogLevelAll(BaseObjectInfo.class.getName());
+            changeLogLevelAll(DeviceObjectInfo.class.getName());
         }
 
         try {

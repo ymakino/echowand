@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 電力量センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class ElectricEnergySensorInfo extends BaseObjectInfo {
+public class ElectricEnergySensorInfo extends DeviceObjectInfo {
     /**
      * ElectricEnergySensorInfoを生成する
      */

@@ -5,7 +5,6 @@ import echowand.common.EPC;
 import echowand.info.ObjectInfo;
 import echowand.info.PropertyInfo;
 import echowand.util.Constraint;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -34,6 +33,7 @@ public class LocalObject implements EchonetObject {
         this.eoj = objectInfo.getClassEOJ().getEOJWithInstanceCode((byte)0x01);
         propertyData = new EnumMap<EPC, ObjectData>(EPC.class);
         delegates = new LinkedList<LocalObjectDelegate>();
+        
         int len = objectInfo.size();
         for (int i=0; i<len; i++) {
             PropertyInfo info = objectInfo.getAtIndex(i);
@@ -41,6 +41,10 @@ public class LocalObject implements EchonetObject {
         }
         
         logger.exiting(className, "LocalObject");
+    }
+    
+    private synchronized LinkedList<LocalObjectDelegate> cloneDelegates() {
+        return new LinkedList<LocalObjectDelegate>(delegates);
     }
     
     /**
@@ -61,7 +65,7 @@ public class LocalObject implements EchonetObject {
      * @param data 設定するデータの内容
      * @return 設定に成功したらtrue、そうでなければfalse
      */
-    public boolean setInternalData(EPC epc, ObjectData data) {
+    public synchronized boolean setInternalData(EPC epc, ObjectData data) {
         logger.entering(className, "setInternalData", new Object[]{epc, data});
         
         if (!contains(epc)) {
@@ -136,7 +140,7 @@ public class LocalObject implements EchonetObject {
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
      */
-    public ObjectData getInternalData(EPC epc) {
+    public synchronized ObjectData getInternalData(EPC epc) {
         logger.entering(className, "getInternalData", epc);
         
         ObjectData data = propertyData.get(epc);
@@ -203,7 +207,7 @@ public class LocalObject implements EchonetObject {
      * @return 存在していればtrue、そうでなければfalse
      */
     @Override
-    public boolean contains(EPC epc) {
+    public synchronized boolean contains(EPC epc) {
         return propertyData.containsKey(epc);
     }
     
@@ -246,7 +250,7 @@ public class LocalObject implements EchonetObject {
     public void notifyDataChanged(EPC epc, ObjectData curData, ObjectData oldData) {
         logger.entering(className, "notifyDataChanged", new Object[]{epc, curData, oldData});
         
-        for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
+        for (LocalObjectDelegate delegate: cloneDelegates()) {
             delegate.notifyDataChanged(this, epc, curData, oldData);
         }
         
@@ -257,7 +261,7 @@ public class LocalObject implements EchonetObject {
         logger.entering(className, "setDataDelegate", new Object[]{epc, newData, curData});
         
         boolean success = false;
-        for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
+        for (LocalObjectDelegate delegate: cloneDelegates()) {
             success |= delegate.setData(this, epc, newData, curData);
         }
         
@@ -269,7 +273,7 @@ public class LocalObject implements EchonetObject {
         logger.entering(className, "getDataDelegate", new Object[]{epc});
         
         ObjectData data = null;
-        for (LocalObjectDelegate delegate: new ArrayList<LocalObjectDelegate>(delegates)) {
+        for (LocalObjectDelegate delegate: cloneDelegates()) {
             ObjectData lastData = delegate.getData(this, epc);
             if (lastData != null) {
                 data = lastData;
@@ -284,7 +288,7 @@ public class LocalObject implements EchonetObject {
      * Delegateを登録する。
      * @param delegate 登録するDelegate
      */
-    public void addDelegate(LocalObjectDelegate delegate) {
+    public synchronized void addDelegate(LocalObjectDelegate delegate) {
         logger.entering(className, "addDelegate", delegate);
         
         delegates.add(delegate);
@@ -296,7 +300,7 @@ public class LocalObject implements EchonetObject {
      * Delegateの登録を抹消する。
      * @param delegate 抹消するDelegate
      */
-    public void removeDelegate(LocalObjectDelegate delegate) {
+    public synchronized void removeDelegate(LocalObjectDelegate delegate) {
         logger.entering(className, "removeDelegate", delegate);
         
         delegates.remove(delegate);

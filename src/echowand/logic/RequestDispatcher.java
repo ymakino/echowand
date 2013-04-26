@@ -29,11 +29,15 @@ public class RequestDispatcher implements Listener {
         logger.exiting(className, "RequestDispatcher");
     }
     
+    private synchronized LinkedList<RequestProcessor> cloneProcessors() {
+        return new LinkedList<RequestProcessor>(processors);
+    }
+    
     /**
      * 指定されたRequestProcessorがリクエスト処理を行なうように登録する。
      * @param processor リクエスト処理を実行するRequestProcessor
      */
-    public void addRequestProcessor(RequestProcessor processor) {
+    public synchronized void addRequestProcessor(RequestProcessor processor) {
         logger.entering(className, "addRequestProcessor", processor);
         
         processors.add(processor);
@@ -45,7 +49,7 @@ public class RequestDispatcher implements Listener {
      * 指定されたRequestProcessorがリクエスト処理を行なわないように登録を抹消する。
      * @param processor リクエスト処理を停止するRequestProcessor
      */
-    public void removeRequestProcessor(RequestProcessor processor) {
+    public synchronized void removeRequestProcessor(RequestProcessor processor) {
         logger.entering(className, "removeRequestProcessor", processor);
         
         processors.remove(processor);
@@ -116,7 +120,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processSetI", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processSetI(subnet, frame, processed);
         }
         
@@ -134,7 +138,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processSetC", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processSetC(subnet, frame, processed);
         }
         
@@ -152,7 +156,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processGet", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processGet(subnet, frame, processed);
         }
         
@@ -170,7 +174,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processSetGet", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processSetGet(subnet, frame, processed);
         }
         
@@ -188,7 +192,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processINF_REQ", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processINF_REQ(subnet, frame, processed);
         }
         
@@ -206,7 +210,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processINF", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processINF(subnet, frame, processed);
         }
         
@@ -224,7 +228,7 @@ public class RequestDispatcher implements Listener {
         logger.entering(className, "processINFC", new Object[]{subnet, frame});
         
         boolean processed = false;
-        for (RequestProcessor processor : new ArrayList<RequestProcessor>(processors)) {
+        for (RequestProcessor processor : cloneProcessors()) {
             processed |= processor.processINFC(subnet, frame, processed);
         }
         

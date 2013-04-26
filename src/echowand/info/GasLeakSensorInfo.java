@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * ガス漏れセンサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class GasLeakSensorInfo extends BaseObjectInfo {
+public class GasLeakSensorInfo extends DeviceObjectInfo {
     /**
      * GasLeakSensorInfoを生成する
      */

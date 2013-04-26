@@ -6,7 +6,7 @@ import echowand.common.ClassEOJ;
 import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.HumiditySensorInfo;
 import echowand.info.NodeProfileInfo;
 import echowand.info.TemperatureSensorInfo;
@@ -122,7 +122,7 @@ public class NodeProfileObjectDelegateTest {
         assertEquals(new EOJ("0011ff"), eoj);
     }
     
-    class DummyInfo extends BaseObjectInfo {
+    class DummyInfo extends DeviceObjectInfo {
         public DummyInfo(int num) {
             byte groupCode = (byte)(num / 256);
             byte group = (byte)(num % 256);

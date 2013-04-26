@@ -3,7 +3,7 @@ package echowand.object;
 import echowand.object.LocalObject;
 import echowand.object.LocalObjectDelegate;
 import echowand.object.ObjectData;
-import echowand.info.BaseObjectInfo;
+import echowand.info.DeviceObjectInfo;
 import echowand.info.PropertyInfo;
 import echowand.info.TemperatureSensorInfo;
 import echowand.info.ObjectInfo;
@@ -69,7 +69,7 @@ public class LocalObjectTest {
     
     @Test
     public void testSetAndGet() {
-        BaseObjectInfo info = new HomeAirConditionerInfo();
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
         info.add(new PropertyInfo(EPC.x80, true, true, false, 1));
         LocalObject object = new LocalObject(info);
         
@@ -85,7 +85,7 @@ public class LocalObjectTest {
     
     @Test
     public void testSetInvalidEPCAndData() {
-        BaseObjectInfo info = new HomeAirConditionerInfo();
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
         info.add(new PropertyInfo(EPC.x80, true, true, false, 1));
         LocalObject object = new LocalObject(info);
         
@@ -127,7 +127,7 @@ public class LocalObjectTest {
     
     @Test
     public void testDelegateSetData() {
-        BaseObjectInfo info = new HomeAirConditionerInfo();
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
         info.add(new PropertyInfo(EPC.x80, true, true, false, 1));
         LocalObject object = new LocalObject(info);
         
@@ -183,7 +183,7 @@ public class LocalObjectTest {
     
     @Test
     public void testSetAndGet2() {
-        BaseObjectInfo info = new HomeAirConditionerInfo();
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
         info.add(new PropertyInfo(EPC.x80, true, true, false, 1));
         LocalObject object = new LocalObject(info);
         

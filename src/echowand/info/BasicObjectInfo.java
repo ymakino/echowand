@@ -13,9 +13,9 @@ import java.util.logging.Logger;
  * ECHONETオブジェクト基本設定構築用クラス
  * @author Yoshiki Makino
  */
-public class BaseObjectInfo implements ObjectInfo {
-    private static final Logger logger = Logger.getLogger(BaseObjectInfo.class.getName());
-    private static final String className = BaseObjectInfo.class.getName();
+public class BasicObjectInfo implements ObjectInfo {
+    private static final Logger logger = Logger.getLogger(DeviceObjectInfo.class.getName());
+    private static final String className = DeviceObjectInfo.class.getName();
     
     private class PropertyInfoComparator implements Comparator<PropertyInfo> {
         @Override
@@ -27,24 +27,9 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     private ClassEOJ classEOJ;
-    private TreeSet<PropertyInfo> props = new TreeSet<PropertyInfo>(new PropertyInfoComparator());
+    private TreeSet<PropertyInfo> props = new TreeSet<PropertyInfo>(new BasicObjectInfo.PropertyInfoComparator());
     private ArrayList<PropertyInfo> propList = null;
     private boolean needsUpdatePropertyMap = true;
-    
-    /**
-     * BaseObjectInfoを生成する。
-     */
-    public BaseObjectInfo() {
-        logger.entering(className, "BaseObjectInfo");
-        
-        add(EPC.x80, true, false,  true, new byte[]{0x30}, new PropertyConstraintOnOff());
-        add(EPC.x88, true, false,  true, new byte[]{0x42}, new PropertyConstraintDetection());
-        add(EPC.x9D, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap()); 
-        add(EPC.x9E, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
-        add(EPC.x9F, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
-        
-        logger.exiting(className, "BaseObjectInfo");
-    }
 
     private synchronized void updatePropertyMapsInNeeds() {
         logger.entering(className, "updatePropertyMapsInNeeds");
@@ -94,8 +79,8 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現しているECHONETオブジェクトのClassEOJを返す。
-     * @return このBaseObjectInfoのClassEOJ
+     * このBasicObjectInfoが表現しているECHONETオブジェクトのClassEOJを返す。
+     * @return このBasicObjectInfoのClassEOJ
      */
     @Override
     public ClassEOJ getClassEOJ() {
@@ -103,8 +88,8 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現しているECHONETオブジェクトのClassEOJを設定する。
-     * @param ceoj このBaseObjectInfoが表現するECHONETオブジェクトのClassEOJ
+     * このBasicObjectInfoが表現しているECHONETオブジェクトのClassEOJを設定する。
+     * @param ceoj このBasicObjectInfoが表現するECHONETオブジェクトのClassEOJ
      */
     public final void setClassEOJ(ClassEOJ ceoj) {
         logger.entering(className, "setClassEOJ", ceoj);
@@ -115,7 +100,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
+     * このBasicObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
      * @param epc 追加するプロパティのEPC
      * @param gettable Setの可否
      * @param settable Getの可否
@@ -128,7 +113,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
+     * このBasicObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
      * @param epc 追加するプロパティのEPC
      * @param gettable Setの可否
      * @param settable Getの可否
@@ -142,7 +127,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
+     * このBasicObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
      * @param epc 追加するプロパティのEPC
      * @param gettable Setの可否
      * @param settable Getの可否
@@ -155,7 +140,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
+     * このBasicObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
      * @param epc 追加するプロパティのEPC
      * @param gettable Setの可否
      * @param settable Getの可否
@@ -169,7 +154,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
+     * このBasicObjectInfoが表現するECHONETオブジェクトにプロパティを追加する。
      * @param prop 追加するプロパティ
      * @return 追加が成功した場合にはtrue、失敗した場合にはfalse
      */
@@ -207,7 +192,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトのプロパティのリストを返す。
+     * このBasicObjectInfoが表現するECHONETオブジェクトのプロパティのリストを返す。
      * @return プロパティのリスト
      */
     private ArrayList<PropertyInfo> getPropList() {
@@ -222,7 +207,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトのindex番目のプロパティを返す。
+     * このBasicObjectInfoが表現するECHONETオブジェクトのindex番目のプロパティを返す。
      * @param index プロパティのインデックス
      * @return index番目のプロパティ
      */
@@ -238,7 +223,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
     
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトの指定されたEPCに対応するプロパティを返す。
+     * このBasicObjectInfoが表現するECHONETオブジェクトの指定されたEPCに対応するプロパティを返す。
      * @param epc プロパティのEPC
      * @return 指定されたEPCに対応するプロパティ
      */
@@ -260,7 +245,7 @@ public class BaseObjectInfo implements ObjectInfo {
     }
 
     /**
-     * このBaseObjectInfoが表現するECHONETオブジェクトの全プロパティ設定数を返す。
+     * このBasicObjectInfoが表現するECHONETオブジェクトの全プロパティ設定数を返す。
      *
      * @return 全プロパティ設定数
      */

@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 漏電センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class ElectricLeakSensorInfo extends BaseObjectInfo {
+public class ElectricLeakSensorInfo extends DeviceObjectInfo {
     /**
      * ElectricLeakSensorInfoを生成する
      */

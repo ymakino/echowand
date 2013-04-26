@@ -7,7 +7,7 @@ import echowand.common.EPC;
  * 湿度センサクラスの基本設定を行う。
  * @author Yoshiki Makino
  */
-public class HumiditySensorInfo extends BaseObjectInfo {
+public class HumiditySensorInfo extends DeviceObjectInfo {
     /**
      * HumiditySensorInfoを生成する
      */
