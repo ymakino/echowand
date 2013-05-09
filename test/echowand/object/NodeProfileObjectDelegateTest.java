@@ -9,6 +9,7 @@ import echowand.common.EPC;
 import echowand.info.DeviceObjectInfo;
 import echowand.info.HumiditySensorInfo;
 import echowand.info.NodeProfileInfo;
+import echowand.info.ObjectInfo;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.TooManyObjectsException;
 import echowand.object.ObjectData;
@@ -53,9 +54,9 @@ public class NodeProfileObjectDelegateTest {
         assertEquals((byte)0x00, data.get(0));
         assertEquals((byte)0x00, data.get(1));
         
-        for (int i = 0; i < 256 * 2 + 9; i++) {
+        for (int i = 0; i < 128 * 2 + 9; i++) {
             TemperatureSensorInfo info = new TemperatureSensorInfo();
-            info.setClassEOJ(new ClassEOJ((byte)(i / 255), (byte)0x11));
+            info.setClassEOJ(new ClassEOJ((byte)(i / 127), (byte)0x11));
             LocalObject obj = new LocalObject(info);
             try {
                 manager.add(obj);
@@ -67,7 +68,7 @@ public class NodeProfileObjectDelegateTest {
         data = object.getData(EPC.xD3);
         assertEquals(3, data.size());
         assertEquals((byte)0x00, data.get(0));
-        assertEquals((byte)0x02, data.get(1));
+        assertEquals((byte)0x01, data.get(1));
         assertEquals((byte)0x09, data.get(2));
         
         data = object.getData(EPC.xD4);
@@ -82,8 +83,17 @@ public class NodeProfileObjectDelegateTest {
         assertEquals((byte)0x0, data.get(0));
         assertEquals(0, data.getExtraSize());
         
-        for (int i = 0; i < 255; i++) {
-            LocalObject obj = new LocalObject(new TemperatureSensorInfo());
+        for (int i = 0; i < 254; i++) {
+            ObjectInfo info;
+            
+            if (i<127) {
+                info = new TemperatureSensorInfo();
+            } else {
+                info = new HumiditySensorInfo();
+            }
+            
+            LocalObject obj = new LocalObject(info);
+            
             try {
                 manager.add(obj);
             } catch (TooManyObjectsException e) {
@@ -95,31 +105,31 @@ public class NodeProfileObjectDelegateTest {
         }
 
         data = object.getData(EPC.xD6);
-        assertEquals((byte) 0xff, data.get(0));
+        assertEquals((byte) 0xfe, data.get(0));
         assertEquals(3, data.getExtraSize());
 
         EOJ eoj = new EOJ(data.get(1), data.get(2), data.get(3));
         assertEquals(new EOJ("001101"), eoj);
 
         Data e1 = data.getExtraDataAt(0);
-        assertEquals((byte)0xff, e1.get(0));
+        assertEquals((byte)0xfe, e1.get(0));
         assertEquals(253, e1.size());
         eoj = new EOJ(e1.get(1), e1.get(2), e1.get(3));
         assertEquals(new EOJ("001155"), eoj);
         
         Data e2 = data.getExtraDataAt(1);
-        assertEquals((byte)0xff, e2.get(0));
+        assertEquals((byte)0xfe, e2.get(0));
         assertEquals(253, e2.size());
         eoj = new EOJ(e2.get(1), e2.get(2), e2.get(3));
-        assertEquals(new EOJ("0011a9"), eoj);
+        assertEquals(new EOJ("00122a"), eoj);
         
         Data e3 = data.getExtraDataAt(2);
-        assertEquals((byte)0xff, e3.get(0));
-        assertEquals(10, e3.size());
+        assertEquals((byte)0xfe, e3.get(0));
+        assertEquals(7, e3.size());
         eoj = new EOJ(e3.get(1), e3.get(2), e3.get(3));
-        assertEquals(new EOJ("0011fd"), eoj);
-        eoj = new EOJ(e3.get(7), e3.get(8), e3.get(9));
-        assertEquals(new EOJ("0011ff"), eoj);
+        assertEquals(new EOJ("00127e"), eoj);
+        eoj = new EOJ(e3.get(4), e3.get(5), e3.get(6));
+        assertEquals(new EOJ("00127f"), eoj);
     }
     
     class DummyInfo extends DeviceObjectInfo {

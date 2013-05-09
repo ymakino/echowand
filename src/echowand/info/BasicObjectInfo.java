@@ -4,6 +4,7 @@ import echowand.common.ClassEOJ;
 import echowand.common.EPC;
 import echowand.common.PropertyMap;
 import echowand.util.Constraint;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -17,7 +18,7 @@ public class BasicObjectInfo implements ObjectInfo {
     private static final Logger logger = Logger.getLogger(DeviceObjectInfo.class.getName());
     private static final String className = DeviceObjectInfo.class.getName();
     
-    private class PropertyInfoComparator implements Comparator<PropertyInfo> {
+    private static class PropertyInfoComparator implements Comparator<PropertyInfo>, Serializable {
         @Override
         public int compare(PropertyInfo p1, PropertyInfo p2) {
             int c1 = (p1.epc.toByte() & 0x000000ff);
@@ -70,7 +71,7 @@ public class BasicObjectInfo implements ObjectInfo {
         logger.exiting(className, "updatePropertyMapsInNeeds");
     }
 
-    private void makeUpdatePropertyMapNeeded() {
+    private synchronized void makeUpdatePropertyMapNeeded() {
         logger.entering(className, "makeUpdatePropertyMapNeeded");
         
         needsUpdatePropertyMap = true;

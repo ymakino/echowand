@@ -112,7 +112,7 @@ public class Transaction {
      * トランザクションのレスポンス処理を行なうTransactionListenerを登録する。
      * @param listener 登録するTransactionListener
      */
-    public void addTransactionListener(TransactionListener listener) {
+    public synchronized void addTransactionListener(TransactionListener listener) {
         logger.entering(className, "addTransactionListener", listener);
         
         transactionListeners.add(listener);
@@ -125,7 +125,7 @@ public class Transaction {
      * トランザクションのレスポンス処理を行なうTransactionListenerの登録を抹消する。
      * @param listener 登録を抹消するTransactionListener
      */
-    public void removeTransactionListener(TransactionListener listener) {
+    public synchronized void removeTransactionListener(TransactionListener listener) {
         logger.entering(className, "removeTransactionListener", listener);
         
         transactionListeners.remove(listener);
@@ -133,10 +133,14 @@ public class Transaction {
         logger.exiting(className, "removeTransactionListener");
     }
     
+    private synchronized List<TransactionListener> cloneTransactionListeners() {
+        return new ArrayList<TransactionListener>(transactionListeners);
+    }
+    
     private void doCallBeginTransactionListeners() {
         logger.entering(className, "doCallBeginTransactionListeners");
         
-        for (TransactionListener l : new ArrayList<TransactionListener>(transactionListeners)) {
+        for (TransactionListener l : cloneTransactionListeners()) {
             l.begin(this);
         }
         
@@ -146,7 +150,7 @@ public class Transaction {
     private void doCallReceiveTransactionListeners(Frame frame) {
         logger.entering(className, "doCallReceiveTransactionListeners", frame);
         
-        for (TransactionListener l : new ArrayList<TransactionListener>(transactionListeners)) {
+        for (TransactionListener l : cloneTransactionListeners()) {
             l.receive(this, subnet, frame);
         }
         
@@ -156,7 +160,7 @@ public class Transaction {
     private void doCallFinishTransactionListeners() {
         logger.entering(className, "doCallFinishTransactionListeners");
         
-        for (TransactionListener l : new ArrayList<TransactionListener>(transactionListeners)) {
+        for (TransactionListener l : cloneTransactionListeners()) {
             l.finish(this);
         }
         
@@ -167,7 +171,7 @@ public class Transaction {
      * 登録済みのTransactionListenerの個数を返す。
      * @return 登録済みのTransactionListener数
      */
-    public int countTransactionListeners() {
+    public synchronized int countTransactionListeners() {
         logger.entering(className, "countTransactionListeners", timeout);
         
         int count = transactionListeners.size();
@@ -330,7 +334,7 @@ public class Transaction {
         logger.exiting(className, "finish");
     }
     
-    private class TimeoutTimerTask extends TimerTask {
+    private static class TimeoutTimerTask extends TimerTask {
         public Transaction t;
         public TimeoutTimerTask(Transaction t) {
             this.t = t;
@@ -377,11 +381,11 @@ public class Transaction {
     public synchronized void join() throws InterruptedException {
         logger.entering(className, "join");
         
-        if (isWaitingResponse()) {
+        while (isWaitingResponse()) {
             wait();
         }
         
-        logger.exiting(className, "execute");
+        logger.exiting(className, "join");
     }
     
     /**

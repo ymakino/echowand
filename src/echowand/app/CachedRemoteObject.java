@@ -222,4 +222,11 @@ public class CachedRemoteObject implements EchonetObject {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.remoteObject != null ? this.remoteObject.hashCode() : 0);
+        return hash;
+    }
 }

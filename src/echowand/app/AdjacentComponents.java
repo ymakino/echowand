@@ -12,7 +12,7 @@ public class AdjacentComponents {
     private AdjacentComponentsRequestFocus leftFocus = null;
     private AdjacentComponentsRequestFocus rightFocus = null;
             
-    class DefaultRequestFocus extends AdjacentComponentsRequestFocus {
+    private static class DefaultRequestFocus extends AdjacentComponentsRequestFocus {
         @Override
         public void requestFocus(Component component) {
             component.requestFocus();

@@ -97,10 +97,18 @@ public class Inet6Subnet implements Subnet {
         initInet6Subnet(doInit);
     }
     
+    private synchronized void setGroupAddress(Inet6Address address) {
+        groupAddress = address;
+    }
+    
+    private synchronized Inet6Address getGroupAddress() {
+        return groupAddress;
+    }
+    
     private void initInet6Subnet(boolean doInit) throws SubnetException {
         
         try {
-            groupAddress = (Inet6Address)Inet6Address.getByName(MULTICAST_ADDRESS);
+            setGroupAddress((Inet6Address)Inet6Address.getByName(MULTICAST_ADDRESS));
             if (localAddress == null) {
                 localAddress = (Inet6Address)Inet6Address.getByName("::1");
             }
@@ -124,7 +132,7 @@ public class Inet6Subnet implements Subnet {
                 multicastSocket.setNetworkInterface(networkInterface);
             }
             
-            multicastSocket.joinGroup(groupAddress);
+            multicastSocket.joinGroup(getGroupAddress());
             multicastSocket.setLoopbackMode(false);
             multicastSocket.setReuseAddress(false);
             
@@ -214,7 +222,7 @@ public class Inet6Subnet implements Subnet {
      */
     @Override
     public boolean send(Frame frame) throws SubnetException {
-        if (!enable) {
+        if (!isEnabled()) {
             throw new SubnetException("not enabled");
         }
 
@@ -251,7 +259,7 @@ public class Inet6Subnet implements Subnet {
      */
     @Override
     public Frame recv()  throws SubnetException {
-        if (!enable) {
+        if (!isEnabled()) {
             throw new SubnetException("not enabled");
         }
         

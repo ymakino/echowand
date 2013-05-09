@@ -75,8 +75,8 @@ class PrintNotifiedDataObserver implements RemoteObjectObserver {
 }
 public class Sample4 {
     
-    public static String peerAddress1 = "192.168.1.1";
-    public static String peerAddress2 = "192.168.1.2";
+    public static final String peerAddress1 = "192.168.1.1";
+    public static final String peerAddress2 = "192.168.1.2";
     
     public static NodeProfileInfo createNodeProfileInfo() {
         NodeProfileInfo nodeProfileInfo = new NodeProfileInfo();

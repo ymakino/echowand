@@ -28,13 +28,17 @@ public class UnusedEOJGenerator {
     public synchronized EOJ generate(ClassEOJ ceoj) throws TooManyObjectsException {
         byte unused = 1;
         Byte b = usedEOJMap.get(ceoj);
+        
         if (b != null) {
             unused = (byte)(b + 1);
         }
-        usedEOJMap.put(ceoj, unused);
-        if (unused == 0) {
+        
+        if (unused <= 0) {
             throw new TooManyObjectsException("too many generated eojs for " + ceoj);
         }
+        
+        usedEOJMap.put(ceoj, unused);
+        
         return ceoj.getEOJWithInstanceCode(unused);
     }
 }

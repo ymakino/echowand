@@ -40,7 +40,7 @@ public class LocalObjectManagerTest {
         LocalObjectManager manager = new LocalObjectManager();
         LocalObject object = null;
         try {
-            for (int i = 0x01; i <= 0xff; i++) {
+            for (int i = 0x01; i <= 0x7f; i++) {
                 object = new LocalObject(new TemperatureSensorInfo());
                 manager.add(object);
             }

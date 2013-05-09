@@ -1,5 +1,7 @@
 package echowand.net;
 
+import java.util.Arrays;
+
 /**
  * 単純なバイト列のペイロード
  * @author Yoshiki Makino
@@ -38,7 +40,7 @@ public class SimplePayload implements Payload {
      * @param payload 設定するペイロード
      */
     public void setPayload(byte[] payload) {
-        this.payload = payload;
+        this.payload = Arrays.copyOf(payload, payload.length);
     }
     
     /**
@@ -46,7 +48,7 @@ public class SimplePayload implements Payload {
      * @return 設定されたペイロード
      */
     public byte[] getPayload() {
-        return this.payload;
+        return Arrays.copyOf(payload, payload.length);
     }
     
     /**
@@ -64,7 +66,7 @@ public class SimplePayload implements Payload {
      */
     @Override
     public byte[] toBytes() {
-        return payload;
+        return Arrays.copyOf(payload, payload.length);
     }
     
     /**

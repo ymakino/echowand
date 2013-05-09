@@ -17,7 +17,7 @@ public class DeviceObjectInfo extends BasicObjectInfo {
     private static final Logger logger = Logger.getLogger(DeviceObjectInfo.class.getName());
     private static final String className = DeviceObjectInfo.class.getName();
     
-    public byte versionBytes[] = new byte[]{0x00, 0x00, asciiCode('B'), 0x00};
+    public byte[] versionBytes = new byte[]{0x00, 0x00, asciiCode('B'), 0x00};
     
     private static byte asciiCode(char c) {
         try {

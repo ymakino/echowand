@@ -80,7 +80,7 @@ public class RemoteObjectManager {
         HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(node);
         RemoteObject object = map.get(eoj);
         
-        logger.exiting(className, "remove", object);
+        logger.exiting(className, "get", object);
         return object;
     }
     
@@ -90,8 +90,8 @@ public class RemoteObjectManager {
         LinkedList<RemoteObject> newList = new LinkedList<RemoteObject>();
         for (Node node : objects.keySet()) {
             HashMap<EOJ, RemoteObject> objectsAtNode = objects.get(node);
-            for (EOJ eoj : objectsAtNode.keySet()) {
-                newList.add(objectsAtNode.get(eoj));
+            for (RemoteObject obj : objectsAtNode.values()) {
+                newList.add(obj);
             }
         }
         

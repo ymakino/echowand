@@ -19,7 +19,7 @@ public abstract class AbstractObjectTableModel extends AbstractTableModel {
             str = str.substring(2);
         }
         
-        if (str.isEmpty() || (str.length() % 2) == 1) {
+        if (str.isEmpty() || (str.length() % 2) != 0) {
             return null;
         }
 

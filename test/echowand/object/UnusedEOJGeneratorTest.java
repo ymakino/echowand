@@ -1,6 +1,5 @@
 package echowand.object;
 
-import echowand.object.UnusedEOJGenerator;
 import echowand.common.ClassEOJ;
 import echowand.common.EOJ;
 import echowand.logic.TooManyObjectsException;
@@ -42,7 +41,7 @@ public class UnusedEOJGeneratorTest {
 
         UnusedEOJGenerator instance = new UnusedEOJGenerator();
         try {
-            for (int i = 0x01; i <= 0xff; i++) {
+            for (int i = 0x01; i <= 0x7f; i++) {
                 instance.generate(ceoj1);
             }
         } catch (TooManyObjectsException e) {

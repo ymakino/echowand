@@ -14,7 +14,7 @@ public class ObjectTableBooleanCellRenderer extends DefaultTableCellRenderer {
     private static String FalseString = "";
     private static HashMap<Boolean, String> bool2str;
     
-    {
+    static {
         bool2str = new HashMap<Boolean, String>();
         bool2str.put(true, TrueString);
         bool2str.put(false, FalseString);

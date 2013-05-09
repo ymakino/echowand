@@ -18,7 +18,7 @@ import java.net.UnknownHostException;
  * @author Yoshiki Makino
  */
 public class Sample3 {
-    public static String peerAddress = "192.168.1.1";
+    public static final String peerAddress = "192.168.1.1";
     
     public static void main(String[] args) {
         Inet4Subnet subnet;

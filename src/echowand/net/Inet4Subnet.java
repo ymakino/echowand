@@ -99,10 +99,18 @@ public class Inet4Subnet implements Subnet {
         initInet4Subnet(doInit);
     }
     
+    private synchronized void setGroupAddress(Inet4Address address) {
+        groupAddress = address;
+    }
+    
+    private synchronized Inet4Address getGroupAddress() {
+        return groupAddress;
+    }
+    
     private void initInet4Subnet(boolean doInit) throws SubnetException {
         
         try {
-            groupAddress = (Inet4Address)Inet4Address.getByName(MULTICAST_ADDRESS);
+            setGroupAddress((Inet4Address)Inet4Address.getByName(MULTICAST_ADDRESS));
             if (localAddress == null) {
                 localAddress = (Inet4Address)Inet4Address.getLocalHost();
             }
@@ -124,7 +132,7 @@ public class Inet4Subnet implements Subnet {
                 multicastSocket.setNetworkInterface(networkInterface);
             }
             
-            multicastSocket.joinGroup(groupAddress);
+            multicastSocket.joinGroup(getGroupAddress());
             multicastSocket.setLoopbackMode(false);
             multicastSocket.setReuseAddress(false);
             
@@ -214,7 +222,7 @@ public class Inet4Subnet implements Subnet {
      */
     @Override
     public boolean send(Frame frame) throws SubnetException {
-        if (!enable) {
+        if (!isEnabled()) {
             throw new SubnetException("not enabled");
         }
 
@@ -251,7 +259,7 @@ public class Inet4Subnet implements Subnet {
      */
     @Override
     public Frame recv()  throws SubnetException {
-        if (!enable) {
+        if (!isEnabled()) {
             throw new SubnetException("not enabled");
         }
         

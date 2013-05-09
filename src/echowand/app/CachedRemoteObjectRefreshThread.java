@@ -67,11 +67,11 @@ public class CachedRemoteObjectRefreshThread extends Thread {
             cachedObject.updatePropertyMapsCache();
             
             int size = cachedObject.size();
-            for (int i = 0; valid && i < size; i++) {
+            for (int i = 0; !isInvalid() && i < size; i++) {
                 success &= updateCacheOfEPC(cachedObject.getEPC(i));
             }
             
-            if (valid) {
+            if (!isInvalid()) {
                 notifyPropertyDataChanged();
             }
             

@@ -5,9 +5,11 @@ import echowand.common.EPC;
 import echowand.info.NodeProfileInfo;
 import echowand.logic.MainLoop;
 import echowand.logic.RequestDispatcher;
+import echowand.logic.TooManyObjectsException;
 import echowand.logic.TransactionManager;
 import echowand.net.Inet4Subnet;
 import echowand.net.Node;
+import echowand.net.SubnetException;
 import echowand.object.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,9 +63,14 @@ public class RemoteObjectSample {
                     }
                 }
             }
-
-        } catch (Exception ex) {
-            Logger.getLogger(RemoteObjectGetSample.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SubnetException ex) {
+            Logger.getLogger(RemoteObjectSample.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TooManyObjectsException ex) {
+            Logger.getLogger(RemoteObjectSample.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(RemoteObjectSample.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EchonetObjectException ex) {
+            Logger.getLogger(RemoteObjectSample.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

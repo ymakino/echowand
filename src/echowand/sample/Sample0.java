@@ -16,7 +16,7 @@ public class Sample0 {
     /*
      * リモートノードのIPアドレス
      */
-    public static String peerAddress = "192.168.1.1";
+    public static final String peerAddress = "192.168.1.1";
     
     /*
      * ローカルのエアコンオブジェクトからリモートのノードプロファイルオブジェクトへ宛てた

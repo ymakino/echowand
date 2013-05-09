@@ -39,7 +39,7 @@ public class InternalNetworkPort {
      * このInternalNetworkPortが接続しているInternalNetworkを返す。
      * @return このポートが接続しているInternalNetwork
      */
-    public InternalNetwork getNetwork() {
+    public synchronized InternalNetwork getNetwork() {
         return network;
     }
     

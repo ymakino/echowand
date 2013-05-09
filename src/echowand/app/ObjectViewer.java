@@ -12,6 +12,7 @@ import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.object.*;
 import echowand.util.Pair;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -221,14 +222,30 @@ public class ObjectViewer implements Runnable {
         openViewerFrame();
     }
     
+    /*
+     * This HashMap keeps Logger instances to avoid being released accidentally.
+     * Because OpenJDK uses weak references for keeping Logger instances,
+     * they might be freed anytime while there are no explicit references
+     * to them.
+     */
+    private static HashMap<String, Logger> loggers = new HashMap<String, Logger>();
+    private synchronized static Logger getLogger(String name) {
+        Logger logger = loggers.get(name);
+        if (logger == null) {
+            logger = Logger.getLogger(name);
+            loggers.put(name, logger);
+        }
+        return logger;
+    }
+    
     private static ConsoleHandler handler = null;
-    public static void changeLogLevelAll(String name) {
+    public synchronized static void changeLogLevelAll(String name) {
         if (handler == null) {
             handler = new ConsoleHandler();
             handler.setLevel(Level.ALL);
         }
-        Logger.getLogger(name).setLevel(Level.ALL);
-        Logger.getLogger(name).addHandler(handler);
+        getLogger(name).setLevel(Level.ALL);
+        getLogger(name).addHandler(handler);
     }
 
     public static void main(String[] args) {

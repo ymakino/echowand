@@ -4,6 +4,7 @@ import echowand.common.Data;
 import echowand.common.EPC;
 import echowand.util.Constraint;
 import echowand.util.ConstraintSize;
+import java.util.Arrays;
 
 /**
  * ObjectInfoで利用されるプロパティを表現する。
@@ -89,7 +90,7 @@ public class PropertyInfo {
         this.settable = settable;
         this.observable = observable;
         this.constraint = constraint;
-        this.initialData = initialData;
+        this.initialData = Arrays.copyOf(initialData, initialData.length);
     }
     
     /**
