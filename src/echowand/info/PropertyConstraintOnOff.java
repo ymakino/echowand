@@ -8,7 +8,15 @@ import echowand.util.ConstraintByte;
  * @author Yoshiki Makino
  */
 public class PropertyConstraintOnOff extends ConstraintByte {
+    
+    /**
+     * ONを表すEPCの値
+     */
     public static final byte ON=0x30;
+    
+    /**
+     * OFFを表すEPCの値
+     */
     public static final byte OFF=0x31;
     
     /**
