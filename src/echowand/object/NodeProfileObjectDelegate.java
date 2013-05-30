@@ -116,7 +116,7 @@ class ClassListDataGenerator extends ListDataGenerator<ClassEOJ> {
  * ノードプロファイルの代理となり、0xD3-0xD7のGet命令の処理を実行。
  * @author Yoshiki Makino
  */
-public class NodeProfileObjectDelegate implements LocalObjectDelegate {
+public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
     private static final Logger logger = Logger.getLogger(NodeProfileObjectDelegate.class.getName());
     private static final String className = NodeProfileObjectDelegate.class.getName();
     
@@ -248,27 +248,4 @@ public class NodeProfileObjectDelegate implements LocalObjectDelegate {
         
         logger.exiting(className, "getData");
     }
-    
-    /**
-     * 特に処理は行わない。
-     * @param result 処理状態を表すオブジェクト
-     * @param object プロパティデータの変更を要求されているオブジェクト
-     * @param epc 変更するプロパティデータのEPC
-     * @param newData 新たに設定されるプロパティデータ
-     * @param curData 現在のプロパティデータ
-     */
-    @Override
-    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
-    }
-    
-    /**
-     * 特に処理は行わない。
-     * @param result 処理状態を表すオブジェクト
-     * @param object プロパティデータの変更通知を行っているオブジェクト
-     * @param epc プロパティデータに変更のあったEPC
-     * @param curData 新たに設定されたプロパティデータ
-     * @param oldData 以前設定されていたプロパティデータ
-     */
-    @Override
-    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {}
 }

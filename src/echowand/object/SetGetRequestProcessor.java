@@ -2,7 +2,7 @@ package echowand.object;
 
 import echowand.common.EOJ;
 import echowand.common.ESV;
-import echowand.logic.RequestProcessor;
+import echowand.logic.DefaultRequestProcessor;
 import echowand.net.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Yoshiki Makino
  */
 
-public class SetGetRequestProcessor extends RequestProcessor {
+public class SetGetRequestProcessor extends DefaultRequestProcessor {
     private static final Logger logger = Logger.getLogger(SetGetRequestProcessor.class.getName());
     private static final String className = SetGetRequestProcessor.class.getName();
     

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
  * 年月日と時刻をローカル時刻に設定するDelegate
  * @author Yoshiki Makino
  */
-public class LocalObjectDateTimeDelegate implements LocalObjectDelegate {
+public class LocalObjectDateTimeDelegate extends LocalObjectDefaultDelegate {
     private static final Logger logger = Logger.getLogger(LocalObjectDateTimeDelegate.class.getName());
     private static final String className = LocalObjectDateTimeDelegate.class.getName();
 
@@ -41,28 +41,5 @@ public class LocalObjectDateTimeDelegate implements LocalObjectDelegate {
         }
         
         logger.exiting(className, "getData");
-    }
-    
-    /**
-     * 特に処理は行わない。
-     * @param result 処理状態を表すオブジェクト
-     * @param epc EPCの指定
-     * @param newData 設定するプロパティデータ
-     * @param curData 現在のプロパティデータ
-     */
-    @Override
-    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
-    }
-
-    /**
-     * 特に処理は行わない。
-     * @param result 処理状態を表すオブジェクト
-     * @param object プロパティデータの変更通知を行っているオブジェクト
-     * @param epc プロパティデータに変更のあったEPC
-     * @param curData 新たに設定されたプロパティデータ
-     * @param oldData 以前設定されていたプロパティデータ
-     */
-    @Override
-    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
     }
 }

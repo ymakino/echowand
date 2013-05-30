@@ -2,7 +2,7 @@ package echowand.object;
 
 import echowand.common.EOJ;
 import echowand.common.ESV;
-import echowand.logic.RequestProcessor;
+import echowand.logic.DefaultRequestProcessor;
 import echowand.net.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * INF、INFCリクエストの処理を実行
  * @author Yoshiki Makino
  */
-public class AnnounceRequestProcessor extends RequestProcessor {
+public class AnnounceRequestProcessor extends DefaultRequestProcessor {
     private static final Logger logger = Logger.getLogger(AnnounceRequestProcessor.class.getName());
     private static final String className = AnnounceRequestProcessor.class.getName();
     

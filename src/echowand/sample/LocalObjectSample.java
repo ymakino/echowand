@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 
 
-class LocalObjectSampleDelegate implements LocalObjectDelegate {
+class LocalObjectSampleDelegate extends LocalObjectDefaultDelegate {
     private ObjectData data;
 
     LocalObjectSampleDelegate(ObjectData data) {
@@ -36,11 +36,6 @@ class LocalObjectSampleDelegate implements LocalObjectDelegate {
             data = newData;
         }
     }
-
-    @Override
-    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
-    }
-    
 }
 
 /**

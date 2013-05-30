@@ -178,7 +178,7 @@ public class RequestDispatcherTest {
     }
 }
 
-class ReturnTrueRequestProcessor extends RequestProcessor {
+class ReturnTrueRequestProcessor implements RequestProcessor {
     @Override
     public boolean processSetI(Subnet subnet, Frame frame, boolean processed){ return true; }
     @Override

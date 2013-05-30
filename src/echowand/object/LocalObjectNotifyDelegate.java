@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * プロパティ値変更時に通知を行うDelegate
  * @author Yoshiki Makino
  */
-public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
+public class LocalObjectNotifyDelegate extends LocalObjectDefaultDelegate {
     private static final Logger logger = Logger.getLogger(LocalObjectNotifyDelegate.class.getName());
     private static final String className = LocalObjectNotifyDelegate.class.getName();
     
@@ -32,28 +32,6 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
         this.transactionManager = transactionManager;
         
         logger.exiting(className, "addObject");
-    }
-    
-    /**
-     * 特に処理は行わない。
-     * @param result 処理状態を表すオブジェクト
-     * @param object プロパティデータが要求されているオブジェクト
-     * @param epc 要求プロパティデータのEPC
-     */
-    @Override
-    public void getData(GetState result, LocalObject object, EPC epc) {
-    }
-
-    /**
-     * 特に処理は行わない。
-     * @param result 処理状態を表すオブジェクト
-     * @param object プロパティデータの変更を要求されているオブジェクト
-     * @param epc 変更するプロパティデータのEPC
-     * @param newData 新たに設定されるプロパティデータ
-     * @param curData 現在のプロパティデータ
-     */
-    @Override
-    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
     }
     
     /**
