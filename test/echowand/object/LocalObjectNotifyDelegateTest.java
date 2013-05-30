@@ -1,8 +1,5 @@
 package echowand.object;
 
-import echowand.object.LocalObjectNotifyDelegate;
-import echowand.object.LocalObject;
-import echowand.object.ObjectData;
 import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Property;
@@ -34,7 +31,11 @@ public class LocalObjectNotifyDelegateTest {
         objectInfo.add(EPC.x80, true, true, true, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
-        delegate.notifyDataChanged(object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        LocalObjectDelegate.NotifyState result = new LocalObjectDelegate.NotifyState();
+        delegate.notifyDataChanged(result, object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        assertTrue(result.isDone());
+        assertFalse(result.isFail());
+        
         Frame frame = subnet.recvNoWait();
         assertTrue(frame != null);
         CommonFrame cf = frame.getCommonFrame();
@@ -61,7 +62,11 @@ public class LocalObjectNotifyDelegateTest {
         objectInfo.add(EPC.x80, true, true, true, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
-        delegate.notifyDataChanged(object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x41));
+        LocalObjectDelegate.NotifyState result = new LocalObjectDelegate.NotifyState();
+        delegate.notifyDataChanged(result, object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x41));
+        assertTrue(result.isDone());
+        assertFalse(result.isFail());
+        
         Frame frame = subnet.recvNoWait();
         assert(frame == null);
     }
@@ -75,7 +80,11 @@ public class LocalObjectNotifyDelegateTest {
         objectInfo.add(EPC.x80, true, true, false, new byte[]{(byte)0x42});
         LocalObject object = new LocalObject(objectInfo);
         
-        delegate.setData(object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        LocalObjectDelegate.NotifyState result = new LocalObjectDelegate.NotifyState();
+        delegate.notifyDataChanged(result, object, EPC.x80, new ObjectData((byte)0x41), new ObjectData((byte)0x41));
+        assertTrue(result.isDone());
+        assertFalse(result.isFail());
+        
         Frame frame = subnet.recvNoWait();
         assertTrue(frame == null);
     }

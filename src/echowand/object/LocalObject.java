@@ -81,7 +81,9 @@ public class LocalObject implements EchonetObject {
 
     /**
      * 指定されたEPCのプロパティの内容をSetの許可がなくても強制的に変更する。
-     * Delegateが最初に処理を行い、Delegateの処理が成功しなかった場合にはLocalObject内部のデータを変更する。
+     * LocalObject内部のデータと新たに指定されたデータを設定したSetResultオブジェクトをDelegateに順番に渡して行く。
+     * 最終的にSetResultが保持している新たに指定された値にLocalObject内部のデータを変更する。
+     * もしも、Delegateが処理に失敗した場合にはnullを返す。
      *
      * @param epc 設定するデータのEPC
      * @param data 設定するデータの内容
@@ -92,22 +94,28 @@ public class LocalObject implements EchonetObject {
         
         ObjectData oldData = this.getData(epc);
 
-        boolean success = setDataDelegate(epc, data, oldData);
+        LocalObjectDelegate.SetState result = setDataDelegate(epc, data, oldData);
 
-        if (!success) {
-            success = setInternalData(epc, data);
-            if (success) {
-                notifyDataChanged(epc, data, oldData);
-            }
+        if (result.isFail()) {
+            logger.exiting(className, "forceSetData", false);
+            return false;
+        }
+        
+        setInternalData(epc, result.getNewData());
+        
+        if (result.isDataChanged()) {
+            notifyDataChanged(epc, result.getNewData(), result.getCurrentData());
         }
 
-        logger.exiting(className, "forceSetData", success);
-        return success;
+        logger.exiting(className, "forceSetData", true);
+        return true;
     }
 
     /**
      * 指定されたEPCのプロパティの内容を変更する。 Setの許可がないプロパティへの操作や、データの制約に従わない操作は失敗する。
-     * Delegateが最初に処理を行い、Delegateの処理が成功しなかった場合にはLocalObject内部のデータを変更する。
+     * LocalObject内部のデータと新たに指定されたデータを設定したSetResultオブジェクトをDelegateに順番に渡して行く。
+     * 最終的にSetResultが保持している新たに指定された値にLocalObject内部のデータを変更する。
+     * もしも、Delegateが処理に失敗した場合にはfalseを返す。
      *
      * @param epc 設定するデータのEPC
      * @param data 設定するデータの内容
@@ -152,7 +160,9 @@ public class LocalObject implements EchonetObject {
 
     /**
      * 指定されたEPCのプロパティの内容をGetの許可がなくても強制的に返す。
-     * Delegateが最初に処理を行い、Delegateがデータを返さない場合にはLocalObject内部のデータを返す。
+     * LocalObject内部のデータを設定したGetResultオブジェクトをDelegateに順番に渡して行く。
+     * 最終的にGetResultが保持している値を返す。
+     * もしも、Delegateが処理に失敗した場合にはnullを返す。
      *
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
@@ -160,19 +170,22 @@ public class LocalObject implements EchonetObject {
     public ObjectData forceGetData(EPC epc) {
         logger.entering(className, "forceGetData", epc);
         
-        ObjectData data = getDataDelegate(epc);
-
-        if (data == null) {
-            data = getInternalData(epc);
+        LocalObjectDelegate.GetState result = getDataDelegate(epc);
+        
+        if (result.isFail()) {
+            logger.exiting(className, "forceGetData", null);
+            return null;
         }
 
-        logger.exiting(className, "forceGetData", data);
-        return data;
+        logger.exiting(className, "forceGetData", result.getGetData());
+        return result.getGetData();
     }
 
     /**
      * 指定されたEPCのプロパティの内容を返す。 Getの許可がない場合にはnullを返す。
-     * Delegateが最初に処理を行い、Delegateがデータを返さない場合にはLocalObject内部のデータを返す。
+     * LocalObject内部のデータを設定したGetResultオブジェクトをDelegateに順番に渡して行く。
+     * 最終的にGetResultが保持している値を返す。
+     * もしも、Delegateが処理に失敗した場合にはnullを返す。
      *
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
@@ -246,42 +259,51 @@ public class LocalObject implements EchonetObject {
      * @param epc 変化したプロパティのEPC
      * @param curData 現在のプロパティデータ
      * @param oldData 以前のプロパティデータ
+     * @return 処理中にエラーが発生しなかった場合にはtrue、そうでなければfalse
      */
-    public void notifyDataChanged(EPC epc, ObjectData curData, ObjectData oldData) {
+    public boolean notifyDataChanged(EPC epc, ObjectData curData, ObjectData oldData) {
         logger.entering(className, "notifyDataChanged", new Object[]{epc, curData, oldData});
         
+        LocalObjectDelegate.NotifyState result = new LocalObjectDelegate.NotifyState();
         for (LocalObjectDelegate delegate: cloneDelegates()) {
-            delegate.notifyDataChanged(this, epc, curData, oldData);
-        }
-        
-        logger.exiting(className, "notifyDataChanged");
-    }
-    
-    private boolean setDataDelegate(EPC epc, ObjectData newData, ObjectData curData) {
-        logger.entering(className, "setDataDelegate", new Object[]{epc, newData, curData});
-        
-        boolean success = false;
-        for (LocalObjectDelegate delegate: cloneDelegates()) {
-            success |= delegate.setData(this, epc, newData, curData);
-        }
-        
-        logger.exiting(className, "setDataDelegate", success);
-        return success;
-    }
-    
-    private ObjectData getDataDelegate(EPC epc) {
-        logger.entering(className, "getDataDelegate", new Object[]{epc});
-        
-        ObjectData data = null;
-        for (LocalObjectDelegate delegate: cloneDelegates()) {
-            ObjectData lastData = delegate.getData(this, epc);
-            if (lastData != null) {
-                data = lastData;
+            delegate.notifyDataChanged(result, this, epc, curData, oldData);
+            if (result.isDone()) {
+                break;
             }
         }
         
-        logger.exiting(className, "getDataDelegate", data);
-        return data;
+        logger.exiting(className, "notifyDataChanged", result.isDone());
+        return result.isFail();
+    }
+    
+    private LocalObjectDelegate.SetState setDataDelegate(EPC epc, ObjectData newData, ObjectData curData) {
+        logger.entering(className, "setDataDelegate", new Object[]{epc, newData, curData});
+        
+        LocalObjectDelegate.SetState result = new LocalObjectDelegate.SetState(newData, curData);
+        for (LocalObjectDelegate delegate: cloneDelegates()) {
+            delegate.setData(result, this, epc, newData, curData);
+            if (result.isDone()) {
+                break;
+            }
+        }
+        
+        logger.exiting(className, "setDataDelegate", result);
+        return result;
+    }
+    
+    private LocalObjectDelegate.GetState getDataDelegate(EPC epc) {
+        logger.entering(className, "getDataDelegate", new Object[]{epc});
+        
+        LocalObjectDelegate.GetState result = new LocalObjectDelegate.GetState(this.getInternalData(epc));
+        for (LocalObjectDelegate delegate: cloneDelegates()) {
+            delegate.getData(result, this, epc);
+            if (result.isDone()) {
+                break;
+            }
+        }
+        
+        logger.exiting(className, "getDataDelegate", result);
+        return result;
     }
     
     /**

@@ -32,47 +32,44 @@ public class LocalObjectRandomDelegate implements LocalObjectDelegate {
 
     /**
      * 指定されたEPCが設定されたEPCと等しい時にはランダムのバイト配列を返す。
-     * 特に代理処理を行わない場合にはnullを返す。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータが要求されているオブジェクト
      * @param epc 要求プロパティデータのEPC
-     * @return 設定されたEPCの場合にはランダムのバイト配列、その他のEPCの場合はnull
      */
     @Override
-    public ObjectData getData(LocalObject object, EPC epc) {
+    public void getData(GetState result, LocalObject object, EPC epc) {
         logger.entering(className, "getData", new Object[]{object, epc});
         
-        ObjectData data = null;
         if (this.epc == epc) {
             byte[] bytes = new byte[len];
             random.nextBytes(bytes);
-            data = new ObjectData(bytes);
+            result.setGetData(new ObjectData(bytes));
         }
         
-        logger.exiting(className, "LocalObjectRandomDelegate", data);
-        return data;
+        logger.exiting(className, "LocalObjectRandomDelegate");
     }
     
     /**
-     * 何も処理せずにfalseを返す。
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータの変更を要求されているオブジェクト
-     * @param epc EPCの指定
-     * @param newData 設定するプロパティデータ
+     * @param epc 変更するプロパティデータのEPC
+     * @param newData 新たに設定されるプロパティデータ
      * @param curData 現在のプロパティデータ
-     * @return 常にfalse
      */
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
-        return false;
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
     }
 
     /**
-     * 何も処理を行わない。
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータの変更通知を行っているオブジェクト
      * @param epc プロパティデータに変更のあったEPC
-     * @param curData 現在のプロパティデータ
-     * @param oldData 以前のプロパティデータ
+     * @param curData 新たに設定されたプロパティデータ
+     * @param oldData 以前設定されていたプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
     }
 }

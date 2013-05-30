@@ -8,8 +8,40 @@ import echowand.logic.RequestDispatcher;
 import echowand.logic.TransactionManager;
 import echowand.net.Inet4Subnet;
 import echowand.object.*;
+import echowand.util.ConstraintSize;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
+
+class LocalObjectSampleDelegate implements LocalObjectDelegate {
+    private ObjectData data;
+
+    LocalObjectSampleDelegate(ObjectData data) {
+        this.data = data;
+    }
+
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+        if (epc == EPC.xF0) {
+            result.setGetData(data);
+        }
+    }
+
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
+        if (epc == EPC.xF0) {
+            result.setCurrentData(data);
+            result.setNewData(newData);
+            data = newData;
+        }
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+    }
+    
+}
 
 /**
  *
@@ -18,12 +50,12 @@ import java.util.logging.Logger;
 public class LocalObjectSample {
     public static void main(String[] args) {
         try {
-            final Inet4Subnet subnet = new Inet4Subnet();
-            final TransactionManager transactionManager = new TransactionManager(subnet);
+            Inet4Subnet subnet = new Inet4Subnet();
+            TransactionManager transactionManager = new TransactionManager(subnet);
             RemoteObjectManager remoteManager = new RemoteObjectManager();
             LocalObjectManager localManager = new LocalObjectManager();
             
-            final RequestDispatcher dispatcher = new RequestDispatcher();
+            RequestDispatcher dispatcher = new RequestDispatcher();
             dispatcher.addRequestProcessor(new SetGetRequestProcessor(localManager));
             dispatcher.addRequestProcessor(new AnnounceRequestProcessor(localManager, remoteManager));
             
@@ -32,8 +64,10 @@ public class LocalObjectSample {
             localManager.add(nodeProfileObject);
             
             TemperatureSensorInfo info = new TemperatureSensorInfo();
+            info.add(EPC.xF0, true, true, true, 1, new ConstraintSize(1, 10));
             LocalObject temperatureSensor = new LocalObject(info);
             temperatureSensor.addDelegate(new LocalObjectNotifyDelegate(subnet, transactionManager));
+            temperatureSensor.addDelegate(new LocalObjectSampleDelegate(new ObjectData((byte)0x00)));
             localManager.add(temperatureSensor);
 
             MainLoop mainLoop = new MainLoop();

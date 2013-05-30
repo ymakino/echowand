@@ -14,23 +14,21 @@ public class LocalObjectDateTimeDelegate implements LocalObjectDelegate {
 
     /**
      * 指定されたEPCが0x97の時は時刻を、0x98の時は年月日を返す。
-     * それ以外の場合には処理を行わずにnullを返す。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータを要求されているオブジェクト
      * @param epc 要求プロパティデータのEPC
-     * @return 時刻か年月日を表すデータ、それ以外の場合はnull
      */
     @Override
-    public ObjectData getData(LocalObject object, EPC epc) {
-        logger.entering(className, "getData", new Object[]{object, epc});
+    public void getData(GetState result, LocalObject object, EPC epc) {
+        logger.entering(className, "getData", new Object[]{result, object, epc});
         
         Calendar cal = Calendar.getInstance();
         
-        ObjectData data = null;
         switch (epc) {
             case x97:
                 byte hour = (byte)cal.get(Calendar.HOUR_OF_DAY);
                 byte minute = (byte)cal.get(Calendar.MINUTE);
-                data = new ObjectData(hour, minute);
+                result.setGetData(new ObjectData(hour, minute));
                 break;
             case x98:
                 int year = cal.get(Calendar.YEAR);
@@ -38,34 +36,33 @@ public class LocalObjectDateTimeDelegate implements LocalObjectDelegate {
                 byte year2 = (byte)(0x000000ff & year);
                 byte month = (byte)(cal.get(Calendar.MONTH) + 1);
                 byte day = (byte)cal.get(Calendar.DAY_OF_MONTH);
-                data = new ObjectData(year1, year2, month, day);
+                result.setGetData(new ObjectData(year1, year2, month, day));
                 break;
         }
         
-        logger.exiting(className, "getData", data);
-        return data;
+        logger.exiting(className, "getData");
     }
     
     /**
-     * 何も処理せずにfalseを返す。
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
      * @param epc EPCの指定
      * @param newData 設定するプロパティデータ
      * @param curData 現在のプロパティデータ
-     * @return 常にfalse
      */
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
-        return false;
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
     }
 
     /**
-     * 何も処理を行わない。
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータの変更通知を行っているオブジェクト
      * @param epc プロパティデータに変更のあったEPC
-     * @param curData 現在のプロパティデータ
-     * @param oldData 以前のプロパティデータ
+     * @param curData 新たに設定されたプロパティデータ
+     * @param oldData 以前設定されていたプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
     }
 }

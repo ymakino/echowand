@@ -35,38 +35,37 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
     }
     
     /**
-     * 特に何も行わずにnullを返す。
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータが要求されているオブジェクト
      * @param epc 要求プロパティデータのEPC
-     * @return 常にnull
      */
     @Override
-    public ObjectData getData(LocalObject object, EPC epc) {
-        return null;
+    public void getData(GetState result, LocalObject object, EPC epc) {
     }
 
     /**
-     * 特に何も処理を行わずにfalseを返す。
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータの変更を要求されているオブジェクト
      * @param epc 変更するプロパティデータのEPC
-     * @param newData 設定するプロパティデータ
+     * @param newData 新たに設定されるプロパティデータ
      * @param curData 現在のプロパティデータ
-     * @return 常にfalse
      */
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
-        return false;
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
     }
     
     /**
      * 指定されたEPCのプロパティが指定されたデータで更新されたことをサブネットに通知する。
+     * @param result 処理状態を表すオブジェクト
      * @param object プロパティデータの変更通知を行っているオブジェクト
      * @param epc プロパティデータに変更のあったEPC
      * @param curData 現在のプロパティデータ
      * @param oldData 以前のプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
         logger.entering(className, "notifyDataChanged", new Object[]{object, epc, curData, oldData});
         
         if (object.isObservable(epc) && !curData.equals(oldData)) {
@@ -82,8 +81,11 @@ public class LocalObjectNotifyDelegate implements LocalObjectDelegate {
                 transaction.execute();
             } catch (SubnetException e) {
                 e.printStackTrace();
+                result.setFail();
             }
         }
+        
+        result.setDone();
         
         logger.exiting(className, "notifyDataChanged");
     }

@@ -184,12 +184,20 @@ public class Transaction {
      * トランザクションのタイムアウトをミリ秒単位で設定する
      * @param timeout タイムアウトの時間(ミリ秒)
      */
-    public void setTimeout(int timeout) {
+    public synchronized void setTimeout(int timeout) {
         logger.entering(className, "setTimeout", timeout);
         
         this.timeout = timeout;
         
         logger.exiting(className, "setTimeout");
+    }
+    
+    /**
+     * トランザクションのタイムアウト時間を返す。
+     * @return timeout タイムアウトの時間(ミリ秒)
+     */
+    public synchronized int getTimeout() {
+        return timeout;
     }
     
     /**
@@ -366,9 +374,10 @@ public class Transaction {
         transactionManager.addTransaction(this);
         
         sendRequest();
-        if (timeout > 0) {
+        int timeout_in_ms = getTimeout();
+        if (timeout_in_ms > 0) {
             timer = new Timer(true);
-            timer.schedule(new TimeoutTimerTask(this), timeout);
+            timer.schedule(new TimeoutTimerTask(this), timeout_in_ms);
         }
 
         logger.exiting(className, "execute");

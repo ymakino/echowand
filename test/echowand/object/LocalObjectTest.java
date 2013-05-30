@@ -27,8 +27,8 @@ class DummyDelegate implements LocalObjectDelegate {
     }
     
     @Override
-    public ObjectData getData(LocalObject object, EPC epc) {
-        return data;
+    public void getData(GetState result, LocalObject object, EPC epc) {
+        result.setGetData(data);
     }
     
     public LocalObject lastObject;
@@ -36,7 +36,7 @@ class DummyDelegate implements LocalObjectDelegate {
     public ObjectData lastData;
     
     @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
         lastObject = object;
         lastEPC = epc;
         lastData = newData;
@@ -48,13 +48,124 @@ class DummyDelegate implements LocalObjectDelegate {
         assertEquals(object.getData(epc), oldData);
         
         data = newData;
-        
-        object.notifyDataChanged(epc, newData, oldData);
-        return true;
     }
 
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+}
+
+class SetFailDelegate implements LocalObjectDelegate {
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+    }
+    
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+        result.setFail();
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+}
+
+class GetFailDelegate implements LocalObjectDelegate {
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+        result.setFail();
+    }
+    
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+}
+
+class SetSameDelegate implements LocalObjectDelegate {
+    private ObjectData data;
+    
+    public SetSameDelegate(ObjectData data) {
+        this.data = data;
+    }
+    
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+    }
+    
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+        result.setSetData(data, data);
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+}
+
+class SetDoneDelegate implements LocalObjectDelegate {
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+    }
+    
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+        result.setDone();
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+}
+
+class GetDoneDelegate implements LocalObjectDelegate {
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+        result.setDone();
+    }
+    
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+    }
+}
+
+class CountDelegate implements LocalObjectDelegate {
+    public int countGet = 0;
+    public int countSet = 0;
+    public int countNotify = 0;
+    
+    @Override
+    public void getData(GetState result, LocalObject object, EPC epc) {
+        countGet++;
+    }
+    
+    @Override
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+        countSet++;
+    }
+
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
+        countNotify++;
+    }
+    
+    public int getCountGet() {
+        return countGet;
+    }
+    
+    public int getCountSet() {
+        return countSet;
+    }
+    
+    public int getCountNotify() {
+        return countNotify;
     }
 }
 
@@ -155,6 +266,42 @@ public class LocalObjectTest {
     }
     
     @Test
+    public void testDelegateSetDataFail() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        SetFailDelegate delegate = new SetFailDelegate();
+        CountDelegate notifyDelegate = new CountDelegate();
+        
+        object.addDelegate(delegate);
+        object.addDelegate(notifyDelegate);
+        boolean result = object.setData(EPC.x80, new ObjectData((byte)0x11));
+        
+        assertFalse(result);
+        assertFalse(new ObjectData((byte)0x11).equals(object.getData(EPC.x80)));
+        assertEquals(0, notifyDelegate.getCountNotify());
+    }
+    
+    @Test
+    public void testDelegateSetDataDone() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        SetDoneDelegate delegate = new SetDoneDelegate();
+        CountDelegate countDelegate = new CountDelegate();
+        
+        object.addDelegate(delegate);
+        object.addDelegate(countDelegate);
+        boolean result = object.setData(EPC.x80, new ObjectData((byte)0x11));
+        
+        assertTrue(result);
+        assertEquals(new ObjectData((byte)0x11), object.getData(EPC.x80));
+        assertEquals(0, countDelegate.getCountSet());
+    }
+    
+    @Test
     public void testDelegateGetData() {
         ObjectInfo info = new HomeAirConditionerInfo();
         LocalObject object = new LocalObject(info);
@@ -182,6 +329,71 @@ public class LocalObjectTest {
     }
     
     @Test
+    public void testDelegateGetDataFail() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        GetFailDelegate delegate = new GetFailDelegate();
+        
+        object.addDelegate(delegate);
+        ObjectData data = object.getData(EPC.x80);
+        
+        assertNull(data);
+    }
+    
+    @Test
+    public void testDelegateGetDataDone() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, new byte[]{0x11}));
+        LocalObject object = new LocalObject(info);
+        
+        GetDoneDelegate delegate = new GetDoneDelegate();
+        CountDelegate countDelegate = new CountDelegate();
+        
+        object.addDelegate(delegate);
+        object.addDelegate(countDelegate);
+        ObjectData result = object.getData(EPC.x80);
+        
+        assertEquals(new ObjectData((byte)0x11), result);
+        assertEquals(0, countDelegate.getCountGet());
+    }
+    
+    @Test
+    public void testDelegateSetDataSame() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        CountDelegate notifyDelegate = new CountDelegate();
+        
+        object.addDelegate(notifyDelegate);
+        
+        boolean result1 = object.setData(EPC.x80, new ObjectData((byte)0x11));
+        assertTrue(result1);
+        assertEquals(new ObjectData((byte)0x11), object.getData(EPC.x80));
+        assertEquals(1, notifyDelegate.getCountNotify());
+        
+        boolean result2 = object.setData(EPC.x80, new ObjectData((byte)0x11));
+        assertTrue(result2);
+        assertEquals(new ObjectData((byte)0x11), object.getData(EPC.x80));
+        assertEquals(1, notifyDelegate.getCountNotify());
+        
+        boolean result3 = object.setData(EPC.x80, new ObjectData((byte)0x12));
+        assertTrue(result3);
+        assertEquals(new ObjectData((byte)0x12), object.getData(EPC.x80));
+        assertEquals(2, notifyDelegate.getCountNotify());
+        
+        SetSameDelegate delegate = new SetSameDelegate(new ObjectData((byte)0x55));
+        object.addDelegate(delegate);
+        
+        boolean result4 = object.setData(EPC.x80, new ObjectData((byte)0x13));
+        assertTrue(result4);
+        assertEquals(new ObjectData((byte)0x55), object.getData(EPC.x80));
+        assertEquals(2, notifyDelegate.getCountNotify());
+    }
+    
+    @Test
     public void testSetAndGet2() {
         DeviceObjectInfo info = new HomeAirConditionerInfo();
         info.add(new PropertyInfo(EPC.x80, true, true, false, 1));
@@ -204,5 +416,21 @@ public class LocalObjectTest {
         
         assertFalse(object.setData(EPC.x80, new ObjectData((byte)0x12, (byte)0x34)));
         assertTrue(object.forceSetData(EPC.x80, new ObjectData((byte)0x12, (byte)0x34)));
+    }
+    
+    @Test
+    public void testDelegateNotifyData() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        CountDelegate notifyDelegate = new CountDelegate();
+        
+        object.addDelegate(notifyDelegate);
+        boolean result = object.setData(EPC.x80, new ObjectData((byte)0x11));
+        
+        assertTrue(result);
+        assertEquals(new ObjectData((byte)0x11), object.getData(EPC.x80));
+        assertEquals(1,  notifyDelegate.getCountNotify());
     }
 }

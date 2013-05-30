@@ -1,8 +1,5 @@
 package echowand.object;
 
-import echowand.object.LocalObjectDateTimeDelegate;
-import echowand.object.LocalObject;
-import echowand.object.ObjectData;
 import echowand.common.EPC;
 import echowand.info.DeviceObjectInfo;
 import echowand.info.TemperatureSensorInfo;
@@ -17,7 +14,7 @@ import static org.junit.Assert.*;
 public class LocalObjectDateTimeDelegateTest {
 
     /**
-     * Test of getData method, of class LocalObjectDateTimeDelegate.
+     * Test of getGetData method, of class LocalObjectDateTimeDelegate.
      */
     @Test
     public void testGetData() {
@@ -26,10 +23,18 @@ public class LocalObjectDateTimeDelegateTest {
         objectInfo.add(EPC.x98, true, false, false, 4);
         LocalObject object = new LocalObject(objectInfo);
         LocalObjectDateTimeDelegate delegate = new LocalObjectDateTimeDelegate();
-        ObjectData dataDate1 = delegate.getData(object, EPC.x98);
-        ObjectData dataTime1 = delegate.getData(object, EPC.x97);
-        ObjectData dataDate2 = delegate.getData(object, EPC.x98);
-        ObjectData dataTime2 = delegate.getData(object, EPC.x97);
+        
+        LocalObjectDelegate.GetState dataDate1 = new LocalObjectDelegate.GetState(object.getInternalData(EPC.x98));
+        delegate.getData(dataDate1, object, EPC.x98);
+        
+        LocalObjectDelegate.GetState dataTime1 = new LocalObjectDelegate.GetState(object.getInternalData(EPC.x98));
+        delegate.getData(dataTime1, object, EPC.x97);
+        
+        LocalObjectDelegate.GetState dataDate2 = new LocalObjectDelegate.GetState(object.getInternalData(EPC.x98));
+        delegate.getData(dataDate2, object, EPC.x98);
+        
+        LocalObjectDelegate.GetState dataTime2 = new LocalObjectDelegate.GetState(object.getInternalData(EPC.x98));
+        delegate.getData(dataTime2, object, EPC.x97);
         
         Calendar now1 = Calendar.getInstance();
         Calendar now2 = ((Calendar)now1.clone());
@@ -40,8 +45,8 @@ public class LocalObjectDateTimeDelegateTest {
         now2.set(Calendar.SECOND, 0);
         now2.set(Calendar.MILLISECOND, 0);
         
-        Calendar cal1 = dataToCal(dataDate1, dataTime1);
-        Calendar cal2 = dataToCal(dataDate2, dataTime2);
+        Calendar cal1 = dataToCal(dataDate1.getGetData(), dataTime1.getGetData());
+        Calendar cal2 = dataToCal(dataDate2.getGetData(), dataTime2.getGetData());
         
         assertTrue(eq(now1, cal1) || eq(now1, cal2) || eq(now2, cal1) || eq(now2, cal2));
     }
@@ -69,13 +74,21 @@ public class LocalObjectDateTimeDelegateTest {
     }
 
     /**
-     * Test of setData method, of class LocalObjectDateTimeDelegate.
+     * Test of setGetData method, of class LocalObjectDateTimeDelegate.
      */
     @Test
     public void testSetData() {
         LocalObject object = new LocalObject(new TemperatureSensorInfo());
         LocalObjectDateTimeDelegate delegate = new LocalObjectDateTimeDelegate();
-        assertEquals(false, delegate.setData(object, EPC.x97, new ObjectData((byte)0x41), new ObjectData((byte)0x40)));
-        assertEquals(false, delegate.setData(object, EPC.x98, new ObjectData((byte)0x41), new ObjectData((byte)0x40)));
+        
+        LocalObjectDelegate.SetState result1 = new LocalObjectDelegate.SetState(new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        delegate.setData(result1, object, EPC.x97, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        assertFalse(result1.isDone());
+        assertFalse(result1.isFail());
+        
+        LocalObjectDelegate.SetState result2 = new LocalObjectDelegate.SetState(new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        delegate.setData(result2, object, EPC.x98, new ObjectData((byte)0x41), new ObjectData((byte)0x40));
+        assertFalse(result2.isDone());
+        assertFalse(result2.isFail());
     }
 }

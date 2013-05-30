@@ -220,59 +220,55 @@ public class NodeProfileObjectDelegate implements LocalObjectDelegate {
     
     /**
      * 0xD3から0xD7までのプロパティデータを生成する。
-     * @param object プロパティのデータを要求されているオブジェクト
-     * @param epc 要求されているプロパティのEPC
-     * @return 指定されたEPCのプロパティのデータ
+     * @param result 処理状態を表すオブジェクト
+     * @param object プロパティデータが要求されているオブジェクト
+     * @param epc 要求プロパティデータのEPC
      */
     @Override
-    public ObjectData getData(LocalObject object, EPC epc) {
+    public void getData(GetState result, LocalObject object, EPC epc) {
         logger.entering(className, "getData");
 
-        ObjectData objectData = null;
         switch (epc) {
             case xD3:
-                objectData = getInstanceCountData();
+                result.setGetData(getInstanceCountData());
                 break;
             case xD4:
-                objectData = getClassCountData();
+                result.setGetData(getClassCountData());
                 break;
             case xD5:
-                objectData = getInstanceListS();
+                result.setGetData(getInstanceListS());
                 break;
             case xD6:
-                objectData = getInstanceListS();
+                result.setGetData(getInstanceListS());
                 break;
             case xD7:
-                objectData = getClassListS();
+                result.setGetData(getClassListS());
                 break;
         }
         
-        logger.exiting(className, "getData", objectData);
-        return objectData;
+        logger.exiting(className, "getData");
     }
     
     /**
-     * プロパティデータのSet処理の時に呼ばれる。
-     * 特に処理を行わずにfalseを返す。
-     * @param object プロパティのデータの設定を要求されているオブジェクト
-     * @param epc 要求されているプロパティのEPC
-     * @param newData 設定するプロパティデータ
-     * @param oldData 現在のプロパティデータ
-     * @return 常にfalse
-     */
-    @Override
-    public boolean setData(LocalObject object, EPC epc, ObjectData newData, ObjectData oldData) {
-        return false;
-    }
-    
-    /**
-     * 指定されたLocalObjectのプロパティデータが更新された時に呼び出される。
      * 特に処理は行わない。
-     * @param object プロパティデータが更新されたオブジェクト
-     * @param epc 更新されたプロパティのEPC
+     * @param result 処理状態を表すオブジェクト
+     * @param object プロパティデータの変更を要求されているオブジェクト
+     * @param epc 変更するプロパティデータのEPC
+     * @param newData 新たに設定されるプロパティデータ
      * @param curData 現在のプロパティデータ
-     * @param oldData 以前のプロパティデータ
      */
     @Override
-    public void notifyDataChanged(LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {}
+    public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
+    }
+    
+    /**
+     * 特に処理は行わない。
+     * @param result 処理状態を表すオブジェクト
+     * @param object プロパティデータの変更通知を行っているオブジェクト
+     * @param epc プロパティデータに変更のあったEPC
+     * @param curData 新たに設定されたプロパティデータ
+     * @param oldData 以前設定されていたプロパティデータ
+     */
+    @Override
+    public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {}
 }
