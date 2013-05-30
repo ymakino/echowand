@@ -254,6 +254,13 @@ public class LocalObject implements EchonetObject {
         return objectInfo.get(epc).observable;
     }
     
+    private void logMessages(LocalObjectDelegate.State state) {
+        int count = state.countMessages();
+        for (int i=0; i<count; i++) {
+            logger.info(state.getMessage(i));
+        }
+    }
+    
     /**
      * 指定されたEPCのプロパティデータが変化したことを通知する。
      * @param epc 変化したプロパティのEPC
@@ -272,7 +279,9 @@ public class LocalObject implements EchonetObject {
             }
         }
         
-        logger.exiting(className, "notifyDataChanged", result.isDone());
+        logMessages(result);
+        
+        logger.exiting(className, "notifyDataChanged", result.isFail());
         return result.isFail();
     }
     
@@ -286,6 +295,8 @@ public class LocalObject implements EchonetObject {
                 break;
             }
         }
+        
+        logMessages(result);
         
         logger.exiting(className, "setDataDelegate", result);
         return result;
@@ -301,6 +312,8 @@ public class LocalObject implements EchonetObject {
                 break;
             }
         }
+        
+        logMessages(result);
         
         logger.exiting(className, "getDataDelegate", result);
         return result;

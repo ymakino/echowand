@@ -1,9 +1,10 @@
 package echowand.object;
 
 import echowand.common.EPC;
+import java.util.LinkedList;
 
 /**
- * LocalObjectの代理処理
+ * LocalObjectの代理処理を実行するクラスを作成するためのインタフェースを表す。
  * @author Yoshiki Makino
  */
 public interface LocalObjectDelegate {
@@ -13,6 +14,7 @@ public interface LocalObjectDelegate {
     static class State {
         private boolean done = false;
         private boolean fail = false;
+        private LinkedList<String> messages = new LinkedList<String>();
         
         /**
          * 処理が完全に終了したことを設定する。
@@ -45,6 +47,32 @@ public interface LocalObjectDelegate {
          */
         public boolean isFail() {
             return fail;
+        }
+        
+        /**
+         * 処理結果に関するメッセージを追加する。
+         * 処理の失敗理由等を設定するために利用し、通常は利用する必要はない。
+         * @param message 処理結果に関するメッセージ
+         */
+        public void addMessage(String message) {
+            messages.add(message);
+        }
+        
+        /**
+         * 処理結果に関するメッセージの数を返す。
+         * @return 処理結果に関するメッセージの数
+         */
+        public int countMessages() {
+            return messages.size();
+        }
+        
+        /**
+         * 指定された順番に保存された処理結果に関するメッセージを返す。
+         * @param index 処理結果に関するメッセージの順番の指定
+         * @return 処理結果に関するメッセージ
+         */
+        public String getMessage(int index) {
+            return messages.get(index);
         }
     }
     
