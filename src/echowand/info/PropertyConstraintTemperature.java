@@ -35,7 +35,11 @@ public class PropertyConstraintTemperature implements Constraint {
     public boolean isValid(byte[] data) {
         return constraint.isValid(data);
     }
-
+    
+    /**
+     * PropertyConstraintTemperatureの文字列表現を返す。
+     * @return PropertyConstraintTemperatureの文字列表現
+     */
     @Override
     public String toString() {
         return constraint.toString();

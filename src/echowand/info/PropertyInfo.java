@@ -117,6 +117,10 @@ public class PropertyInfo {
         return this.epc.hashCode();
     }
     
+    /**
+     * PropertyInfoの文字列表現を返す。
+     * @return PropertyInfoの文字列表現
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

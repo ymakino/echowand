@@ -36,6 +36,7 @@ public class Inet6Subnet implements Subnet {
     /**
      * Inet6Subnetを生成する。
      * ソケットの初期化も同時に行い、このInet6Subnetを有効にする。
+     * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet() throws SubnetException {
         initInet6Subnet(true);
@@ -46,6 +47,7 @@ public class Inet6Subnet implements Subnet {
      * 与えられたdoInitがtrueであればソケットの初期化も行い、このInet6Subnetを有効にする。
      * doInitがfalseであればソケットの初期化は行わず、enableが呼ばれるまで無効状態になる。
      * @param doInit ソケットの初期化処理の有無
+     * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(boolean doInit) throws SubnetException {
         initInet6Subnet(doInit);

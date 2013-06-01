@@ -17,6 +17,7 @@ public class PropertyConstraintHumidity implements Constraint {
     private static final byte UNDERFLOW = (byte)0xfe;
     
     private ConstraintUnion constraint;
+    
     /**
      * PropertyConstraintHumidityを生成する。
      */
@@ -35,6 +36,10 @@ public class PropertyConstraintHumidity implements Constraint {
         return constraint.isValid(data);
     }
     
+    /**
+     * PropertyConstraintHumidityの文字列表現を返す。
+     * @return PropertyConstraintHumidityの文字列表現
+     */
     @Override
     public String toString() {
         return constraint.toString();

@@ -1,15 +1,16 @@
 package echowand.util;
 
+import java.io.PrintWriter;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class DoubleRange {
-    long count = 0;
-    double ave = 0;
-    double min = 0;
-    double max = 0;
+    private long count = 0;
+    private double ave = 0;
+    private double min = 0;
+    private double max = 0;
 
     public void add(double d) {
         if (count == 0) {
@@ -50,11 +51,13 @@ public class HeapUsageReporter extends TimerTask {
     private DoubleRange used;
     private DoubleRange free;
     private DoubleRange max;
+    private PrintWriter writer;
     private long interval;
     private long count;
 
     /**
      * 指定されたインターバルで表示を行なうHeapUsageReporterを生成する。
+     * 標準の出力先はSystem.outになる。
      * @param interval インターバル(ミリ秒)の指定
      */
     public HeapUsageReporter(int interval) {
@@ -63,6 +66,22 @@ public class HeapUsageReporter extends TimerTask {
         free = new DoubleRange();
         max  = new DoubleRange();
         this.interval = interval;
+        writer = new PrintWriter(System.out);
+        count = 0;
+    }
+
+    /**
+     * 指定されたインターバルで表示を行なうHeapUsageReporterを生成する。
+     * @param interval インターバル(ミリ秒)の指定
+     * @param writer  出力先の指定
+     */
+    public HeapUsageReporter(int interval, PrintWriter writer) {
+        total= new DoubleRange();
+        used = new DoubleRange();
+        free = new DoubleRange();
+        max  = new DoubleRange();
+        this.interval = interval;
+        this.writer = writer;
         count = 0;
     }
 
@@ -79,12 +98,22 @@ public class HeapUsageReporter extends TimerTask {
         count++;
         return usage;
     }
+    
+    private void println(Object obj) {
+        writer.println(obj.toString());
+        writer.flush();
+    }
+    
+    private void printf(String format, Object... args) {
+        writer.printf(format, args);
+        writer.flush();
+    }
 
     /**
      * ヒープの使用量の定期的な表示を開始する。
      */
     public void start() {
-        System.out.println(new HeapUsage());
+        println(new HeapUsage());
         new Timer().schedule(this, interval, interval);
     }
 
@@ -95,10 +124,10 @@ public class HeapUsageReporter extends TimerTask {
     public void run() {
         HeapUsage usage = getHeapUsage();
         String u = usage.getUnit().toString();
-        System.out.printf("%d %s\n", count, usage);
-        System.out.printf("\tAVE used: %d%s, free: %d%s\n", (long)used.getAve(), u, (long)free.getAve(), u);
-        System.out.printf("\tMIN used: %d%s, free: %d%s\n", (long)used.getMin(), u, (long)free.getMin(), u);
-        System.out.printf("\tMAX used: %d%s, free: %d%s\n", (long)used.getMax(), u, (long)free.getMax(), u);
+        printf("%d %s\n", count, usage);
+        printf("\tAVE used: %d%s, free: %d%s\n", (long)used.getAve(), u, (long)free.getAve(), u);
+        printf("\tMIN used: %d%s, free: %d%s\n", (long)used.getMin(), u, (long)free.getMin(), u);
+        printf("\tMAX used: %d%s, free: %d%s\n", (long)used.getMax(), u, (long)free.getMax(), u);
     }
 
     /**
