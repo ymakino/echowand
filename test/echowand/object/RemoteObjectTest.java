@@ -29,6 +29,7 @@ import org.junit.*;
 public class RemoteObjectTest {
     
     private Data data = new Data((byte)0x41);
+    
     public Frame createGetFrame(Subnet subnet, Frame reqFrame) {
         short tid = reqFrame.getCommonFrame().getTID();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.Get_Res);
@@ -58,6 +59,18 @@ public class RemoteObjectTest {
             Data bigData = new Data(new byte[253]);
             payload.addFirstProperty(new Property(EPC.xE0, bigData));
         }
+        cf.setTID(tid);
+        Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
+        return frame;
+    }
+    
+    public Frame createGetFailFrame(Subnet subnet, Frame reqFrame) {
+        short tid = reqFrame.getCommonFrame().getTID();
+        StandardPayload reqPayload = (StandardPayload)reqFrame.getCommonFrame().getEDATA();
+        CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.Get_SNA);
+        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        EPC epc = ((StandardPayload)reqFrame.getCommonFrame().getEDATA()).getFirstPropertyAt(0).getEPC();
+        payload.addFirstProperty(reqPayload.getFirstPropertyAt(0));
         cf.setTID(tid);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         return frame;
@@ -121,7 +134,11 @@ public class RemoteObjectTest {
                     StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
                     switch (payload.getESV()) {
                         case Get:
-                            transactionManager.process(subnet, createGetFrame(subnet, frame), false);
+                            if (payload.getFirstPropertyAt(0).getEPC() == EPC.xE1) {
+                                transactionManager.process(subnet, createGetFailFrame(subnet, frame), false);
+                            } else {
+                                transactionManager.process(subnet, createGetFrame(subnet, frame), false);
+                            }
                             break;
                         case SetC:
                             if (payload.getFirstPropertyAt(0).getEPC() == EPC.x80) {
@@ -162,6 +179,20 @@ public class RemoteObjectTest {
         }
     }
     
+    @Test(expected=EchonetObjectException.class)
+    public void testGetFail() throws EchonetObjectException {
+        InternalSubnet subnet = new InternalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
+        assertEquals(subnet, object.getSubnet());
+        assertEquals(transactionManager, object.getListener());
+        assertEquals(subnet.getLocalNode(), object.getNode());
+        assertEquals(new EOJ("001101"), object.getEOJ());
+
+        new ResponseThread(subnet, transactionManager).start();
+        ObjectData bigData = object.getData(EPC.xE1);
+    }
+
     @Test
     public void testSet() {
         InternalSubnet subnet = new InternalSubnet();

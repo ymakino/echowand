@@ -325,6 +325,12 @@ public class RemoteObject implements EchonetObject {
         }
         
         ObjectData data =  transactionListener.getData();
+        if (data == null) {
+            EchonetObjectException exception = new EchonetObjectException("no valid data");
+            logger.throwing(className, "getData", exception);
+            throw exception;
+        }
+        
         logger.exiting(className, "getData", data);
         return data;
     }
