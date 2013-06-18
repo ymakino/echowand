@@ -14,6 +14,6 @@ public class HumiditySensorInfo extends DeviceObjectInfo {
     public HumiditySensorInfo() {
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x12)));
         
-        add(EPC.xE0, true, false, true, 1, new PropertyConstraintHumidity());
+        add(EPC.xE0, true, false, false, 1, new PropertyConstraintHumidity());
     }
 }
