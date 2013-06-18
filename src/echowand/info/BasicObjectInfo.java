@@ -162,11 +162,28 @@ public class BasicObjectInfo implements ObjectInfo {
     public final boolean add(PropertyInfo prop) {
         logger.entering(className, "add", prop);
         
+        boolean status = addWithoutUpdating(prop);
         makeUpdatePropertyMapNeeded();
         makePropListOutdated();
-        boolean status = addWithoutUpdating(prop);
         
         logger.exiting(className, "add", status);
+        return status;
+    }
+    
+    
+    /**
+     * このBasicObjectInfoが表現するECHONETオブジェクトからプロパティを削除する。
+     * @param epc 削除するプロパティのEPC
+     * @return 削除が成功した場合にはtrue、失敗した場合にはfalse
+     */
+    public final boolean remove(EPC epc) {
+        logger.entering(className, "remove", epc);
+        
+        boolean status = props.remove(get(epc));
+        makeUpdatePropertyMapNeeded();
+        makePropListOutdated();
+        
+        logger.exiting(className, "remove", status);
         return status;
     }
     
@@ -247,7 +264,6 @@ public class BasicObjectInfo implements ObjectInfo {
 
     /**
      * このBasicObjectInfoが表現するECHONETオブジェクトの全プロパティ設定数を返す。
-     *
      * @return 全プロパティ設定数
      */
     @Override

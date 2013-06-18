@@ -46,4 +46,41 @@ public class BasicObjectInfoTest {
         assertEquals((byte)0x9E, getMap[7]);
         assertEquals((byte)0x9F, getMap[8]);
     }
+    
+    @Test
+    public void testAddEPC() {
+        DeviceObjectInfo objectInfo = new DeviceObjectInfo();
+        
+        PropertyInfo propertyInfo1 = objectInfo.get(EPC.xF0);
+        assertEquals(EPC.xF0, propertyInfo1.epc);
+        assertFalse(propertyInfo1.gettable);
+        assertFalse(propertyInfo1.settable);
+        assertFalse(propertyInfo1.observable);
+        
+        objectInfo.add(EPC.xF0, true, false, true, new byte[]{0x00});
+        PropertyInfo propertyInfo2 = objectInfo.get(EPC.xF0);
+        assertEquals(EPC.xF0, propertyInfo2.epc);
+        assertTrue(propertyInfo2.gettable);
+        assertFalse(propertyInfo2.settable);
+        assertTrue(propertyInfo2.observable);
+    }
+    
+    @Test
+    public void testRemoveEPC() {
+        DeviceObjectInfo objectInfo = new DeviceObjectInfo();
+        
+        objectInfo.add(EPC.xF0, true, false, true, new byte[]{0x00});
+        PropertyInfo propertyInfo1 = objectInfo.get(EPC.xF0);
+        assertEquals(EPC.xF0, propertyInfo1.epc);
+        assertTrue(propertyInfo1.gettable);
+        assertFalse(propertyInfo1.settable);
+        assertTrue(propertyInfo1.observable);
+        
+        objectInfo.remove(EPC.xF0);
+        PropertyInfo propertyInfo2 = objectInfo.get(EPC.xF0);
+        assertEquals(EPC.xF0, propertyInfo2.epc);
+        assertFalse(propertyInfo2.gettable);
+        assertFalse(propertyInfo2.settable);
+        assertFalse(propertyInfo2.observable);
+    }
 }
