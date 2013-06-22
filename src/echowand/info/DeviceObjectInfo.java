@@ -39,7 +39,7 @@ public class DeviceObjectInfo extends BasicObjectInfo {
         
         add(EPC.x80, true, false,  true, new byte[]{0x30}, new PropertyConstraintOnOff());
         add(EPC.x81, true,  true,  true, new byte[]{0x00}, new ConstraintByte());
-        add(EPC.x82, true, false,  true, versionBytes, new PropertyConstraintVersion());
+        add(EPC.x82, true, false, false, versionBytes, new PropertyConstraintVersion());
         add(EPC.x88, true, false,  true, new byte[]{0x42}, new PropertyConstraintDetection());
         add(EPC.x8A, true, false, false, new byte[]{0x00, 0x00, 0x00}, new ConstraintSize(3));
         add(EPC.x9D, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap()); 

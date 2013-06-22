@@ -25,7 +25,7 @@ public class NodeProfileInfo extends BasicObjectInfo {
         ConstraintSize size2 = new ConstraintSize(17);
         ConstraintUnion c = new ConstraintUnion(size1, size2);
         add(EPC.x80, true, false,  true, new byte[]{0x30}, new PropertyConstraintOnOff());
-        add(EPC.x82, true, false,  true, versionBytes, new PropertyConstraintVersion());
+        add(EPC.x82, true, false, false, versionBytes, new PropertyConstraintVersion());
         add(EPC.x83, true, false, false, 9, c);
         add(EPC.x9D, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap()); 
         add(EPC.x9E, true, false, false, new PropertyMap().toBytes(), new PropertyConstraintMap());
