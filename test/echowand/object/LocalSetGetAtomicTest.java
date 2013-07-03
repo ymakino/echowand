@@ -101,7 +101,7 @@ public class LocalSetGetAtomicTest {
         assertEquals(EPC.x88, getResult.get(0).getEPC());
         assertEquals(1, getResult.get(0).getPDC());
         assertEquals(EPC.x9D, getResult.get(1).getEPC());
-        assertEquals(5, getResult.get(1).getPDC());
+        assertEquals(4, getResult.get(1).getPDC());
         
         assertTrue(localSetGetAtomic.isSuccess());
     }
@@ -187,7 +187,7 @@ public class LocalSetGetAtomicTest {
         assertEquals(EPC.x88, getResult.get(0).getEPC());
         assertEquals(1, getResult.get(0).getPDC());
         assertEquals(EPC.x9D, getResult.get(1).getEPC());
-        assertEquals(4, getResult.get(1).getPDC());
+        assertEquals(3, getResult.get(1).getPDC());
         
         assertEquals((byte)0x42, object.getData(EPC.x80).get(0));
         assertEquals((byte)0xab, object.getData(EPC.xE0).get(0));
