@@ -70,6 +70,8 @@ public class LocalObjectSample {
             mainLoop.addListener(transactionManager);
             mainLoop.addListener(dispatcher);
             
+            subnet.startService();
+            
             Thread mainThread = new Thread(mainLoop);
             mainThread.setDaemon(true);
             mainThread.start();

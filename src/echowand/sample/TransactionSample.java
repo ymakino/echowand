@@ -24,6 +24,8 @@ public class TransactionSample {
             mainLoop.setSubnet(subnet);
             mainLoop.addListener(transactionManager);
             
+            subnet.startService();
+            
             Thread mainThread = new Thread(mainLoop);
             mainThread.setDaemon(true);
             mainThread.start();

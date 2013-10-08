@@ -28,6 +28,7 @@ public class Sample2 {
 
         try {
             subnet = new Inet4Subnet();
+            subnet.startService();
         } catch (SubnetException e) {
             e.printStackTrace();
             return;

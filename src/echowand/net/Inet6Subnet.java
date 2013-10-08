@@ -44,6 +44,10 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(Inet6Address localAddress) throws SubnetException {
+        if (localAddress == null) {
+            throw new SubnetException("invalid address: " + localAddress);
+        }
+        
         try {
             Inet6Address multicastAddress = (Inet6Address)Inet6Address.getByName(MULTICAST_ADDRESS);
             
@@ -60,6 +64,10 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(NetworkInterface networkInterface) throws SubnetException {
+        if (networkInterface == null) {
+            throw new SubnetException("invalid network interface: " + networkInterface);
+        }
+        
         try {
             Inet6Address multicastAddress = (Inet6Address)Inet6Address.getByName(MULTICAST_ADDRESS);
             

@@ -39,6 +39,8 @@ public class RemoteObjectSample {
             mainLoop.addListener(transactionManager);
             mainLoop.addListener(dispatcher);
             
+            subnet.startService();
+            
             Thread mainThread = new Thread(mainLoop);
             mainThread.start();
 

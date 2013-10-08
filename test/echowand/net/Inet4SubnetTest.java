@@ -78,22 +78,18 @@ public class Inet4SubnetTest {
     }
 
     @Test
-    public void testSendAndRecv() throws SubnetException {
+    public void testSendAndRecv() throws SubnetException, UnknownHostException {
         subnet.startService();
         
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
         
-        try {
-            Node node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("127.0.0.1"), Inet4Subnet.DEFAULT_PORT_NUMBER);
+            Node node = subnet.getRemoteNode(Inet4Address.getByName("127.0.0.1"), Inet4Subnet.DEFAULT_PORT_NUMBER);
             sendTest(node, true);
-            Node invalidAddr = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("172.21.254.254"), Inet4Subnet.DEFAULT_PORT_NUMBER);
+            Node invalidAddr = subnet.getRemoteNode(Inet4Address.getByName("172.21.254.254"), Inet4Subnet.DEFAULT_PORT_NUMBER);
             sendTest(invalidAddr, false);
-            Node invalidPort = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("127.0.0.1"), 4321);
+            Node invalidPort = subnet.getRemoteNode(Inet4Address.getByName("127.0.0.1"), 4321);
             sendTest(invalidPort, false);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
     }
     
     @Test
@@ -175,11 +171,11 @@ public class Inet4SubnetTest {
     @Test(expected = SubnetException.class)
     public void testCreationWithNullAddress() throws SubnetException {
         subnet.stopService();
-        subnet = new Inet4Subnet((Inet4Address) null);
+        subnet = new Inet4Subnet((Inet4Address)null);
     }
 
     @Test
-    public void testEnable() throws SubnetException {
+    public void testStartAndStopService() throws SubnetException {
         assertFalse(subnet.isWorking());
 
         assertTrue(subnet.startService());
@@ -206,13 +202,13 @@ public class Inet4SubnetTest {
     }
     
     @Test(expected= SubnetException.class)
-    public void testSendAfterDisable() throws SubnetException {
+    public void testSendAfterStopService() throws SubnetException {
         subnet.stopService();
         subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
     }
 
     @Test
-    public void testEnableAfterDisable() throws SubnetException {
+    public void testStartServiceAfterStopService() throws SubnetException {
         try {
             subnet.startService();
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
@@ -246,11 +242,11 @@ public class Inet4SubnetTest {
     }*/
     
     @Test
-    public void testNodeEquals() {
+    public void testNodeEquals() throws SubnetException {
         try {
-            Node node1 = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("192.168.1.1"));
-            Node node2 = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("192.168.1.1"), 3610);
-            Node node3 = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("192.168.1.1"), 3611);
+            Node node1 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"));
+            Node node2 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"), 3610);
+            Node node3 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"), 3611);
             assertEquals(node1, node2);
             assertFalse(node1.equals(node3));
         } catch (UnknownHostException e) {

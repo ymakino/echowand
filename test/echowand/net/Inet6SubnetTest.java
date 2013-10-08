@@ -29,7 +29,7 @@ public class Inet6SubnetTest {
     
     @After
     public void tearDown() {
-        subnet.disable();
+        subnet.stopService();
     }
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
@@ -78,31 +78,30 @@ public class Inet6SubnetTest {
     }
 
     @Test
-    public void testSendAndRecv() {
+    public void testSendAndRecv() throws SubnetException, UnknownHostException {
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
-        try {
-            Node node = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("::1"), Inet6Subnet.DEFAULT_PORT);
-            sendTest(node, true);
-            Node invalidAddr = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::fe"), Inet6Subnet.DEFAULT_PORT);
-            sendTest(invalidAddr, false);
-            Node invalidPort = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("::1"), 4321);
-            sendTest(invalidPort, false);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+
+        Node node = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("::1"), Inet6Subnet.DEFAULT_PORT_NUMBER);
+        sendTest(node, true);
+        Node invalidAddr = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("FD00::fe"), Inet6Subnet.DEFAULT_PORT_NUMBER);
+        sendTest(invalidAddr, false);
+        Node invalidPort = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("::1"), 4321);
+        sendTest(invalidPort, false);
     }
-    
+
     @Test
     public void testCreation() throws SubnetException {
-        assertFalse(subnet.enable());
-        subnet.disable();
-        subnet = new Inet6Subnet(true);
-        assertTrue(subnet.isEnabled());
-        subnet.disable();
-        subnet = new Inet6Subnet(false);
-        assertFalse(subnet.isEnabled());
-        subnet.disable();
+        assertFalse(subnet.stopService());
+        assertFalse(subnet.stopService());
+        
+        assertTrue(subnet.startService());
+        assertFalse(subnet.startService());
+        assertTrue(subnet.isWorking());
+        
+        assertTrue(subnet.stopService());
+        assertFalse(subnet.stopService());
+        assertFalse(subnet.isWorking());
     }
     
     private LinkedList<Inet6Address> getInet6Addresses() throws SocketException {
@@ -138,102 +137,90 @@ public class Inet6SubnetTest {
     
     @Test
     public void testCreationWithNetworkInterface() throws SocketException, SubnetException {
-        subnet.disable();
+        subnet.stopService();
 
         for (NetworkInterface nif : getInet6Interfaces()) {
-            subnet = new Inet6Subnet(nif, true);
-            assertTrue(subnet.isEnabled());
+            subnet = new Inet6Subnet(nif);
+            assertFalse(subnet.isWorking());
             assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
-
-            subnet = new Inet6Subnet(nif, false);
-            assertFalse(subnet.isEnabled());
-            assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
+            subnet.stopService();
         }
     }
 
     @Test(expected = SubnetException.class)
     public void testCreationWithNullNetworkInterface() throws SubnetException {
-        subnet.disable();
-        subnet = new Inet6Subnet((NetworkInterface) null, true);
+        subnet.stopService();
+        subnet = new Inet6Subnet((NetworkInterface) null);
     }
 
     @Test
     public void testCreationWithAddress() throws SocketException, SubnetException {
-        subnet.disable();
+        subnet.stopService();
 
         for (Inet6Address addr : getInet6Addresses()) {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
-            
-            subnet = new Inet6Subnet(addr, true);
-            assertTrue(subnet.isEnabled());
+            subnet = new Inet6Subnet(addr);
+            assertFalse(subnet.isWorking());
             assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
-
-            subnet = new Inet6Subnet(addr, false);
-            assertFalse(subnet.isEnabled());
-            assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
+            subnet.stopService();
         }
     }
     
     @Test(expected=SubnetException.class)
     public void testCreationWithNullAddress() throws SubnetException {
-        subnet.disable();
-        subnet = new Inet6Subnet((Inet6Address)null, true);
+        subnet.stopService();
+        subnet = new Inet6Subnet((Inet6Address)null);
     }
     
     @Test
-    public void testEnable() throws SubnetException {
-        assertTrue(subnet.isEnabled());
+    public void testStartAndStopService() throws SubnetException {
+        assertFalse(subnet.isWorking());
 
-        assertTrue(subnet.disable());
-        assertFalse(subnet.isEnabled());
-        assertFalse(subnet.disable());
-        assertFalse(subnet.isEnabled());
+        assertTrue(subnet.startService());
+        assertTrue(subnet.isWorking());
+        assertFalse(subnet.startService());
+        assertTrue(subnet.isWorking());
 
-
-        assertTrue(subnet.enable());
-        assertTrue(subnet.isEnabled());
-        assertFalse(subnet.enable());
-        assertTrue(subnet.isEnabled());
+        assertTrue(subnet.stopService());
+        assertFalse(subnet.isWorking());
+        assertFalse(subnet.stopService());
+        assertFalse(subnet.isWorking());
     }
     
     @Test(expected=SubnetException.class)
     public void testInvalidSend() throws SubnetException {
-        subnet.disable();
+        subnet.stopService();
         subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
     }
     
     @Test(expected=SubnetException.class)
     public void testInvalidRecv() throws SubnetException {  
-        subnet.disable();
+        subnet.stopService();
         subnet.receive();
     }
     
     @Test(expected= SubnetException.class)
-    public void testSendAfterDisable() throws SubnetException {
-        subnet.disable();
+    public void testSendAfterStopService() throws SubnetException {
+        subnet.stopService();
         subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
     }
 
     @Test
-    public void testEnableAfterDisable() throws SubnetException {
+    public void testStartServiceAfterStopService() throws SubnetException {
         try {
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
         } catch (SubnetException e) {
             fail();
         }    
         
-        subnet.disable();
+        subnet.stopService();
 
         try {
             subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
         } catch (SubnetException e) {
         }
 
-        subnet.enable();
+        subnet.startService();
 
         try {
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
@@ -243,19 +230,20 @@ public class Inet6SubnetTest {
         }
     }
     
+    /*
     @Test
     public void setBufferSize() {
         assertEquals(1500, subnet.getBufferSize());
         subnet.setBufferSize(3000);
         assertEquals(3000, subnet.getBufferSize());
-    }
+    }*/
     
     @Test
-    public void testNodeEquals() {
+    public void testNodeEquals() throws SubnetException {
         try {
-            Node node1 = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::1"));
-            Node node2 = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::1"), 3610);
-            Node node3 = subnet.getRemoteNode((Inet6Address)Inet6Address.getByName("FD00::1"), 3611);
+            Node node1 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"));
+            Node node2 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"), 3610);
+            Node node3 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"), 3611);
             assertEquals(node1, node2);
             assertFalse(node1.equals(node3));
         } catch (UnknownHostException e) {

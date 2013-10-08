@@ -34,6 +34,8 @@ public class RemoteObjectGetSample {
             Thread mainThread = new Thread(mainLoop);
             mainThread.setDaemon(true);
             mainThread.start();
+            
+            subnet.startService();
 
             InstanceListRequestExecutor instanceListRequest = new InstanceListRequestExecutor(subnet, transactionManager, remoteManager);
             instanceListRequest.execute();
