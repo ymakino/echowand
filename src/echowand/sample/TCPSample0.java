@@ -21,8 +21,7 @@ public class TCPSample0 {
     /*
      * リモートノードのIPアドレス
      */
-    // public static final String peerAddress = "192.168.1.1";
-    public static final String peerAddress = "150.65.231.101";
+    public static final String peerAddress = "192.168.1.1";
     
     /*
      * ローカルのエアコンオブジェクトからリモートのノードプロファイルオブジェクトへ宛てた
