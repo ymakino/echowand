@@ -20,7 +20,7 @@ public class Inet4NodeTest {
     
     @After
     public void tearDown() {
-        subnet.disable();
+        subnet.stopService();
     }
 
     /**
@@ -52,8 +52,8 @@ public class Inet4NodeTest {
      */
     @Test
     public void testIsMemberOf() throws UnknownHostException, SubnetException {
-        Inet4Subnet subnet2 = new Inet4Subnet(false);
-        assertFalse(subnet2.isEnabled());
+        Inet4Subnet subnet2 = new Inet4Subnet();
+        assertFalse(subnet2.isWorking());
         
         Inet4Node node = new Inet4Node(subnet, (Inet4Address)Inet4Address.getByName("127.0.0.1"), 3610);
         assertTrue(node.isMemberOf(subnet));
@@ -65,15 +65,15 @@ public class Inet4NodeTest {
      */
     @Test
     public void testEquals() throws UnknownHostException, SubnetException {
-        Inet4Subnet subnet2 = new Inet4Subnet(false);
-        assertFalse(subnet2.isEnabled());
+        Inet4Subnet subnet2 = new Inet4Subnet();
+        assertFalse(subnet2.isWorking());
         
         Inet4Node node = new Inet4Node(subnet, (Inet4Address)Inet4Address.getByName("172.16.1.1"), 3610);
         Inet4Node node1 = new Inet4Node(subnet, (Inet4Address)Inet4Address.getByName("172.16.1.1"), 3610);
         Inet4Node node2 = new Inet4Node(subnet2, (Inet4Address)Inet4Address.getByName("172.16.1.1"), 3610);
         Inet4Node node3 = new Inet4Node(subnet, (Inet4Address)Inet4Address.getByName("192.168.0.1"), 3610);
         Inet4Node node4 = new Inet4Node(subnet, (Inet4Address)Inet4Address.getByName("172.16.1.1"), 3611);
-        
+        System.out.println(node);
         assertTrue(node.equals(node));
         assertTrue(node1.equals(node));
         assertTrue(node.equals(node1));

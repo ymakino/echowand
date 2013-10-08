@@ -30,7 +30,7 @@ class FrameReceiver extends Thread {
     @Override
     public void run() {
         try {
-            recvFrame = subnet.recv();
+            recvFrame = subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
         }

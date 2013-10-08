@@ -1,8 +1,5 @@
 package echowand.net;
 
-import echowand.net.StandardPayloadValidator;
-import echowand.net.Property;
-import echowand.net.StandardPayload;
 import echowand.common.Data;
 import echowand.common.ESV;
 import echowand.common.EOJ;
@@ -27,8 +24,7 @@ public class StandardPayloadValidatorTest {
         assertFalse(validator.validateProperties(payload));
     }
     
-    @Test
-    public void testGetValidation() {
+    private void validateGet(ESV esv) {
         StandardPayloadValidator validator = new StandardPayloadValidator();
         StandardPayload payload = new StandardPayload(new EOJ("001101"), new EOJ("001101"), ESV.Get);
         payload.addFirstProperty(new Property(EPC.x80));
@@ -46,10 +42,40 @@ public class StandardPayloadValidatorTest {
         assertFalse(validator.validateProperties(payload));
     }
     
-    @Test
-    public void testSetValidation() {
+    private void validateGet2(ESV esv) {
         StandardPayloadValidator validator = new StandardPayloadValidator();
-        StandardPayload payload = new StandardPayload(new EOJ("001101"), new EOJ("001101"), ESV.SetI);
+        StandardPayload payload = new StandardPayload(new EOJ("001101"), new EOJ("001101"), ESV.Get);
+        payload.addFirstProperty(new Property(EPC.x80));
+        payload.addFirstProperty(new Property(EPC.x88));
+        assertTrue(validator.validate(payload));
+        assertTrue(validator.validateSEOJ(payload));
+        assertTrue(validator.validateDEOJ(payload));
+        assertTrue(validator.validateESV(payload));
+        assertTrue(validator.validateProperties(payload));
+        
+        payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x12)));
+        assertFalse(validator.validate(payload));
+        assertTrue(validator.validateSEOJ(payload));
+        assertTrue(validator.validateDEOJ(payload));
+        assertTrue(validator.validateESV(payload));
+        assertFalse(validator.validateProperties(payload));
+    }
+    
+    @Test
+    public void testGetValidation() {
+        validateGet(ESV.Get);
+        validateGet(ESV.INF_REQ);
+    }
+    
+    @Test
+    public void testGetValidation2() {
+        validateGet2(ESV.Get);
+        validateGet2(ESV.INF_REQ);
+    }
+    
+    private void validateSet(ESV esv) {
+        StandardPayloadValidator validator = new StandardPayloadValidator();
+        StandardPayload payload = new StandardPayload(new EOJ("001101"), new EOJ("001101"), esv);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x12)));
         assertTrue(validator.validate(payload));
         assertTrue(validator.validateSEOJ(payload));
@@ -60,6 +86,38 @@ public class StandardPayloadValidatorTest {
         payload.addFirstProperty(new Property(EPC.x80));
         assertFalse(validator.validate(payload));
         assertFalse(validator.validateProperties(payload));
+    }
+    
+    private void validateSet2(ESV esv) {
+        StandardPayloadValidator validator = new StandardPayloadValidator();
+        StandardPayload payload = new StandardPayload(new EOJ("001101"), new EOJ("001101"), esv);
+        payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x12)));
+        payload.addFirstProperty(new Property(EPC.x88, new Data((byte)0x34)));
+        assertTrue(validator.validate(payload));
+        assertTrue(validator.validateSEOJ(payload));
+        assertTrue(validator.validateDEOJ(payload));
+        assertTrue(validator.validateESV(payload));
+        assertTrue(validator.validateProperties(payload));
+        
+        payload.addFirstProperty(new Property(EPC.x80));
+        assertFalse(validator.validate(payload));
+        assertFalse(validator.validateProperties(payload));
+    }
+    
+    @Test
+    public void testSetValidation() {
+        validateSet(ESV.SetI);
+        validateSet(ESV.SetC);
+        validateSet(ESV.INF);
+        validateSet(ESV.INFC);
+    }
+    
+    @Test
+    public void testSetValidation2() {
+        validateSet2(ESV.SetI);
+        validateSet2(ESV.SetC);
+        validateSet2(ESV.INF);
+        validateSet2(ESV.INFC);
     }
     
     @Test

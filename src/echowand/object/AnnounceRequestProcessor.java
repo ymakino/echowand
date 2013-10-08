@@ -3,7 +3,12 @@ package echowand.object;
 import echowand.common.EOJ;
 import echowand.common.ESV;
 import echowand.logic.DefaultRequestProcessor;
-import echowand.net.*;
+import echowand.net.CommonFrame;
+import echowand.net.Frame;
+import echowand.net.Property;
+import echowand.net.StandardPayload;
+import echowand.net.Subnet;
+import echowand.net.SubnetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -72,7 +77,7 @@ public class AnnounceRequestProcessor extends DefaultRequestProcessor {
         replyCommonFrame.setEDATA(replyPayload);
         replyCommonFrame.setTID(commonFrame.getTID());
 
-        Frame replyFrame = new Frame(subnet.getLocalNode(), frame.getSender(), replyCommonFrame);
+        Frame replyFrame = new Frame(subnet.getLocalNode(), frame.getSender(), replyCommonFrame, frame.getConnection());
         try {
             subnet.send(replyFrame);
         } catch (SubnetException e) {

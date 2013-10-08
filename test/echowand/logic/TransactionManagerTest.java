@@ -27,7 +27,7 @@ public class TransactionManagerTest {
     
     public Frame recvWithoutError(Subnet subnet) {
         try {
-            return subnet.recv();
+            return subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();

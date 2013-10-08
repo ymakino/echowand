@@ -12,6 +12,8 @@ import echowand.object.ObjectData;
 import echowand.object.RemoteObject;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,9 +45,11 @@ public class Sample3 {
         Node node = null;
         
         try {
-            node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName(peerAddress), 3610);
+            node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress), 3610);
         } catch (UnknownHostException e) {
             e.printStackTrace();
+        } catch (SubnetException ex) {
+            Logger.getLogger(Sample3.class.getName()).log(Level.SEVERE, null, ex);
         }
         RemoteObject object = new RemoteObject(subnet, node, new EOJ("013001"), transactionManager);
         

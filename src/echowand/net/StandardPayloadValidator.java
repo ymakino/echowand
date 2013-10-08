@@ -72,7 +72,7 @@ public class StandardPayloadValidator {
     }
     
     private PropType nextPropType(PropType lastType, Property property) {
-        PropType nextType = PropType.Nothing;
+        PropType nextType = lastType;
         byte pdc = property.getPDC();
         switch (lastType) {
             case Nothing:

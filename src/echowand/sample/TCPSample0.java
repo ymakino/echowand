@@ -5,18 +5,24 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.ESV;
 import echowand.net.*;
+import echowand.util.LoggerConfig;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * フレームの送受信を行うサンプルプログラム
  * @author Yoshiki Makino
  */
-public class Sample0 {
+public class TCPSample0 {
     /*
      * リモートノードのIPアドレス
      */
-    public static final String peerAddress = "192.168.1.1";
+    // public static final String peerAddress = "192.168.1.1";
+    public static final String peerAddress = "150.65.231.101";
     
     /*
      * ローカルのエアコンオブジェクトからリモートのノードプロファイルオブジェクトへ宛てた
@@ -87,8 +93,13 @@ public class Sample0 {
     
     public static void main(String[] args) {
         
+        //LoggerConfig.changeLogLevelAll(TCPConnectionPool.class.getName());
+        //LoggerConfig.changeLogLevelAll(TCPConnection.class.getName());
+        //LoggerConfig.changeLogLevelAll(TCPNetwork.class.getName());
+        //LoggerConfig.changeLogLevelAll(TCPReceiveTask.class.getName());
+        
         //3秒後にプログラムが終了するように設定
-        setTimeout(3000);
+        // setTimeout(3000);
 
         try {
 
@@ -99,10 +110,11 @@ public class Sample0 {
 
             //========================= Get =========================
             // メッセージの宛先のNodeを取得
-            Node remoteNode1 = subnet.getRemoteNode((Inet4Address) Inet4Address.getByName(peerAddress));
+            Node remoteNode1 = subnet.getRemoteNode(Inet4Address.getByName(peerAddress));
 
             // Getフレームを作成
             Frame frame1 = new Frame(subnet.getLocalNode(), remoteNode1, createCommonFrameGet());
+            subnet.createTCPConnection(frame1);
             
             // フレームを送信
             System.out.println("Sending:  " + frame1);
@@ -116,10 +128,11 @@ public class Sample0 {
             
             //========================= SetGet =========================
             // メッセージの宛先のNodeを取得
-            Node remoteNode2 = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName(peerAddress));
+            Node remoteNode2 = subnet.getRemoteNode(Inet4Address.getByName(peerAddress));
             
             // SetGetフレームを作成
             Frame frame2 = new Frame(subnet.getLocalNode(), remoteNode2, createCommonFrameSetGet());
+            //subnet.createTCPConnection(frame2);
             
             // フレームを送信
             System.out.println("Sending:  " + frame2);
@@ -127,8 +140,10 @@ public class Sample0 {
             
             // フレームを受信
             // 宛先ノードが存在しない場合や宛先エアコンオブジェクトが存在しない場合には、ここでタイムアウトする
-            System.out.println("Received: " + subnet.receive());
+            Frame rframe2 = subnet.receive();
+            System.out.println("Received: " + rframe2);
             System.out.println();
+            //subnet.deleteTCPConnection(rframe2);
             
             
             //========================= INFC =========================

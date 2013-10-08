@@ -4,17 +4,21 @@ import echowand.common.EPC;
 import echowand.info.DeviceObjectInfo;
 import echowand.info.HumiditySensorInfo;
 import echowand.info.NodeProfileInfo;
+import echowand.info.PropertyConstraintHumidity;
+import echowand.info.PropertyConstraintTemperature;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.*;
+import echowand.net.TCPConnectionPool;
 import echowand.net.Inet4Subnet;
 import echowand.net.Inet6Subnet;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
+import echowand.net.TCPConnection;
+import echowand.net.TCPConnectionListener;
 import echowand.object.*;
+import echowand.util.LoggerConfig;
 import echowand.util.Pair;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
@@ -103,7 +107,6 @@ public class ObjectViewer implements Runnable {
     }
 
     private void initialize() {
-        
         transactionManager = new TransactionManager(subnet);
         remoteManager = new RemoteObjectManager();
         localManager = new LocalObjectManager();
@@ -173,14 +176,12 @@ public class ObjectViewer implements Runnable {
     public void setObjectTableEditor(JTable objectTable) {
         objectTable.setDefaultEditor(ObjectData.class, new ObjectTableObjectDataCellEditor());
     }
-
-    @Override
-    public void run() {
-        initialize();
-
+    
+    private void createDummyDevices() {
         DeviceObjectInfo temperatureSensorInfo = new TemperatureSensorInfo();
         temperatureSensorInfo.add(EPC.x97, true, false, false, 2);
         temperatureSensorInfo.add(EPC.x98, true, false, false, 4);
+        temperatureSensorInfo.add(EPC.xE0, true, false, true, 2, new PropertyConstraintTemperature());
         LocalObject temperatureSensor = new LocalObject(temperatureSensorInfo);
         temperatureSensor.addDelegate(new LocalObjectDateTimeDelegate());
         temperatureSensor.addDelegate(new LocalObjectNotifyDelegate(subnet, transactionManager));
@@ -200,6 +201,7 @@ public class ObjectViewer implements Runnable {
         DeviceObjectInfo humiditySensorInfo = new HumiditySensorInfo();
         humiditySensorInfo.add(EPC.x97, true, false, false, 2);
         humiditySensorInfo.add(EPC.x98, true, false, false, 4);
+        humiditySensorInfo.add(EPC.xE0, true, false, false, 1, new PropertyConstraintHumidity());
         LocalObject humiditySensor = new LocalObject(humiditySensorInfo);
         humiditySensor.addDelegate(new LocalObjectDateTimeDelegate());
         humiditySensor.addDelegate(new LocalObjectNotifyDelegate(subnet, transactionManager));
@@ -214,68 +216,53 @@ public class ObjectViewer implements Runnable {
         updater2.addData(new ObjectData(new byte[]{(byte) 0x01, (byte) 0x00, (byte) 0x11, (byte) 01}), 1000);
         updater2.addData(new ObjectData(new byte[]{(byte) 0x02, (byte) 0x00, (byte) 0x11, (byte) 0x01, (byte) 0x00, (byte) 0x11, (byte) 0x02}), 1000);
         updater2.start();
+    }
 
+    @Override
+    public void run() {
+        initialize();
+        
+        createDummyDevices();
+        
         Thread loopThread = new Thread(loop);
         loopThread.setDaemon(true);
         loopThread.start();
-
+        
         openViewerFrame();
-    }
-    
-    /*
-     * This HashMap keeps Logger instances to avoid being released accidentally.
-     * Because OpenJDK uses weak references for keeping Logger instances,
-     * they might be freed anytime while there are no explicit references
-     * to them.
-     */
-    private static HashMap<String, Logger> loggers = new HashMap<String, Logger>();
-    private synchronized static Logger getLogger(String name) {
-        Logger logger = loggers.get(name);
-        if (logger == null) {
-            logger = Logger.getLogger(name);
-            loggers.put(name, logger);
-        }
-        return logger;
-    }
-    
-    private static ConsoleHandler handler = null;
-    public synchronized static void changeLogLevelAll(String name) {
-        if (handler == null) {
-            handler = new ConsoleHandler();
-            handler.setLevel(Level.ALL);
-        }
-        getLogger(name).setLevel(Level.ALL);
-        getLogger(name).addHandler(handler);
     }
 
     public static void main(String[] args) {
-        boolean trace = false;
-
-        handler = new ConsoleHandler();
-        handler.setLevel(Level.ALL);
-
+        final boolean trace = true;
+        
         if (trace) {
-            changeLogLevelAll(Transaction.class.getName());
-            changeLogLevelAll(AnnounceTransactionConfig.class.getName());
-            changeLogLevelAll(MainLoop.class.getName());
-            changeLogLevelAll(RequestDispatcher.class.getName());
-            changeLogLevelAll(SetGetTransactionConfig.class.getName());
-            changeLogLevelAll(TransactionConfig.class.getName());
-            changeLogLevelAll(TransactionManager.class.getName());
-            changeLogLevelAll(AnnounceRequestProcessor.class.getName());
-            changeLogLevelAll(InstanceListRequestExecutor.class.getName());
-            changeLogLevelAll(LocalObject.class.getName());
-            changeLogLevelAll(LocalObjectDateTimeDelegate.class.getName());
-            changeLogLevelAll(LocalObjectManager.class.getName());
-            changeLogLevelAll(LocalObjectNotifyDelegate.class.getName());
-            changeLogLevelAll(LocalObjectRandomDelegate.class.getName());
-            changeLogLevelAll(LocalSetGetAtomic.class.getName());
-            changeLogLevelAll(NodeProfileObjectDelegate.class.getName());
-            changeLogLevelAll(NodeProfileObjectListener.class.getName());
-            changeLogLevelAll(RemoteObject.class.getName());
-            changeLogLevelAll(RemoteObjectManager.class.getName());
-            changeLogLevelAll(SetGetRequestProcessor.class.getName());
-            changeLogLevelAll(DeviceObjectInfo.class.getName());
+            /*
+            LoggerConfig.changeLogLevelAll(Transaction.class.getName());
+            LoggerConfig.changeLogLevelAll(AnnounceTransactionConfig.class.getName());
+            LoggerConfig.changeLogLevelAll(MainLoop.class.getName());
+            LoggerConfig.changeLogLevelAll(RequestDispatcher.class.getName());
+            LoggerConfig.changeLogLevelAll(SetGetTransactionConfig.class.getName());
+            LoggerConfig.changeLogLevelAll(TransactionConfig.class.getName());
+            LoggerConfig.changeLogLevelAll(TransactionManager.class.getName());
+            LoggerConfig.changeLogLevelAll(AnnounceRequestProcessor.class.getName());
+            LoggerConfig.changeLogLevelAll(InstanceListRequestExecutor.class.getName());
+            LoggerConfig.changeLogLevelAll(LocalObject.class.getName());
+            LoggerConfig.changeLogLevelAll(LocalObjectDateTimeDelegate.class.getName());
+            LoggerConfig.changeLogLevelAll(LocalObjectManager.class.getName());
+            LoggerConfig.changeLogLevelAll(LocalObjectNotifyDelegate.class.getName());
+            LoggerConfig.changeLogLevelAll(LocalObjectRandomDelegate.class.getName());
+            LoggerConfig.changeLogLevelAll(LocalSetGetAtomic.class.getName());
+            LoggerConfig.changeLogLevelAll(NodeProfileObjectDelegate.class.getName());
+            LoggerConfig.changeLogLevelAll(NodeProfileObjectListener.class.getName());
+            LoggerConfig.changeLogLevelAll(RemoteObject.class.getName());
+            LoggerConfig.changeLogLevelAll(RemoteObjectManager.class.getName());
+            LoggerConfig.changeLogLevelAll(SetGetRequestProcessor.class.getName());
+            LoggerConfig.changeLogLevelAll(DeviceObjectInfo.class.getName());
+            */
+            
+            // LoggerConfig.changeLogLevelAll(UDPNetwork.class.getName());
+            LoggerConfig.changeLogLevelAll(TCPConnectionPool.class.getName());
+            LoggerConfig.changeLogLevelAll(TCPConnectionListener.class.getName());
+            LoggerConfig.changeLogLevelAll(TCPConnection.class.getName());
         }
 
         try {
@@ -296,7 +283,9 @@ public class ObjectViewer implements Runnable {
         }
 
         try {
-            ObjectViewer viewer = new ObjectViewer(new Inet4Subnet());
+            Inet4Subnet subnet = new Inet4Subnet();
+            subnet.startService();
+            ObjectViewer viewer = new ObjectViewer(subnet);
             java.awt.EventQueue.invokeLater(viewer);
         } catch (SubnetException ex) {
             quitWithErrorFrame(ex);

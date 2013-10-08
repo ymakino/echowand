@@ -29,7 +29,7 @@ public class Inet4SubnetTest {
     
     @After
     public void tearDown() {
-        subnet.disable();
+        subnet.stopService();
     }
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
@@ -78,13 +78,16 @@ public class Inet4SubnetTest {
     }
 
     @Test
-    public void testSendAndRecv() {
+    public void testSendAndRecv() throws SubnetException {
+        subnet.startService();
+        
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
+        
         try {
-            Node node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("127.0.0.1"), Inet4Subnet.DEFAULT_PORT);
+            Node node = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("127.0.0.1"), Inet4Subnet.DEFAULT_PORT_NUMBER);
             sendTest(node, true);
-            Node invalidAddr = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("172.21.254.254"), Inet4Subnet.DEFAULT_PORT);
+            Node invalidAddr = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("172.21.254.254"), Inet4Subnet.DEFAULT_PORT_NUMBER);
             sendTest(invalidAddr, false);
             Node invalidPort = subnet.getRemoteNode((Inet4Address)Inet4Address.getByName("127.0.0.1"), 4321);
             sendTest(invalidPort, false);
@@ -95,14 +98,16 @@ public class Inet4SubnetTest {
     
     @Test
     public void testCreation() throws SubnetException {
-        assertFalse(subnet.enable());
-        subnet.disable();
-        subnet = new Inet4Subnet(true);
-        assertTrue(subnet.isEnabled());
-        subnet.disable();
-        subnet = new Inet4Subnet(false);
-        assertFalse(subnet.isEnabled());
-        subnet.disable();
+        assertFalse(subnet.stopService());
+        assertFalse(subnet.stopService());
+        
+        assertTrue(subnet.startService());
+        assertFalse(subnet.startService());
+        assertTrue(subnet.isWorking());
+        
+        assertTrue(subnet.stopService());
+        assertFalse(subnet.stopService());
+        assertFalse(subnet.isWorking());
     }
     
     private LinkedList<Inet4Address> getInet4Addresses() throws SocketException {
@@ -138,102 +143,91 @@ public class Inet4SubnetTest {
     
     @Test
     public void testCreationWithNetworkInterface() throws SocketException, SubnetException {
-        subnet.disable();
+        subnet.stopService();
 
         for (NetworkInterface nif : getInet4Interfaces()) {
-            subnet = new Inet4Subnet(nif, true);
-            assertTrue(subnet.isEnabled());
+            subnet = new Inet4Subnet(nif);
+            assertFalse(subnet.isWorking());
             assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
-
-            subnet = new Inet4Subnet(nif, false);
-            assertFalse(subnet.isEnabled());
-            assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
+            subnet.stopService();
         }
     }
 
     @Test (expected=SubnetException.class)
     public void testCreationWithNullNetworkInterface() throws SubnetException {
-        subnet.disable();
-        subnet = new Inet4Subnet((NetworkInterface) null, true);
+        subnet.stopService();
+        subnet = new Inet4Subnet((NetworkInterface) null);
     }
 
     @Test
     public void testCreationWithAddress() throws SocketException, SubnetException {
-        subnet.disable();
+        subnet.stopService();
 
         for (Inet4Address addr : getInet4Addresses()) {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
-            
-            subnet = new Inet4Subnet(addr, true);
-            assertTrue(subnet.isEnabled());
+            subnet = new Inet4Subnet(addr);
+            assertFalse(subnet.isWorking());
             assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
-
-            subnet = new Inet4Subnet(addr, false);
-            assertFalse(subnet.isEnabled());
-            assertEquals(subnet.getNetworkInterface(), nif);
-            subnet.disable();
+            subnet.stopService();
         }
     }
 
     @Test(expected = SubnetException.class)
     public void testCreationWithNullAddress() throws SubnetException {
-        subnet.disable();
-        subnet = new Inet4Subnet((Inet4Address) null, true);
+        subnet.stopService();
+        subnet = new Inet4Subnet((Inet4Address) null);
     }
 
     @Test
     public void testEnable() throws SubnetException {
-        assertTrue(subnet.isEnabled());
+        assertFalse(subnet.isWorking());
 
-        assertTrue(subnet.disable());
-        assertFalse(subnet.isEnabled());
-        assertFalse(subnet.disable());
-        assertFalse(subnet.isEnabled());
+        assertTrue(subnet.startService());
+        assertTrue(subnet.isWorking());
+        assertFalse(subnet.startService());
+        assertTrue(subnet.isWorking());
 
-
-        assertTrue(subnet.enable());
-        assertTrue(subnet.isEnabled());
-        assertFalse(subnet.enable());
-        assertTrue(subnet.isEnabled());
+        assertTrue(subnet.stopService());
+        assertFalse(subnet.isWorking());
+        assertFalse(subnet.stopService());
+        assertFalse(subnet.isWorking());
     }
     
     @Test(expected=SubnetException.class)
     public void testInvalidSend() throws SubnetException {
-        subnet.disable();
+        subnet.stopService();
         subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
     }
     
     @Test(expected=SubnetException.class)
     public void testInvalidRecv() throws SubnetException {  
-        subnet.disable();
-        subnet.recv();
+        subnet.stopService();
+        subnet.receive();
     }
     
     @Test(expected= SubnetException.class)
     public void testSendAfterDisable() throws SubnetException {
-        subnet.disable();
+        subnet.stopService();
         subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
     }
 
     @Test
     public void testEnableAfterDisable() throws SubnetException {
         try {
+            subnet.startService();
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
         } catch (SubnetException e) {
             fail();
         }    
         
-        subnet.disable();
+        subnet.stopService();
 
         try {
             subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
         } catch (SubnetException e) {
         }
 
-        subnet.enable();
+        subnet.startService();
 
         try {
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
@@ -243,12 +237,13 @@ public class Inet4SubnetTest {
         }
     }
     
+    /*
     @Test
     public void setBufferSize() {
-        assertEquals(1500, subnet.getBufferSize());
+        assertEquals(4096, subnet.getBufferSize());
         subnet.setBufferSize(3000);
         assertEquals(3000, subnet.getBufferSize());
-    }
+    }*/
     
     @Test
     public void testNodeEquals() {

@@ -182,7 +182,7 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
             peer = subnet.getGroupNode();
         }
         
-        Frame resFrame =  new Frame(sender, peer, cf);
+        Frame resFrame =  new Frame(sender, peer, cf, frame.getConnection());
         
         logger.exiting(className, "createResponse", resFrame);
         return resFrame;

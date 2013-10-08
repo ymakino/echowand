@@ -85,7 +85,7 @@ public class InstanceListRequestExecutorTest {
     }
     
     public void checkFrame(Subnet subnet) throws SubnetException {
-        Frame frame = subnet.recv();
+        Frame frame = subnet.receive();
         assertEquals(frame.getReceiver(), subnet.getGroupNode());
         CommonFrame commonFrame = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload) commonFrame.getEDATA();

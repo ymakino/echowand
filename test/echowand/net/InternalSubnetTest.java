@@ -46,7 +46,7 @@ public class InternalSubnetTest {
         Frame recvFrame = null;
         try {
             subnet.send(new Frame(local, group, sendFrame));
-            recvFrame = subnet.recv();
+            recvFrame = subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -59,7 +59,7 @@ public class InternalSubnetTest {
         sendFrame = createFrame();
         try {
             subnet.send(new Frame(local, local, sendFrame));
-            recvFrame = subnet.recv();
+            recvFrame = subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();

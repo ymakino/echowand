@@ -7,18 +7,53 @@ package echowand.net;
 public class Frame {
     private Node sender;
     private Node receiver;
-    private CommonFrame frame;
+    private CommonFrame commonFrame;
+    private Connection connection;
     
     /**
      * Frameを生成する。
      * @param sender 送信ノード
      * @param receiver 受信ノード
-     * @param frame 共通フレーム
+     * @param commonFrame 共通フレーム
      */
-    public Frame(Node sender, Node receiver, CommonFrame frame) {
+    public Frame(Node sender, Node receiver, CommonFrame commonFrame) {
         this.sender = sender;
         this.receiver = receiver;
-        this.frame = frame;
+        this.commonFrame = commonFrame;
+        this.connection = null;
+    }
+    
+    /**
+     * Frameを生成する。
+     * @param sender 送信ノード
+     * @param receiver 受信ノード
+     * @param commonFrame 共通フレーム
+     * @param connection コネクション情報
+     */
+    public Frame(Node sender, Node receiver, CommonFrame commonFrame, Connection connection) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.commonFrame = commonFrame;
+        this.connection = connection;
+    }
+    
+    /**
+     * 利用するコネクション情報を登録し、以前登録されていたコネクション情報を返す。
+     * @param connection 登録するコネクション情報
+     * @return 以前のコネクション情報
+     */
+    public Connection setConnection(Connection connection) {
+        Connection lastConnection = this.connection;
+        this.connection = connection;
+        return lastConnection;
+    }
+    
+    /**
+     * 登録されているコネクション情報を返す。
+     * @return コネクション情報
+     */
+    public Connection getConnection() {
+        return connection;
     }
     
     /**
@@ -26,7 +61,7 @@ public class Frame {
      * @return 共通フレーム
      */
     public CommonFrame getCommonFrame() {
-        return frame;
+        return commonFrame;
     }
     
     /**
@@ -52,6 +87,6 @@ public class Frame {
     @Override
     public String toString() {
         String format = "[Sender=%s Receiver=%s %s]";
-        return String.format(format, sender, receiver, frame);
+        return String.format(format, sender, receiver, commonFrame);
     }
 }

@@ -59,7 +59,7 @@ public class MainLoop implements Runnable {
     public Frame recvFrame() throws SubnetException {
         logger.entering(className, "recvFrame");
         
-        Frame frame = subnet.recv();
+        Frame frame = subnet.receive();
         
         logger.exiting(className, "recvFrame");
         

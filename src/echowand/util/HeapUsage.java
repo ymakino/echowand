@@ -50,7 +50,7 @@ public class HeapUsage {
         /**
          * バイト数を決められた単位の値に変換する。
          * @param bytes バイト数の指定
-         * @return
+         * @return 変換された値
          */
         public long convert(long bytes) {
             return bytes / ratio;

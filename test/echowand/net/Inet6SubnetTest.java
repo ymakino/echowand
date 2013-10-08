@@ -209,7 +209,7 @@ public class Inet6SubnetTest {
     @Test(expected=SubnetException.class)
     public void testInvalidRecv() throws SubnetException {  
         subnet.disable();
-        subnet.recv();
+        subnet.receive();
     }
     
     @Test(expected= SubnetException.class)
