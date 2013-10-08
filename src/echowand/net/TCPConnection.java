@@ -38,10 +38,14 @@ public class TCPConnection implements Connection {
         observers = new LinkedList<TCPConnectionObserver>();
     }
     
+    public synchronized LinkedList<TCPConnectionObserver> cloneObservers() {
+        return new LinkedList<TCPConnectionObserver>(observers);
+    }
+    
     private void notifySent(CommonFrame commonFrame) {
         LOGGER.entering(CLASS_NAME, "notifySent", commonFrame);
         
-        for (TCPConnectionObserver observer : observers) {
+        for (TCPConnectionObserver observer : cloneObservers()) {
             observer.notifySent(this, commonFrame);
         }
         
@@ -51,7 +55,7 @@ public class TCPConnection implements Connection {
     private void notifyReceived(CommonFrame commonFrame) {
         LOGGER.entering(CLASS_NAME, "notifyReceived", commonFrame);
         
-        for (TCPConnectionObserver observer : observers) {
+        for (TCPConnectionObserver observer : cloneObservers()) {
             observer.notifyReceived(this, commonFrame);
         }
         
@@ -61,18 +65,18 @@ public class TCPConnection implements Connection {
     private void notifyClosed() {
         LOGGER.entering(CLASS_NAME, "notifyClosed");
         
-        for (TCPConnectionObserver observer : observers) {
+        for (TCPConnectionObserver observer : cloneObservers()) {
             observer.notifyClosed(this);
         }
         
         LOGGER.exiting(CLASS_NAME, "notifyClosed");
     }
     
-    public boolean addObserver(TCPConnectionObserver observer) {
+    public synchronized boolean addObserver(TCPConnectionObserver observer) {
         return observers.add(observer);
     }
     
-    public boolean removeObserver(TCPConnectionObserver observer) {
+    public synchronized boolean removeObserver(TCPConnectionObserver observer) {
         return observers.remove(observer);
     }
     

@@ -326,7 +326,7 @@ public class TCPNetwork implements TCPConnectionObserver {
                 
                 Node localNode = subnet.getLocalNode();
                 Node remoteNode = subnet.getRemoteNode(connection.getRemoteNodeInfo());
-                Frame frame = new Frame(remoteNode, localNode, commonFrame);
+                Frame frame = new Frame(remoteNode, localNode, commonFrame, connection);
                 receiveQueue.add(frame);
             } catch (SubnetException ex) {
                 LOGGER.logp(Level.INFO, CLASS_NAME, "notifyReceive", "catched exception", ex);
