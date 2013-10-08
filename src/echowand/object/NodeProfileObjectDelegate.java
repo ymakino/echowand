@@ -120,6 +120,7 @@ public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
     private static final Logger logger = Logger.getLogger(NodeProfileObjectDelegate.class.getName());
     private static final String className = NodeProfileObjectDelegate.class.getName();
     
+    private boolean countOnlyDeviceClass = true;
     private LocalObjectManager manager;
     
     /**
@@ -149,12 +150,20 @@ public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
         return objectData;
     }
     
+    private List<LocalObject> getObjectsForClassCountData() {
+        if (countOnlyDeviceClass) {
+            return manager.getDeviceObjects();
+        } else {
+            return manager.getAllObjects();
+        }
+    }
+    
     private ObjectData getClassCountData() {
         logger.entering(className, "getClassCountData");
         
         HashSet<ClassEOJ> classSet = new HashSet<ClassEOJ>();
-        List<LocalObject> deviceObjects = manager.getDeviceObjects();
-        for (LocalObject object : deviceObjects) {
+        List<LocalObject> objects = getObjectsForClassCountData();
+        for (LocalObject object : objects) {
             classSet.add(object.getEOJ().getClassEOJ());
         }
         int len = classSet.size();
@@ -165,7 +174,7 @@ public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
         logger.exiting(className, "getClassCountData", objectData);
         return objectData;
     }
-    
+
     private Data getListData(int index, ListDataGenerator generator) {
         logger.entering(className, "getListData", new Object[]{index, generator});
         
@@ -208,14 +217,30 @@ public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
         logger.exiting(className, "getInstanceListS", objectData);
         return objectData;
     }
-    
+
     private ObjectData getClassListS() {
         logger.entering(className, "getClassListS");
-        
+
         ObjectData objectData = getListS(new ClassListDataGenerator());
-        
+
         logger.exiting(className, "getClassListS", objectData);
         return objectData;
+    }
+
+    /**
+     * デバイスオブジェクトのみを自ノードクラス数(0xD4)に含めるかどうかを返す。
+     * @return デバイスオブジェクトのみを含む場合にはtrue、そうでなければfalse
+     */
+    public boolean getCountOnlyDeviceClass() {
+        return countOnlyDeviceClass;
+    }
+    
+    /**
+     * デバイスオブジェクトのみを自ノードクラス数(0xD4)に含めるかどうかを設定する。
+     * @param onlyDeviceClass デバイスオブジェクトのみを含めるかどうか指定
+     */
+    public void setCountOnlyDeviceClass(boolean onlyDeviceClass) {
+        countOnlyDeviceClass = onlyDeviceClass;
     }
     
     /**

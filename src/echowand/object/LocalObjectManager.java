@@ -134,6 +134,24 @@ public class LocalObjectManager {
     
     
     /**
+     * 機器オブジェクトを含む、ローカルオブジェクトのリストを返す。
+     * @return オブジェクトのリスト
+     */
+    public synchronized LinkedList<LocalObject> getAllObjects() {
+        logger.entering(className, "getObjects");
+        
+        LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {
+            @Override
+            public boolean select(LocalObject object) {
+                return true;
+            }
+        });
+        
+        logger.exiting(className, "getObjects", objectList);
+        return objectList;
+    }
+    
+    /**
      * 機器オブジェクトに属するローカルオブジェクトのリストを返す。
      * @return 機器オブジェクトのリスト
      */
