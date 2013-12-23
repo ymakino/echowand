@@ -80,18 +80,16 @@ public class Inet4SubnetTest {
     @Test
     public void testSendAndRecv() throws SubnetException, UnknownHostException {
         subnet.startService();
-        
+
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
-        
-            Node node = subnet.getRemoteNode(Inet4Address.getByName("127.0.0.1"), Inet4Subnet.DEFAULT_PORT_NUMBER);
-            sendTest(node, true);
-            Node invalidAddr = subnet.getRemoteNode(Inet4Address.getByName("172.21.254.254"), Inet4Subnet.DEFAULT_PORT_NUMBER);
-            sendTest(invalidAddr, false);
-            Node invalidPort = subnet.getRemoteNode(Inet4Address.getByName("127.0.0.1"), 4321);
-            sendTest(invalidPort, false);
+
+        Node node = subnet.getRemoteNode(Inet4Address.getByName("127.0.0.1"));
+        sendTest(node, true);
+        Node invalidAddr = subnet.getRemoteNode(Inet4Address.getByName("172.21.254.254"));
+        sendTest(invalidAddr, false);
     }
-    
+
     @Test
     public void testCreation() throws SubnetException {
         assertFalse(subnet.stopService());
@@ -107,7 +105,7 @@ public class Inet4SubnetTest {
     }
     
     private LinkedList<Inet4Address> getInet4Addresses() throws SocketException {
-        LinkedList<Inet4Address> inet6addrs = new LinkedList<Inet4Address>();
+        LinkedList<Inet4Address> inet4addrs = new LinkedList<Inet4Address>();
         
         Enumeration<NetworkInterface> nifs = NetworkInterface.getNetworkInterfaces();
         while (nifs.hasMoreElements()) {
@@ -116,25 +114,25 @@ public class Inet4SubnetTest {
             while (addrs.hasMoreElements()) {
                 InetAddress addr = addrs.nextElement();
                 if (addr instanceof Inet4Address) {
-                    inet6addrs.add((Inet4Address)addr);
+                    inet4addrs.add((Inet4Address)addr);
                 }
             }
         }
         
-        return inet6addrs;
+        return inet4addrs;
     }
     
     private LinkedList<NetworkInterface> getInet4Interfaces() throws SocketException {
-        LinkedList<NetworkInterface> inet6ifs = new LinkedList<NetworkInterface>();
+        LinkedList<NetworkInterface> inet4ifs = new LinkedList<NetworkInterface>();
         
         for (Inet4Address addr : getInet4Addresses()) {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
-            if (!inet6ifs.contains(nif)) {
-                inet6ifs.add(nif);
+            if (!inet4ifs.contains(nif)) {
+                inet4ifs.add(nif);
             }
         }
         
-        return inet6ifs;
+        return inet4ifs;
     }
     
     @Test
@@ -245,13 +243,36 @@ public class Inet4SubnetTest {
     public void testNodeEquals() throws SubnetException {
         try {
             Node node1 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"));
-            Node node2 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"), 3610);
-            Node node3 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"), 3611);
+            Node node2 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"));
             assertEquals(node1, node2);
-            assertFalse(node1.equals(node3));
         } catch (UnknownHostException e) {
             e.printStackTrace();
             fail();
         }
+    }
+    
+    @Test
+    public void testEnableTCP() throws SubnetException {
+        assertFalse(subnet.isTCPEnabled());
+        assertTrue(subnet.enableTCP());
+        assertTrue(subnet.isTCPEnabled());
+        
+        subnet.startService();
+        
+        assertFalse(subnet.enableTCP());
+        assertTrue(subnet.isTCPEnabled());
+    }
+    
+    @Test
+    public void testDisableTCP() throws SubnetException {
+        subnet.enableTCP();
+        assertTrue(subnet.isTCPEnabled());
+        assertTrue(subnet.disableTCP());
+        assertFalse(subnet.isTCPEnabled());
+        
+        subnet.startService();
+        
+        assertFalse(subnet.disableTCP());
+        assertFalse(subnet.isTCPEnabled());
     }
 }

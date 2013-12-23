@@ -24,35 +24,22 @@ public class InetNodeTest {
     }
 
     /**
-     * Test of getPort method, of class InetNode.
-     */
-    @Test
-    public void testGetPort() throws UnknownHostException {
-        InetNode node1 = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"), 3610);
-        assertEquals(3610, node1.getPort());
-        
-        InetNode node2 = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"), 1234);
-        assertEquals(1234, node2.getPort());
-    }
-
-    /**
      * Test of getAddress method, of class InetNode.
      */
     @Test
     public void testGetAddress() throws UnknownHostException {
-        InetNode node1 = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"), 3610);
+        InetNode node1 = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"));
         assertEquals(Inet4Address.getByName("127.0.0.1"), node1.getAddress());
         
-        InetNode node2 = new InetNode(subnet, Inet4Address.getByName("192.168.0.1"), 3610);
+        InetNode node2 = new InetNode(subnet, Inet4Address.getByName("192.168.0.1"));
         assertEquals(Inet4Address.getByName("192.168.0.1"), node2.getAddress());
     }
     
     @Test
     public void testGetNodeInfo() throws UnknownHostException {
-        InetNodeInfo nodeInfo = new InetNodeInfo(Inet4Address.getByName("127.0.0.1"), 3610);
+        InetNodeInfo nodeInfo = new InetNodeInfo(Inet4Address.getByName("127.0.0.1"));
         InetNode node1 = new InetNode(subnet, nodeInfo);
         assertEquals(Inet4Address.getByName("127.0.0.1"), node1.getAddress());
-        assertEquals(3610, node1.getPort());
         assertEquals(nodeInfo, node1.getNodeInfo());
     }
 
@@ -64,7 +51,7 @@ public class InetNodeTest {
         Inet4Subnet subnet2 = new Inet4Subnet();
         assertFalse(subnet2.isWorking());
         
-        InetNode node = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"), 3610);
+        InetNode node = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"));
         assertTrue(node.isMemberOf(subnet));
         assertFalse(node.isMemberOf(subnet2));
     }
@@ -77,30 +64,22 @@ public class InetNodeTest {
         Inet4Subnet subnet2 = new Inet4Subnet();
         assertFalse(subnet2.isWorking());
         
-        InetNode node = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"), 3610);
-        InetNode node1 = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"), 3610);
-        InetNode node2 = new InetNode(subnet2, Inet4Address.getByName("172.16.1.1"), 3610);
-        InetNode node3 = new InetNode(subnet, Inet4Address.getByName("192.168.0.1"), 3610);
-        InetNode node4 = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"), 3611);
-        System.out.println(node);
+        InetNode node = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"));
+        InetNode node1 = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"));
+        InetNode node2 = new InetNode(subnet2, Inet4Address.getByName("172.16.1.1"));
+        InetNode node3 = new InetNode(subnet, Inet4Address.getByName("192.168.0.1"));
+
         assertTrue(node.equals(node));
         assertTrue(node1.equals(node));
         assertTrue(node.equals(node1));
         
         assertFalse(node1.equals(node2));
         assertFalse(node1.equals(node3));
-        assertFalse(node1.equals(node4));
         
         assertFalse(node2.equals(node1));
         assertFalse(node2.equals(node3));
-        assertFalse(node2.equals(node4));
         
         assertFalse(node3.equals(node1));
         assertFalse(node3.equals(node2));
-        assertFalse(node3.equals(node4));
-        
-        assertFalse(node4.equals(node1));
-        assertFalse(node4.equals(node2));
-        assertFalse(node4.equals(node3));
     }
 }

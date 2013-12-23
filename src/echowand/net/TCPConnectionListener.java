@@ -3,6 +3,7 @@ package echowand.net;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -31,7 +32,6 @@ public class TCPConnectionListener {
         this.port = port;
         observers = new LinkedList<TCPConnectionObserver>();
     }
-
     /**
      * コネクション確立時に通知を行うオブジェクトの追加
      *
@@ -67,8 +67,8 @@ public class TCPConnectionListener {
         
         try {
             Socket socket = serverSocket.accept();
-            NodeInfo localNodeInfo = new InetNodeInfo(socket.getLocalAddress(), socket.getLocalPort());
-            NodeInfo remoteNodeInfo = new InetNodeInfo(socket.getInetAddress(), socket.getPort());
+            NodeInfo localNodeInfo = new InetNodeInfo(socket.getLocalAddress());
+            NodeInfo remoteNodeInfo = new InetNodeInfo(socket.getInetAddress());
             TCPConnection connection = new TCPConnection(socket, localNodeInfo, remoteNodeInfo);
             
             notifyAccept(connection);

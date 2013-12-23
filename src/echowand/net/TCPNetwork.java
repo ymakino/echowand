@@ -14,6 +14,11 @@ public class TCPNetwork implements TCPConnectionObserver {
     private static final Logger LOGGER = Logger.getLogger(TCPNetwork.class.getName());
     private static final String CLASS_NAME = TCPNetwork.class.getName();
     
+    /**
+     * ECHONET Liteが利用するポート番号
+     */
+    public static final short  DEFAULT_PORT_NUMBER = 3610;
+    
     private static final int CREATE_TIMEOUT = 10 * 1000;
     
     private Subnet subnet;
@@ -24,35 +29,33 @@ public class TCPNetwork implements TCPConnectionObserver {
     private TCPAcceptTask acceptTask;
     private int createTimeout = CREATE_TIMEOUT;
     private boolean working = false;
+    private int portNumber = DEFAULT_PORT_NUMBER;
     
-    public TCPNetwork(InetSubnet subnet, int port) throws NetworkException {
-        this(subnet, new TCPConnectionListener(port), new TCPConnectionCreator());
-    }
-    
-    public TCPNetwork(InetSubnet subnet, InetAddress localAddress, int port) throws NetworkException {
-        this(subnet, new TCPConnectionListener(localAddress, port), new TCPConnectionCreator());
-    }
-
-    public TCPNetwork(Subnet subnet, TCPConnectionListener listener) {
-        this(subnet, listener, null);
-    }
-
-    public TCPNetwork(Subnet subnet, TCPConnectionCreator creator) {
-        this(subnet, null, creator);
-    }
-
-    public TCPNetwork(Subnet subnet, TCPConnectionListener listener, TCPConnectionCreator creator) {
+    public TCPNetwork(Subnet subnet, int portNumber) throws NetworkException {
         this.subnet = subnet;
-        this.listener = listener;
-        this.creator = creator;
+        this.listener = new TCPConnectionListener(portNumber);
+        this.creator = new TCPConnectionCreator();
+        receiveQueue = new LinkedBlockingQueue<Frame>();
+        connectionPool = new TCPConnectionPool();
+        acceptTask = null;
+    }
+
+    public TCPNetwork(Subnet subnet, InetAddress localAddress, int portNumber) throws NetworkException {
+        this.subnet = subnet;
+        this.listener = new TCPConnectionListener(localAddress, portNumber);
+        this.creator = new TCPConnectionCreator();
         receiveQueue = new LinkedBlockingQueue<Frame>();
         connectionPool = new TCPConnectionPool();
         acceptTask = null;
     }
     
+    public int getPortNumber() {
+        return portNumber;
+    }
+    
     /**
-     * このConnectionNetworkが有効であるかどうか返す。
-     * @return 有効であればtrue、そうでなければfalse
+     * このTCPNetworkが実行中であるかどうか返す。
+     * @return 実行中であればtrue、そうでなければfalse
      */
     public synchronized boolean isWorking() {
         return working;
@@ -79,6 +82,7 @@ public class TCPNetwork implements TCPConnectionObserver {
                 new Thread(acceptTask).start();
             } catch (NetworkException ex) {
                 LOGGER.logp(Level.INFO, CLASS_NAME, "startService", "catched exception", ex);
+                LOGGER.exiting(CLASS_NAME, "startService", false);
                 return false;
             }
         }
@@ -117,6 +121,7 @@ public class TCPNetwork implements TCPConnectionObserver {
                 acceptTask = null;
                 listener.stopService();
             } catch (NetworkException ex) {
+                LOGGER.logp(Level.INFO, CLASS_NAME, "stopService", "catched exception", ex);
             }
         }
 
@@ -202,7 +207,7 @@ public class TCPNetwork implements TCPConnectionObserver {
         
         NodeInfo localNodeInfo = frame.getSender().getNodeInfo();
         NodeInfo remoteNodeInfo = frame.getReceiver().getNodeInfo();
-        TCPConnection connection = creator.create(localNodeInfo, remoteNodeInfo, getCreateTimeout());
+        TCPConnection connection = creator.create(localNodeInfo, remoteNodeInfo, getPortNumber(), getCreateTimeout());
 
         if (connection == null) {
             NetworkException exception = new NetworkException("cannot create connection: " + remoteNodeInfo);
@@ -210,7 +215,6 @@ public class TCPNetwork implements TCPConnectionObserver {
             throw exception;
         }
 
-        addConnection(connection);
         frame.setConnection(connection);
         
         LOGGER.exiting(CLASS_NAME, "createConnection", connection);
@@ -363,6 +367,10 @@ public class TCPNetwork implements TCPConnectionObserver {
     @Override
     public void notifyConnected(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "notifyConnected", connection);
+        
+        if (isWorking()) {
+            addConnection(connection);
+        }
         
         LOGGER.exiting(CLASS_NAME, "notifyConnected", connection);
     }

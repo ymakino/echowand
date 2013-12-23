@@ -15,10 +15,9 @@ public class InetNode implements Node {
      * 直接生成は行わずにInetSubnetのgetRemoteNodeメソッドの利用を推奨する。
      * @param subnet このノードの存在するサブネット
      * @param address このノードのIPv4アドレス
-     * @param port このノードのポート番号
      */
-    public InetNode(InetSubnet subnet, InetAddress address, int port) {
-        this(subnet, new InetNodeInfo(address, port));
+    public InetNode(InetSubnet subnet, InetAddress address) {
+        this(subnet, new InetNodeInfo(address));
     }
     
     /**
@@ -47,14 +46,6 @@ public class InetNode implements Node {
      */
     public InetAddress getAddress() {
         return nodeInfo.getAddress();
-    }
-    
-    /**
-     * ポート番号を返す。
-     * @return ポート番号
-     */
-    public int getPort() {
-        return nodeInfo.getPort();
     }
     
     @Override

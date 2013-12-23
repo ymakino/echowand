@@ -46,7 +46,7 @@ public class Sample3 {
         Node node = null;
         
         try {
-            node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress), 3610);
+            node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SubnetException ex) {

@@ -45,7 +45,7 @@ public class TCPConnectionCreator {
         }
     }
     
-    public TCPConnection create(NodeInfo localNodeInfo, NodeInfo remoteNodeInfo, int timeout) throws NetworkException {
+    public TCPConnection create(NodeInfo localNodeInfo, NodeInfo remoteNodeInfo, int portNumber, int timeout) throws NetworkException {
         try {
             if (!(localNodeInfo instanceof InetNodeInfo)) {
                 throw new NetworkException("invalid node: "+ localNodeInfo);
@@ -57,8 +57,7 @@ public class TCPConnectionCreator {
             
             InetNodeInfo remoteInetNodeInfo = (InetNodeInfo)remoteNodeInfo;
             InetAddress remoteAddress = remoteInetNodeInfo.getAddress();
-            int remotePort = remoteInetNodeInfo.getPort();
-            InetSocketAddress remoteSocketAddress = new InetSocketAddress(remoteAddress, remotePort);
+            InetSocketAddress remoteSocketAddress = new InetSocketAddress(remoteAddress, portNumber);
 
             Socket socket = new Socket();
             socket.connect(remoteSocketAddress, timeout);

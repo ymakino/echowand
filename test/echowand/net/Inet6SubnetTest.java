@@ -82,12 +82,10 @@ public class Inet6SubnetTest {
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
 
-        Node node = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("::1"), Inet6Subnet.DEFAULT_PORT_NUMBER);
+        Node node = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("::1"));
         sendTest(node, true);
-        Node invalidAddr = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("FD00::fe"), Inet6Subnet.DEFAULT_PORT_NUMBER);
+        Node invalidAddr = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("FD00::fe"));
         sendTest(invalidAddr, false);
-        Node invalidPort = subnet.getRemoteNode((Inet6Address) Inet6Address.getByName("::1"), 4321);
-        sendTest(invalidPort, false);
     }
 
     @Test
@@ -242,10 +240,8 @@ public class Inet6SubnetTest {
     public void testNodeEquals() throws SubnetException {
         try {
             Node node1 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"));
-            Node node2 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"), 3610);
-            Node node3 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"), 3611);
+            Node node2 = subnet.getRemoteNode(Inet6Address.getByName("FD00::1"));
             assertEquals(node1, node2);
-            assertFalse(node1.equals(node3));
         } catch (UnknownHostException e) {
             e.printStackTrace();
             fail();

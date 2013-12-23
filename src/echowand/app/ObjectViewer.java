@@ -18,6 +18,9 @@ import echowand.net.TCPConnectionListener;
 import echowand.object.*;
 import echowand.util.LoggerConfig;
 import echowand.util.Pair;
+import java.awt.Dimension;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +71,9 @@ public class ObjectViewer implements Runnable {
     private LocalObject nodeProfile;
     private RequestDispatcher requestDispatcher;
     private MainLoop loop;
+    
+    private int width;
+    private int height;
     
     public NodeListModel createNodeListModel() {
         return new NodeListModel(remoteManager);
@@ -129,12 +135,29 @@ public class ObjectViewer implements Runnable {
     }
     
     public ObjectViewer(Subnet subnet) {
+        this(subnet, 0, 0);
+    }
+    
+    public ObjectViewer(Subnet subnet, int width, int height) {
         this.subnet = subnet;
+        this.width = width;
+        this.height = height;
     }
     
     public void openViewerFrame() {
         ViewerFrame viewerFrame = new ViewerFrame(this);
         viewerFrame.setVisible(true);
+        Dimension d = viewerFrame.getSize();
+        
+        if (width == 0) {
+            width = d.width;
+        }
+        
+        if (height == 0) {
+            height = d.height;
+        }
+        
+        viewerFrame.setSize(width, height);
     }
 
     public void openObjectTableFrame(RemoteObject remoteObject) {
@@ -230,6 +253,10 @@ public class ObjectViewer implements Runnable {
         
         openViewerFrame();
     }
+    
+    private static void usage() {
+        System.out.println("Usage: ObjectViewer [--help] [-i interface] [-w width] [-h height]");
+    }
 
     public static void main(String[] args) {
         final boolean trace = true;
@@ -281,14 +308,55 @@ public class ObjectViewer implements Runnable {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ViewerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-
+        
+        int n=0;
+        String interfaceName = null;
+        int width = 0;
+        int height = 0;
+        
+        while (args.length > n) {
+            if (args[n].equals("--help")) {
+                usage();
+                System.exit(0);
+            } else if (args[n].equals("-i")) {
+                if (args.length <= n+1) {
+                    usage();
+                    System.exit(1);
+                }
+                interfaceName = args[n+1];
+                n += 2;
+            } else if (args[n].equals("-w")) {
+                if (args.length <= n+1) {
+                    usage();
+                    System.exit(1);
+                }
+                width = Integer.parseInt(args[n+1]);
+                n += 2;
+            } else if (args[n].equals("-h")) {
+                if (args.length <= n+1) {
+                    usage();
+                    System.exit(1);
+                }
+                height = Integer.parseInt(args[n+1]);
+                n += 2;
+            }
+        }
+        
         try {
-            Inet4Subnet subnet = new Inet4Subnet();
+            Inet4Subnet subnet;
+            if (interfaceName == null) {
+                subnet = new Inet4Subnet();
+            } else {
+                NetworkInterface nif = NetworkInterface.getByName(interfaceName);
+                subnet = new Inet4Subnet(nif);
+            }
             subnet.startService();
-            ObjectViewer viewer = new ObjectViewer(subnet);
+            ObjectViewer viewer = new ObjectViewer(subnet, width, height);
             java.awt.EventQueue.invokeLater(viewer);
         } catch (SubnetException ex) {
             quitWithErrorFrame(ex);
+        } catch (SocketException ex) {
+            Logger.getLogger(ObjectViewer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

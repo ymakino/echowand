@@ -62,8 +62,8 @@ public class TCPConnectionTest {
                 socket = ss.accept();
                 socket.setReuseAddress(true);
                 
-                InetNodeInfo localNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"), port);
-                InetNodeInfo remoteNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"), 3610);
+                InetNodeInfo localNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"));
+                InetNodeInfo remoteNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"));
                 
                 c1 = new TCPConnection(socket, localNodeInfo, remoteNodeInfo);
             } catch (IOException ex) {
@@ -90,8 +90,8 @@ public class TCPConnectionTest {
                 socket = new Socket("localhost", port);
                 socket.setReuseAddress(true);
                 
-                InetNodeInfo localNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"), 3610);
-                InetNodeInfo remoteNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"), port);
+                InetNodeInfo localNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"));
+                InetNodeInfo remoteNodeInfo = new InetNodeInfo(InetAddress.getByName("127.0.0.1"));
                 
                 c2 = new TCPConnection(socket, localNodeInfo, remoteNodeInfo);
             } catch (UnknownHostException ex) {

@@ -28,10 +28,26 @@ public class UDPNetwork {
     
     private InetSubnet subnet;
     private NetworkInterface networkInterface;
+    private InetAddress localAddress;
     private InetAddress multicastAddress;
     private MulticastSocket multicastSocket;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
+    private int portNumber = DEFAULT_PORT_NUMBER;
     private boolean working = false;
+    
+    /**
+     * 利用するUDPネットワークおよびローカルアドレス、マルチキャストアドレスを指定してUDPNetworkを生成する。
+     * @param subnet このUDPネットワークを利用するサブネットの指定
+     * @param localAddress 利用するローカルアドレスの指定
+     * @param multicastAddress 利用するマルチキャストアドレスの指定
+     * @throws SubnetException 生成に失敗した場合
+     */
+    public UDPNetwork(InetSubnet subnet, InetAddress localAddress, InetAddress multicastAddress) {
+        this.subnet = subnet;
+        this.localAddress = localAddress;
+        this.networkInterface = null;
+        this.multicastAddress = multicastAddress;
+    }
     
     /**
      * 利用するUDPネットワークおよびインタフェース、マルチキャストアドレスを指定してUDPNetworkを生成する。
@@ -42,7 +58,21 @@ public class UDPNetwork {
      */
     public UDPNetwork(InetSubnet subnet, NetworkInterface networkInterface, InetAddress multicastAddress) {
         this.subnet = subnet;
+        this.localAddress = null;
         this.networkInterface = networkInterface;
+        this.multicastAddress = multicastAddress;
+    }
+    
+    /**
+     * 利用するUDPネットワークおよびインタフェース、マルチキャストアドレスを指定してUDPNetworkを生成する。
+     * @param subnet このUDPネットワークを利用するサブネットの指定
+     * @param multicastAddress 利用するマルチキャストアドレスの指定
+     * @throws SubnetException 生成に失敗した場合
+     */
+    public UDPNetwork(InetSubnet subnet, InetAddress multicastAddress) {
+        this.subnet = subnet;
+        this.localAddress = null;
+        this.networkInterface = null;
         this.multicastAddress = multicastAddress;
     }
     
@@ -63,9 +93,14 @@ public class UDPNetwork {
         LOGGER.entering(CLASS_NAME, "openSocket");
         
         try {
-            multicastSocket = new MulticastSocket(DEFAULT_PORT_NUMBER);
+            multicastSocket = new MulticastSocket(getPortNumber());
+
+            if (localAddress != null) {
+                multicastSocket.setInterface(localAddress);
+            } else if (networkInterface != null) {
+                multicastSocket.setNetworkInterface(networkInterface);
+            }
             
-            multicastSocket.setNetworkInterface(networkInterface);
             multicastSocket.joinGroup(multicastAddress);
             multicastSocket.setLoopbackMode(false);
             multicastSocket.setReuseAddress(false);
@@ -79,6 +114,10 @@ public class UDPNetwork {
         }
         
         LOGGER.exiting(CLASS_NAME, "openSocket");
+    }
+    
+    public int getPortNumber() {
+        return portNumber;
     }
     
     /**
@@ -169,7 +208,7 @@ public class UDPNetwork {
             InetNode remoteNode = (InetNode)frame.getReceiver();
             
             InetAddress receiver = remoteNode.getAddress();
-            int port = remoteNode.getPort();
+            int port = getPortNumber();
             
             DatagramPacket packet = new DatagramPacket(data, data.length, receiver, port);
             
@@ -208,7 +247,7 @@ public class UDPNetwork {
      * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
      */
     public Frame receive()  throws NetworkException {
-        LOGGER.entering(CLASS_NAME, "recv");
+        LOGGER.entering(CLASS_NAME, "receive");
         
         if (!isWorking()) {
             throw new NetworkException("not working");
@@ -223,23 +262,23 @@ public class UDPNetwork {
             InetAddress addr = packet.getAddress();
             int port = packet.getPort();
             
-            Node remoteNode = subnet.getRemoteNode(addr, port);
+            Node remoteNode = subnet.getRemoteNode(addr);
             Node localNode = subnet.getLocalNode();
             
             Frame frame = new Frame(remoteNode, localNode, commonFrame);
-            LOGGER.exiting(CLASS_NAME, "recv", frame);
+            LOGGER.exiting(CLASS_NAME, "receive", frame);
             return frame;
         } catch (IOException ex) {
             NetworkException exception = new NetworkException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "recv", exception);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
         } catch (InvalidDataException ex) {
             NetworkException exception = new NetworkException("invalid frame", ex);
-            LOGGER.throwing(CLASS_NAME, "recv", exception);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
         } catch (SubnetException ex) {
             NetworkException exception = new NetworkException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "recv", exception);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
         }
     }

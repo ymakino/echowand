@@ -28,10 +28,9 @@ public class Inet6Subnet extends InetSubnet {
      */
     public Inet6Subnet() throws SubnetException {
         try {
-            Inet6Address localAddress = (Inet6Address)Inet6Address.getLocalHost();
             Inet6Address multicastAddress = (Inet6Address)Inet6Address.getByName(MULTICAST_ADDRESS);
             
-            initialize(localAddress, multicastAddress, DEFAULT_PORT_NUMBER);
+            initialize(multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
             throw new SubnetException("catched exception", ex);
         }

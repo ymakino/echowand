@@ -14,7 +14,7 @@ public class Inet4Subnet extends InetSubnet {
     /**
      * ECHONET Liteが利用するIPv4マルチキャストアドレス
      */
-    public static final String MULTICAST_ADDRESS=  "224.0.23.0";
+    public static final String MULTICAST_ADDRESS = "224.0.23.0";
     
     /**
      * ECHONET Liteが利用するポート番号
@@ -28,10 +28,9 @@ public class Inet4Subnet extends InetSubnet {
      */
     public Inet4Subnet() throws SubnetException {
         try {
-            Inet4Address localAddress = (Inet4Address)Inet4Address.getLocalHost();
             Inet4Address multicastAddress = (Inet4Address)Inet4Address.getByName(MULTICAST_ADDRESS);
             
-            initialize(localAddress, multicastAddress, DEFAULT_PORT_NUMBER);
+            initialize(multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
             throw new SubnetException("catched exception", ex);
         }

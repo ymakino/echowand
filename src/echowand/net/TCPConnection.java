@@ -216,11 +216,13 @@ public class TCPConnection implements Connection {
             commonFrame = receiver.receiveCommonFrame();
         } finally {
             if (commonFrame == null) {
-                close();
+                closeInput();
             }
         }
         
-        notifyReceived(commonFrame);
+        if (commonFrame != null) {
+            notifyReceived(commonFrame);
+        }
         
         LOGGER.exiting(CLASS_NAME, "receive", commonFrame);
         return commonFrame;
@@ -318,6 +320,10 @@ public class TCPConnection implements Connection {
             LOGGER.entering(CLASS_NAME, "parseNextFrame");
             CommonFrame commonFrame;
             
+            if (offset == 0) {
+                return null;
+            }
+            
             try {
                 byte[] currentBuffer = Arrays.copyOf(buffer, offset);
                 commonFrame = new CommonFrame(currentBuffer);
@@ -336,71 +342,73 @@ public class TCPConnection implements Connection {
         }
         
         private boolean isValidCommonFrame(CommonFrame commonFrame) {
+            // xxx
             return true;
+        }
+        
+        private void validateCommonFrame(CommonFrame commonFrame) throws NetworkException {
+            if (!isValidCommonFrame(commonFrame)) {
+                NetworkException exception = new NetworkException("invalid common frame: " + commonFrame);
+                LOGGER.throwing(CLASS_NAME, "validateCommonFrame", exception);
+                throw exception;
+            }
+        }
+        
+        private void readBytes() throws NetworkException {
+            int count;
+
+            try {
+                count = is.read(buffer, offset, getRemain());
+            } catch (IOException ex) {
+                NetworkException exception = new NetworkException("catched exception", ex);
+                LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
+                throw exception;
+            }
+
+            if (count == -1) {
+                NetworkException exception = new NetworkException("socket closed");
+                LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
+                throw exception;
+            }
+
+            offset += count;
+        }
+        
+        private void validateBufferSize() throws NetworkException {
+            if (MAX_BUFFER_SIZE == offset) {
+                close();
+                NetworkException exception = new NetworkException("buffer overflowed");
+                LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
+                throw exception;
+            }
+
+            if (getRemain() == 0) {
+                expandBuffer();
+            }
         }
 
         public synchronized CommonFrame receiveCommonFrame() throws NetworkException {
             LOGGER.entering(CLASS_NAME, "receiveCommonFrame");
             
-            CommonFrame commonFrame = null;
-            
-            if (offset > 0) {
-                commonFrame = parseFrame();
-            }
+            CommonFrame commonFrame = parseFrame();
 
             if (commonFrame != null) {
-                if (!isValidCommonFrame(commonFrame)) {
-                    NetworkException exception = new NetworkException("invalid common frame: " + commonFrame);
-                    LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
-                    throw exception;
-                }
-                
+                validateCommonFrame(commonFrame);
                 LOGGER.exiting(CLASS_NAME, "receiveCommonFrame", commonFrame);
                 return commonFrame;
             }
 
             for (;;) {
-                int count;
-
-                try {
-                    count = is.read(buffer, offset, getRemain());
-                } catch (IOException ex) {
-                    NetworkException exception = new NetworkException("catched exception", ex);
-                    LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
-                    throw exception;
-                }
-
-                if (count == -1) {
-                    NetworkException exception = new NetworkException("socket closed");
-                    LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
-                    throw exception;
-                }
-
-                offset += count;
-
+                readBytes();
                 commonFrame = parseFrame();
 
                 if (commonFrame != null) {
-                    if (!isValidCommonFrame(commonFrame)) {
-                        NetworkException exception = new NetworkException("invalid common frame: " + commonFrame);
-                        LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
-                        throw exception;
-                    }
-
+                    validateCommonFrame(commonFrame);
                     LOGGER.exiting(CLASS_NAME, "receiveCommonFrame", commonFrame);
                     return commonFrame;
                 }
 
-                if (MAX_BUFFER_SIZE == offset) {
-                    close();
-                    NetworkException exception = new NetworkException("buffer overflowed");
-                    LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
-                    throw exception;
-                }
-
-                if (getRemain() == 0) {
-                    expandBuffer();
-                }
+                validateBufferSize();
             }
         }
     }

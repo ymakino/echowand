@@ -222,7 +222,7 @@ public class Sample4 {
         }
         
         try {
-            Node node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress1), 3610);
+            Node node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress1));
             EPC epc = EPC.x9E;
             System.out.println(remoteManager.get(node, new EOJ("0ef001")).getData(epc));
             System.out.println(remoteManager.get(node, new EOJ("013001")).getData(epc));
@@ -234,7 +234,7 @@ public class Sample4 {
             remoteObject = remoteManager.get(node, new EOJ("001101"));
             remoteObject.addObserver(new PrintNotifiedDataObserver());
             
-            node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress2), 3610);
+            node = subnet.getRemoteNode(Inet4Address.getByName(peerAddress2));
             epc = EPC.x9E;
             System.out.println(remoteManager.get(node, new EOJ("0ef001")).getData(epc));
             System.out.println(remoteManager.get(node, new EOJ("013001")).getData(epc));

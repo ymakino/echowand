@@ -123,6 +123,7 @@ public class TCPSample0 {
             // 宛先ノードが存在しない場合には、ここでタイムアウトする
             System.out.println("Received: " + subnet.receive());
             System.out.println();
+            subnet.deleteTCPConnection(frame1);
             
             
             //========================= SetGet =========================
@@ -131,7 +132,7 @@ public class TCPSample0 {
             
             // SetGetフレームを作成
             Frame frame2 = new Frame(subnet.getLocalNode(), remoteNode2, createCommonFrameSetGet());
-            //subnet.createTCPConnection(frame2);
+            subnet.createTCPConnection(frame2);
             
             // フレームを送信
             System.out.println("Sending:  " + frame2);
@@ -142,7 +143,7 @@ public class TCPSample0 {
             Frame rframe2 = subnet.receive();
             System.out.println("Received: " + rframe2);
             System.out.println();
-            //subnet.deleteTCPConnection(rframe2);
+            subnet.deleteTCPConnection(frame2);
             
             
             //========================= INFC =========================
