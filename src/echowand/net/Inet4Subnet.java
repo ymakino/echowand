@@ -12,6 +12,11 @@ import java.net.UnknownHostException;
 public class Inet4Subnet extends InetSubnet {
     
     /**
+     * IPv4ループバックアドレス
+     */
+    public static final String LOOPBACK_ADDRESS = "127.0.0.1";
+    
+    /**
      * ECHONET Liteが利用するIPv4マルチキャストアドレス
      */
     public static final String MULTICAST_ADDRESS = "224.0.23.0";
@@ -28,9 +33,10 @@ public class Inet4Subnet extends InetSubnet {
      */
     public Inet4Subnet() throws SubnetException {
         try {
+            Inet4Address loopbackAddress = (Inet4Address)Inet4Address.getByName(LOOPBACK_ADDRESS);
             Inet4Address multicastAddress = (Inet4Address)Inet4Address.getByName(MULTICAST_ADDRESS);
             
-            initialize(multicastAddress, DEFAULT_PORT_NUMBER);
+            initialize(loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
             throw new SubnetException("catched exception", ex);
         }
@@ -48,9 +54,10 @@ public class Inet4Subnet extends InetSubnet {
         }
         
         try {
+            Inet4Address loopbackAddress = (Inet4Address)Inet4Address.getByName(LOOPBACK_ADDRESS);
             Inet4Address multicastAddress = (Inet4Address)Inet4Address.getByName(MULTICAST_ADDRESS);
             
-            initialize(localAddress, multicastAddress, DEFAULT_PORT_NUMBER);
+            initialize(localAddress, loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
             throw new SubnetException("catched exception", ex);
         }
@@ -68,9 +75,10 @@ public class Inet4Subnet extends InetSubnet {
         }
         
         try {
+            Inet4Address loopbackAddress = (Inet4Address)Inet4Address.getByName(LOOPBACK_ADDRESS);
             Inet4Address multicastAddress = (Inet4Address)Inet4Address.getByName(MULTICAST_ADDRESS);
             
-            initialize(networkInterface, multicastAddress, DEFAULT_PORT_NUMBER);
+            initialize(networkInterface, loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
             throw new SubnetException("catched exception", ex);
         }

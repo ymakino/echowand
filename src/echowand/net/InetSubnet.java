@@ -31,6 +31,7 @@ public class InetSubnet implements Subnet {
     private int portNumber;
     
     private InetAddress localAddress;
+    private InetAddress loopbackAddress;
     private InetNode groupNode;
     private InetNode localNode;
     
@@ -42,22 +43,27 @@ public class InetSubnet implements Subnet {
     /**
      * InetSubnetの初期化を行う。
      * @param networkInterface ネットワークインタフェースの指定
+     * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
      * @param portNumber ポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    protected void initialize(NetworkInterface networkInterface, InetAddress multicastAddress, int portNumber) throws SubnetException {
+    protected void initialize(NetworkInterface networkInterface, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{networkInterface, multicastAddress, portNumber});
+        
+        if (!isValidAddress(loopbackAddress)) {
+            throw new SubnetException("invalid loopback address: " + localAddress);
+        }
         
         if (!isValidAddress(multicastAddress)) {
             throw new SubnetException("invalid multicast address: " + multicastAddress);
         }
         
+        this.localAddress = null;
         this.networkInterface = networkInterface;
+        this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
-        
-        localAddress = null;
         
         LOGGER.exiting(CLASS_NAME, "initialize");
     }
@@ -65,14 +71,19 @@ public class InetSubnet implements Subnet {
     /**
      * InetSubnetの初期化を行う。
      * @param localAddress ローカルアドレスの指定
+     * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
      * @param portNumber ポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    protected void initialize(InetAddress localAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
+    protected void initialize(InetAddress localAddress, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{localAddress, multicastAddress, portNumber});
         if (!isValidAddress(localAddress)) {
             throw new SubnetException("invalid local address: " + localAddress);
+        }
+        
+        if (!isValidAddress(loopbackAddress)) {
+            throw new SubnetException("invalid loopback address: " + localAddress);
         }
                 
         if (!isValidAddress(multicastAddress)) {
@@ -86,6 +97,7 @@ public class InetSubnet implements Subnet {
         }
         
         this.localAddress = localAddress;
+        this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
         
@@ -95,12 +107,17 @@ public class InetSubnet implements Subnet {
     /**
      * InetSubnetの初期化を行う。
      *
+     * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
      * @param portNumber ポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    protected void initialize(InetAddress multicastAddress, int portNumber) throws SubnetException {
+    protected void initialize(InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{multicastAddress, portNumber});
+        
+        if (!isValidAddress(loopbackAddress)) {
+            throw new SubnetException("invalid loopback address: " + localAddress);
+        }
         
         if (!isValidAddress(multicastAddress)) {
             throw new SubnetException("invalid multicast address: " + multicastAddress);
@@ -108,6 +125,7 @@ public class InetSubnet implements Subnet {
 
         this.localAddress = null;
         this.networkInterface = null;
+        this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
         
@@ -118,11 +136,11 @@ public class InetSubnet implements Subnet {
         LOGGER.entering(CLASS_NAME, "createUDPNetwork", new Object[]{multicastAddress, portNumber});
         
         if (localAddress != null) {
-            udpNetwork = new UDPNetwork(this, localAddress, multicastAddress);
+            udpNetwork = new UDPNetwork(this, localAddress, multicastAddress, portNumber);
         } else if (networkInterface != null) {
-            udpNetwork = new UDPNetwork(this, networkInterface, multicastAddress);
+            udpNetwork = new UDPNetwork(this, networkInterface, multicastAddress, portNumber);
         } else {
-            udpNetwork = new UDPNetwork(this, multicastAddress);
+            udpNetwork = new UDPNetwork(this, multicastAddress, portNumber);
         }
         
         LOGGER.exiting(CLASS_NAME, "createUDPNetwork");
@@ -456,22 +474,22 @@ public class InetSubnet implements Subnet {
         
         @Override
         public void run() {
-            try {
-                while (!terminated) {
+            while (!terminated) {
+                try {
                     Frame frame = network.receive();
                     queue.put(frame);
-                }
-            } catch (InterruptedException ex) {
-                if (terminated) {
-                    LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
-                } else {
-                    LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
-                }
-            } catch (NetworkException ex) {
-                if (terminated) {
-                    LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
-                } else {
-                    LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
+                } catch (InterruptedException ex) {
+                    if (terminated) {
+                        LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
+                    } else {
+                        LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
+                    }
+                } catch (NetworkException ex) {
+                    if (terminated) {
+                        LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
+                    } else {
+                        LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
+                    }
                 }
             }
         }
@@ -567,17 +585,12 @@ public class InetSubnet implements Subnet {
             throw new SubnetException("invalid nodeInfo: " + nodeInfo);
         }
     }
-    
+
     private InetAddress getLocalAddress() {
         if (localAddress != null) {
             return localAddress;
         } else {
-            try {
-                return InetAddress.getByName("localhost");
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(InetSubnet.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
-            }
+            return loopbackAddress;
         }
     }
     

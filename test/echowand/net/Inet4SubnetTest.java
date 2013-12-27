@@ -161,7 +161,7 @@ public class Inet4SubnetTest {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
             subnet = new Inet4Subnet(addr);
             assertFalse(subnet.isWorking());
-            assertEquals(subnet.getNetworkInterface(), nif);
+            assertEquals(nif, subnet.getNetworkInterface());
             subnet.stopService();
         }
     }

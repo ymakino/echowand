@@ -14,25 +14,21 @@ public class TCPNetwork implements TCPConnectionObserver {
     private static final Logger LOGGER = Logger.getLogger(TCPNetwork.class.getName());
     private static final String CLASS_NAME = TCPNetwork.class.getName();
     
-    /**
-     * ECHONET Liteが利用するポート番号
-     */
-    public static final short  DEFAULT_PORT_NUMBER = 3610;
-    
     private static final int CREATE_TIMEOUT = 10 * 1000;
     
     private Subnet subnet;
     private TCPConnectionCreator creator;
     private TCPConnectionListener listener;
+    private int portNumber;
     private LinkedBlockingQueue<Frame> receiveQueue;
     private TCPConnectionPool connectionPool;
     private TCPAcceptTask acceptTask;
     private int createTimeout = CREATE_TIMEOUT;
     private boolean working = false;
-    private int portNumber = DEFAULT_PORT_NUMBER;
     
     public TCPNetwork(Subnet subnet, int portNumber) throws NetworkException {
         this.subnet = subnet;
+        this.portNumber = portNumber;
         this.listener = new TCPConnectionListener(portNumber);
         this.creator = new TCPConnectionCreator();
         receiveQueue = new LinkedBlockingQueue<Frame>();
@@ -42,6 +38,7 @@ public class TCPNetwork implements TCPConnectionObserver {
 
     public TCPNetwork(Subnet subnet, InetAddress localAddress, int portNumber) throws NetworkException {
         this.subnet = subnet;
+        this.portNumber = portNumber;
         this.listener = new TCPConnectionListener(localAddress, portNumber);
         this.creator = new TCPConnectionCreator();
         receiveQueue = new LinkedBlockingQueue<Frame>();

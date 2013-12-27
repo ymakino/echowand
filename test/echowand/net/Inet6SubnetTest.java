@@ -79,6 +79,8 @@ public class Inet6SubnetTest {
 
     @Test
     public void testSendAndRecv() throws SubnetException, UnknownHostException {
+        subnet.startService();
+
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
 
@@ -159,7 +161,7 @@ public class Inet6SubnetTest {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
             subnet = new Inet6Subnet(addr);
             assertFalse(subnet.isWorking());
-            assertEquals(subnet.getNetworkInterface(), nif);
+            assertEquals(nif, subnet.getNetworkInterface());
             subnet.stopService();
         }
     }
@@ -206,6 +208,7 @@ public class Inet6SubnetTest {
     @Test
     public void testStartServiceAfterStopService() throws SubnetException {
         try {
+            subnet.startService();
             assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
         } catch (SubnetException e) {
             fail();

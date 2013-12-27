@@ -17,12 +17,7 @@ public class UDPNetwork {
     private static final String CLASS_NAME = UDPNetwork.class.getName();
     
     /**
-     * ECHONET Liteが利用するポート番号
-     */
-    public static final short  DEFAULT_PORT_NUMBER = 3610;
-    
-    /**
-     * 受信データ用バッファの最大長のデフォルト
+     * 受信データ用バッファのデフォルトサイズ
      */
     public static final short  DEFAULT_BUFFER_SIZE = 1500;
     
@@ -31,8 +26,8 @@ public class UDPNetwork {
     private InetAddress localAddress;
     private InetAddress multicastAddress;
     private MulticastSocket multicastSocket;
+    private int portNumber;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
-    private int portNumber = DEFAULT_PORT_NUMBER;
     private boolean working = false;
     
     /**
@@ -40,13 +35,15 @@ public class UDPNetwork {
      * @param subnet このUDPネットワークを利用するサブネットの指定
      * @param localAddress 利用するローカルアドレスの指定
      * @param multicastAddress 利用するマルチキャストアドレスの指定
+     * @param portNumber 利用するポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    public UDPNetwork(InetSubnet subnet, InetAddress localAddress, InetAddress multicastAddress) {
+    public UDPNetwork(InetSubnet subnet, InetAddress localAddress, InetAddress multicastAddress, int portNumber) {
         this.subnet = subnet;
         this.localAddress = localAddress;
         this.networkInterface = null;
         this.multicastAddress = multicastAddress;
+        this.portNumber = portNumber;
     }
     
     /**
@@ -54,26 +51,30 @@ public class UDPNetwork {
      * @param subnet このUDPネットワークを利用するサブネットの指定
      * @param networkInterface 利用するネットワークインタフェースの指定
      * @param multicastAddress 利用するマルチキャストアドレスの指定
+     * @param portNumber 利用するポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    public UDPNetwork(InetSubnet subnet, NetworkInterface networkInterface, InetAddress multicastAddress) {
+    public UDPNetwork(InetSubnet subnet, NetworkInterface networkInterface, InetAddress multicastAddress, int portNumber) {
         this.subnet = subnet;
         this.localAddress = null;
         this.networkInterface = networkInterface;
         this.multicastAddress = multicastAddress;
+        this.portNumber = portNumber;
     }
     
     /**
      * 利用するUDPネットワークおよびインタフェース、マルチキャストアドレスを指定してUDPNetworkを生成する。
      * @param subnet このUDPネットワークを利用するサブネットの指定
      * @param multicastAddress 利用するマルチキャストアドレスの指定
+     * @param portNumber 利用するポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    public UDPNetwork(InetSubnet subnet, InetAddress multicastAddress) {
+    public UDPNetwork(InetSubnet subnet, InetAddress multicastAddress, int portNumber) {
         this.subnet = subnet;
         this.localAddress = null;
         this.networkInterface = null;
         this.multicastAddress = multicastAddress;
+        this.portNumber = portNumber;
     }
     
     private synchronized void closeSocket() {
