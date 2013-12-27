@@ -16,7 +16,7 @@ public class InternalSubnet implements Subnet {
     }
     
     private Node localNode;
-    private static Node groupNode;
+    private Node groupNode;
     private InternalNetworkPort port;
     
     /**
@@ -58,7 +58,7 @@ public class InternalSubnet implements Subnet {
     
     private boolean shouldLocalNodeReceive(Frame frame) {
             Node node = frame.getReceiver();
-            return (node == getGroupNode() || node == getLocalNode());
+            return (node.equals(getGroupNode()) || node.equals(getLocalNode()));
     }
     
     /**
