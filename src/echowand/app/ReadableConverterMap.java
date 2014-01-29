@@ -33,7 +33,7 @@ public class ReadableConverterMap {
         cachedMap = new HashMap<ReadableConverterMapKey, ReadableConverter>();
         
         putInternal(EPC.x80, new ReadableConverterToggle((byte)0x30, "ON", (byte)0x31, "OFF"));
-        putInternal(EPC.x82, new ReadableConverterVersion());
+        putInternal(EPC.x82, new ReadableConverterStandardVersion());
         putInternal(EPC.x84, new ReadableConverterUnsignedInteger("W"));
         putInternal(EPC.x85, new ReadableConverterReal(1000, "kWh"));
         putInternal(EPC.x87, new ReadableConverterPercentage());
@@ -49,6 +49,8 @@ public class ReadableConverterMap {
         putInternal(EPC.x9D, new ReadableConverterPropertyMap());
         putInternal(EPC.x9E, new ReadableConverterPropertyMap());
         putInternal(EPC.x9F, new ReadableConverterPropertyMap());
+        
+        putInternal(new ClassEOJ("0ef0"), EPC.x82, new ReadableConverterVersion());
         
         HashMap<Byte, String> LevelMap = new HashMap<Byte, String>();
         for (int i=1; i<=8; i++) {
