@@ -57,7 +57,7 @@ public class TCPConnectionReceiverThread extends Thread {
             try {
                 connection.close();
             } catch (NetworkException ex) {
-                LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
+                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
             }
 
             LOGGER.exiting(CLASS_NAME, "run");

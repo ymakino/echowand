@@ -163,7 +163,7 @@ public class TCPReceiver implements TCPConnectionObserver {
         LOGGER.entering(CLASS_NAME, "notifySent", new Object[]{connection, commonFrame});
         
         if (!isWorking()) {
-            LOGGER.logp(Level.FINE, CLASS_NAME, "notifySent", "not working");
+            LOGGER.logp(Level.INFO, CLASS_NAME, "notifySent", "not working");
             return;
         }
         
@@ -175,7 +175,7 @@ public class TCPReceiver implements TCPConnectionObserver {
         LOGGER.entering(CLASS_NAME, "notifyReceived", new Object[]{connection, commonFrame});
         
         if (!isWorking()) {
-            LOGGER.logp(Level.FINE, CLASS_NAME, "notifyReceived", "not working");
+            LOGGER.logp(Level.INFO, CLASS_NAME, "notifyReceived", "not working");
             return;
         }
 
@@ -187,6 +187,11 @@ public class TCPReceiver implements TCPConnectionObserver {
     @Override
     public synchronized void notifyClosed(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "notifyClosed", connection);
+        
+        if (!isWorking()) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "notifyClosed", "not working");
+            return;
+        }
 
         removeConnection(connection);
 

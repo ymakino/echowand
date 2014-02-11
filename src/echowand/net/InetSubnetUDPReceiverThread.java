@@ -49,11 +49,11 @@ public class InetSubnetUDPReceiverThread extends Thread {
                 Node remoteNode = subnet.getRemoteNode(nodeInfo);
                 queue.put(new Frame(remoteNode, localNode, commonFrame));
             } catch (InterruptedException ex) {
-                LOGGER.logp(Level.FINE, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
+                LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
             } catch (NetworkException ex) {
                 LOGGER.logp(Level.FINE, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
             } catch (SubnetException ex) {
-                LOGGER.logp(Level.FINE, CLASS_NAME, "InetSubnetUDPReceiver.run", "invalid remoteNode", ex);
+                LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "invalid remoteNode", ex);
             }
         }
     }

@@ -55,11 +55,11 @@ public class InetSubnetTCPReceiverThread extends Thread {
                     Node remoteNode = subnet.getRemoteNode(connection.getRemoteNodeInfo());
                     queue.put(new Frame(remoteNode, localNode, commonFrame, connection));
                 } catch (SubnetException ex) {
-                    LOGGER.logp(Level.FINE, CLASS_NAME, "run", "invalid remoteNode", ex);
+                    LOGGER.logp(Level.INFO, CLASS_NAME, "run", "invalid remoteNode", ex);
                 }
             }
         } catch (InterruptedException ex) {
-            LOGGER.logp(Level.FINE, CLASS_NAME, "run", "interrupted", ex);
+            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "interrupted", ex);
         } catch (NetworkException ex) {
             LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
         }

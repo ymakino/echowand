@@ -48,7 +48,7 @@ public class InetSubnetTCPAcceptorThread extends Thread {
                 LOGGER.logp(Level.FINE, CLASS_NAME, "run", "accept", connection);
             }
         } catch (NetworkException ex) {
-            LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
+            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
         }
 
         LOGGER.exiting(CLASS_NAME, "run");
