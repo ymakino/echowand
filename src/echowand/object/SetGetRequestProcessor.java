@@ -282,8 +282,9 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
         } else {
             res.setESV(ESV.INF_SNA);
         }
+        
         try {
-            subnet.send(createResponse(subnet.getLocalNode(), frame, object, res, true, subnet));
+            subnet.send(createResponse(subnet.getLocalNode(), frame, object, res, false, subnet));
         } catch (SubnetException e) {
             e.printStackTrace();
         }
