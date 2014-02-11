@@ -3,9 +3,12 @@ package echowand.net;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.ESV;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -20,11 +23,44 @@ import static org.junit.Assert.*;
  * @author Yoshiki Makino
  */
 public class Inet4SubnetTest {
-    private Inet4Subnet subnet;
+    private InetSubnet subnet;
+    
+    public String localAddress4 = "127.0.0.1";
+    public String remoteAddress4 = "172.21.254.254";
+    public String localAddress6 = "::1";
+    public String remoteAddress6 = "FD00::FFFE";
+    
+    public InetSubnet newInetSubnet() throws SubnetException {
+        return new Inet4Subnet();
+    }
+    
+    public InetSubnet newInetSubnet(InetAddress addr) throws SubnetException {
+        return new Inet4Subnet((Inet4Address)addr);
+    }
+    
+    public InetSubnet newInetSubnet(NetworkInterface nif) throws SubnetException {
+        return new Inet4Subnet(nif);
+    }
+    
+    public boolean isValidAddress(InetAddress addr) {
+        return addr instanceof Inet4Address;
+    }
+    
+    public InetAddress getLocalAddress() throws UnknownHostException {
+        return InetAddress.getByName(localAddress4);
+    }
+    
+    public InetAddress getRemoteAddress() throws UnknownHostException {
+        return InetAddress.getByName(remoteAddress4);
+    }
+    
+    public InetAddress getInvalidAddress() throws UnknownHostException {
+        return InetAddress.getByName(localAddress6);
+    }
     
     @Before
     public void setUp() throws SubnetException {
-        subnet = new Inet4Subnet();
+        subnet = newInetSubnet();
     }
     
     @After
@@ -84,9 +120,9 @@ public class Inet4SubnetTest {
         sendTest(subnet.getGroupNode(), true);
         sendTest(subnet.getLocalNode(), true);
 
-        Node node = subnet.getRemoteNode(Inet4Address.getByName("127.0.0.1"));
+        Node node = subnet.getRemoteNode(getLocalAddress());
         sendTest(node, true);
-        Node invalidAddr = subnet.getRemoteNode(Inet4Address.getByName("172.21.254.254"));
+        Node invalidAddr = subnet.getRemoteNode(getRemoteAddress());
         sendTest(invalidAddr, false);
     }
 
@@ -104,8 +140,14 @@ public class Inet4SubnetTest {
         assertFalse(subnet.isWorking());
     }
     
-    private LinkedList<Inet4Address> getInet4Addresses() throws SocketException {
-        LinkedList<Inet4Address> inet4addrs = new LinkedList<Inet4Address>();
+    @Test
+    public void testIsValidAddress() throws UnknownHostException {
+        assertTrue(subnet.isValidAddress(getLocalAddress()));
+        assertFalse(subnet.isValidAddress(getInvalidAddress()));
+    }
+    
+    private LinkedList<InetAddress> getInetAddresses() throws SocketException {
+        LinkedList<InetAddress> inetAddrs = new LinkedList<InetAddress>();
         
         Enumeration<NetworkInterface> nifs = NetworkInterface.getNetworkInterfaces();
         while (nifs.hasMoreElements()) {
@@ -113,34 +155,34 @@ public class Inet4SubnetTest {
             Enumeration<InetAddress> addrs = nif.getInetAddresses();
             while (addrs.hasMoreElements()) {
                 InetAddress addr = addrs.nextElement();
-                if (addr instanceof Inet4Address) {
-                    inet4addrs.add((Inet4Address)addr);
+                if (isValidAddress(addr)) {
+                    inetAddrs.add((InetAddress)addr);
                 }
             }
         }
         
-        return inet4addrs;
+        return inetAddrs;
     }
     
-    private LinkedList<NetworkInterface> getInet4Interfaces() throws SocketException {
-        LinkedList<NetworkInterface> inet4ifs = new LinkedList<NetworkInterface>();
+    private LinkedList<NetworkInterface> getInetInterfaces() throws SocketException {
+        LinkedList<NetworkInterface> inetIfs = new LinkedList<NetworkInterface>();
         
-        for (Inet4Address addr : getInet4Addresses()) {
+        for (InetAddress addr : getInetAddresses()) {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
-            if (!inet4ifs.contains(nif)) {
-                inet4ifs.add(nif);
+            if (!inetIfs.contains(nif)) {
+                inetIfs.add(nif);
             }
         }
         
-        return inet4ifs;
+        return inetIfs;
     }
     
     @Test
     public void testCreationWithNetworkInterface() throws SocketException, SubnetException {
         subnet.stopService();
 
-        for (NetworkInterface nif : getInet4Interfaces()) {
-            subnet = new Inet4Subnet(nif);
+        for (NetworkInterface nif : getInetInterfaces()) {
+            subnet = newInetSubnet(nif);
             assertFalse(subnet.isWorking());
             assertEquals(subnet.getNetworkInterface(), nif);
             subnet.stopService();
@@ -150,16 +192,16 @@ public class Inet4SubnetTest {
     @Test (expected=SubnetException.class)
     public void testCreationWithNullNetworkInterface() throws SubnetException {
         subnet.stopService();
-        subnet = new Inet4Subnet((NetworkInterface) null);
+        subnet = newInetSubnet((NetworkInterface)null);
     }
 
     @Test
     public void testCreationWithAddress() throws SocketException, SubnetException {
         subnet.stopService();
 
-        for (Inet4Address addr : getInet4Addresses()) {
+        for (InetAddress addr : getInetAddresses()) {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
-            subnet = new Inet4Subnet(addr);
+            subnet = newInetSubnet(addr);
             assertFalse(subnet.isWorking());
             assertEquals(nif, subnet.getNetworkInterface());
             subnet.stopService();
@@ -169,7 +211,7 @@ public class Inet4SubnetTest {
     @Test(expected = SubnetException.class)
     public void testCreationWithNullAddress() throws SubnetException {
         subnet.stopService();
-        subnet = new Inet4Subnet((Inet4Address)null);
+        subnet = newInetSubnet((InetAddress)null);
     }
 
     @Test
@@ -242,8 +284,8 @@ public class Inet4SubnetTest {
     @Test
     public void testNodeEquals() throws SubnetException {
         try {
-            Node node1 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"));
-            Node node2 = subnet.getRemoteNode(Inet4Address.getByName("192.168.1.1"));
+            Node node1 = subnet.getRemoteNode(getRemoteAddress());
+            Node node2 = subnet.getRemoteNode(getRemoteAddress());
             assertEquals(node1, node2);
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -252,27 +294,60 @@ public class Inet4SubnetTest {
     }
     
     @Test
-    public void testEnableTCP() throws SubnetException {
-        assertFalse(subnet.isTCPEnabled());
-        assertTrue(subnet.enableTCP());
-        assertTrue(subnet.isTCPEnabled());
+    public void testEnableTCPAcceptor() throws SubnetException {
+        assertFalse(subnet.isTCPAcceptorEnabled());
+        assertTrue(subnet.enableTCPAcceptor());
+        assertTrue(subnet.isTCPAcceptorEnabled());
         
         subnet.startService();
         
-        assertFalse(subnet.enableTCP());
-        assertTrue(subnet.isTCPEnabled());
+        assertFalse(subnet.enableTCPAcceptor());
+        assertTrue(subnet.isTCPAcceptorEnabled());
     }
     
     @Test
-    public void testDisableTCP() throws SubnetException {
-        subnet.enableTCP();
-        assertTrue(subnet.isTCPEnabled());
-        assertTrue(subnet.disableTCP());
-        assertFalse(subnet.isTCPEnabled());
+    public void testDisableTCPAcceptor() throws SubnetException {
+        subnet.enableTCPAcceptor();
+        assertTrue(subnet.isTCPAcceptorEnabled());
+        assertTrue(subnet.disableTCPAcceptor());
+        assertFalse(subnet.isTCPAcceptorEnabled());
         
         subnet.startService();
         
-        assertFalse(subnet.disableTCP());
-        assertFalse(subnet.isTCPEnabled());
+        assertFalse(subnet.disableTCPAcceptor());
+        assertFalse(subnet.isTCPAcceptorEnabled());
+    }
+    
+    @Test(expected = SubnetException.class)
+    public void testNewTCPConnectionFailure() throws SubnetException, UnknownHostException {
+        subnet.newTCPConnection(subnet.getRemoteNode(getLocalAddress()));
+    }
+    
+    @Test
+    public void testNewTCPConnection() throws SubnetException, UnknownHostException, IOException, NetworkException {
+        ServerSocket ss = new ServerSocket(3610);
+        ss.setReuseAddress(true);
+        try {
+            Node localNode = subnet.getLocalNode();
+            Node remoteNode = subnet.getRemoteNode(getLocalAddress());
+            TCPConnection conn1 = subnet.newTCPConnection(remoteNode);
+            Socket socket = ss.accept();
+            TCPConnection conn2 = new TCPConnection(socket, localNode.getNodeInfo(), remoteNode.getNodeInfo());
+            
+            CommonFrame commonFrame1 = new CommonFrame();
+            StandardPayload payload = new StandardPayload();
+            payload.setSEOJ(new EOJ("0ef001"));
+            payload.setDEOJ(new EOJ("0ef001"));
+            payload.setESV(ESV.Get);
+            payload.addFirstProperty(new Property(EPC.x80));
+            commonFrame1.setEDATA(payload);
+            
+            conn1.send(commonFrame1);
+            CommonFrame commonFrame2 = conn2.receive();
+            
+            assertArrayEquals(commonFrame1.toBytes(), commonFrame2.toBytes());
+        } finally {
+            ss.close();
+        }
     }
 }

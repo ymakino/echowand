@@ -7,14 +7,17 @@ import echowand.info.NodeProfileInfo;
 import echowand.info.PropertyConstraintHumidity;
 import echowand.info.PropertyConstraintTemperature;
 import echowand.info.TemperatureSensorInfo;
-import echowand.logic.*;
-import echowand.net.TCPConnectionPool;
+import echowand.logic.MainLoop;
+import echowand.logic.RequestDispatcher;
+import echowand.logic.TooManyObjectsException;
+import echowand.logic.TransactionManager;
 import echowand.net.Inet4Subnet;
 import echowand.net.Inet6Subnet;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.net.TCPConnection;
-import echowand.net.TCPConnectionListener;
+import echowand.net.TCPAcceptor;
+import echowand.net.UDPNetwork;
 import echowand.object.*;
 import echowand.util.LoggerConfig;
 import echowand.util.Pair;
@@ -104,10 +107,10 @@ public class ObjectViewer implements Runnable {
     
     private static void quitWithErrorFrame(SubnetException ex) {
         ErrorFrame frame = new ErrorFrame(null, true);
-        if (ex.getInternalException() == null) {
+        if (ex.getCause() == null) {
             frame.setMessage(ex.getMessage());
         } else {
-            frame.setMessage(ex.getInternalException().getMessage());
+            frame.setMessage(ex.getCause().getMessage());
         }
         frame.setVisible(true);
     }
@@ -286,10 +289,12 @@ public class ObjectViewer implements Runnable {
             LoggerConfig.changeLogLevelAll(DeviceObjectInfo.class.getName());
             */
             
-            // LoggerConfig.changeLogLevelAll(UDPNetwork.class.getName());
-            LoggerConfig.changeLogLevelAll(TCPConnectionPool.class.getName());
-            LoggerConfig.changeLogLevelAll(TCPConnectionListener.class.getName());
-            LoggerConfig.changeLogLevelAll(TCPConnection.class.getName());
+            //LoggerConfig.changeLogLevelAll(InetSubnet.class.getName());
+            //LoggerConfig.changeLogLevelAll(UDPNetwork.class.getName());
+            //LoggerConfig.changeLogLevelAll(TCPAcceptor.class.getName());
+            //LoggerConfig.changeLogLevelAll(InetSubnetTCPAcceptorThread.class.getName());
+            //LoggerConfig.changeLogLevelAll(InetSubnetTCPReceiverThread.class.getName());
+            //LoggerConfig.changeLogLevelAll(TCPConnection.class.getName());
         }
 
         try {

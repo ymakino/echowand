@@ -28,6 +28,7 @@ public class InternalNodeInfo implements NodeInfo {
         return name;
     }
     
+    @Override
     public boolean equals(Object o) {
         if (o instanceof InternalNodeInfo) {
             return name.equals(((InternalNodeInfo)o).name);

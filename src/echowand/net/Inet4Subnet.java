@@ -21,11 +21,6 @@ public class Inet4Subnet extends InetSubnet {
      */
     public static final String MULTICAST_ADDRESS = "224.0.23.0";
     
-    /**
-     * ECHONET Liteが利用するポート番号
-     */
-    public static final short  DEFAULT_PORT_NUMBER = 3610;
-    
     
     /**
      * Inet4Subnetを生成する。

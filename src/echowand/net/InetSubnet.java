@@ -1,47 +1,51 @@
 package echowand.net;
 
+import echowand.util.Pair;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * IPv4ネットワークのサブネット
+ * IPネットワークのサブネット
+ *
  * @author Yoshiki Makino
  */
 public class InetSubnet implements Subnet {
     private static final Logger LOGGER = Logger.getLogger(InetSubnet.class.getName());
     private static final String CLASS_NAME = InetSubnet.class.getName();
-    
+
     /**
-     * 利用するUDPネットワーク
+     * ECHONET Liteが利用するポート番号
      */
+    public static final short DEFAULT_PORT_NUMBER = 3610;
+
     private UDPNetwork udpNetwork;
-    
-    /**
-     * 利用するTCPネットワーク
-     */
-    private TCPNetwork tcpNetwork;
-    
+    private TCPReceiver tcpReceiver;
+    private TCPAcceptor tcpAcceptor;
+
     private NetworkInterface networkInterface;
     private InetAddress multicastAddress;
     private int portNumber;
-    
+
     private InetAddress localAddress;
     private InetAddress loopbackAddress;
     private InetNode groupNode;
     private InetNode localNode;
-    
-    private InetSubnetUDPReceiver udpReceiver;
-    private InetSubnetTCPReceiver tcpReceiver;
-    
-    private boolean tcpEnabled = false;
-    
+
+    private SynchronousQueue<Frame> receiveQueue = null;
+
+    private InetSubnetUDPReceiverThread udpReceiverThread;
+    private InetSubnetTCPReceiverThread tcpReceiverThread;
+    private InetSubnetTCPAcceptorThread tcpAcceptorThread;
+
+    private boolean tcpAcceptorEnabled = false;
+
     /**
      * InetSubnetの初期化を行う。
+     *
      * @param networkInterface ネットワークインタフェースの指定
      * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
@@ -49,27 +53,32 @@ public class InetSubnet implements Subnet {
      * @throws SubnetException 生成に失敗した場合
      */
     protected void initialize(NetworkInterface networkInterface, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "initialize", new Object[]{networkInterface, multicastAddress, portNumber});
-        
+        LOGGER.entering(CLASS_NAME, "initialize", new Object[]{networkInterface, loopbackAddress, multicastAddress, portNumber});
+
         if (!isValidAddress(loopbackAddress)) {
             throw new SubnetException("invalid loopback address: " + localAddress);
         }
-        
+
         if (!isValidAddress(multicastAddress)) {
             throw new SubnetException("invalid multicast address: " + multicastAddress);
         }
-        
+
         this.localAddress = null;
         this.networkInterface = networkInterface;
         this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
-        
+
+        createUDPNetwork();
+        createTCPReceiver();
+        createTCPAcceptor();
+
         LOGGER.exiting(CLASS_NAME, "initialize");
     }
-    
+
     /**
      * InetSubnetの初期化を行う。
+     *
      * @param localAddress ローカルアドレスの指定
      * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
@@ -77,30 +86,35 @@ public class InetSubnet implements Subnet {
      * @throws SubnetException 生成に失敗した場合
      */
     protected void initialize(InetAddress localAddress, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "initialize", new Object[]{localAddress, multicastAddress, portNumber});
+        LOGGER.entering(CLASS_NAME, "initialize", new Object[]{localAddress, loopbackAddress, multicastAddress, portNumber});
+        
         if (!isValidAddress(localAddress)) {
             throw new SubnetException("invalid local address: " + localAddress);
         }
-        
+
         if (!isValidAddress(loopbackAddress)) {
             throw new SubnetException("invalid loopback address: " + localAddress);
         }
-                
+
         if (!isValidAddress(multicastAddress)) {
             throw new SubnetException("invalid multicast address: " + multicastAddress);
         }
-        
+
         try {
             this.networkInterface = NetworkInterface.getByInetAddress(localAddress);
         } catch (SocketException ex) {
             throw new SubnetException("catched exception", ex);
         }
-        
+
         this.localAddress = localAddress;
         this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
-        
+
+        createUDPNetwork();
+        createTCPReceiver();
+        createTCPAcceptor();
+
         LOGGER.exiting(CLASS_NAME, "initialize");
     }
 
@@ -114,11 +128,11 @@ public class InetSubnet implements Subnet {
      */
     protected void initialize(InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{multicastAddress, portNumber});
-        
+
         if (!isValidAddress(loopbackAddress)) {
             throw new SubnetException("invalid loopback address: " + localAddress);
         }
-        
+
         if (!isValidAddress(multicastAddress)) {
             throw new SubnetException("invalid multicast address: " + multicastAddress);
         }
@@ -128,192 +142,198 @@ public class InetSubnet implements Subnet {
         this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
-        
+
+        createUDPNetwork();
+        createTCPReceiver();
+        createTCPAcceptor();
+
         LOGGER.exiting(CLASS_NAME, "initialize");
     }
 
     private void createUDPNetwork() {
         LOGGER.entering(CLASS_NAME, "createUDPNetwork", new Object[]{multicastAddress, portNumber});
-        
+
         if (localAddress != null) {
-            udpNetwork = new UDPNetwork(this, localAddress, multicastAddress, portNumber);
+            udpNetwork = new UDPNetwork(localAddress, multicastAddress, portNumber);
         } else if (networkInterface != null) {
-            udpNetwork = new UDPNetwork(this, networkInterface, multicastAddress, portNumber);
+            udpNetwork = new UDPNetwork(networkInterface, multicastAddress, portNumber);
         } else {
-            udpNetwork = new UDPNetwork(this, multicastAddress, portNumber);
+            udpNetwork = new UDPNetwork(multicastAddress, portNumber);
         }
-        
+
         LOGGER.exiting(CLASS_NAME, "createUDPNetwork");
     }
 
-    private void createTCPNetwork() throws NetworkException {
+    private void createTCPReceiver() {
         LOGGER.entering(CLASS_NAME, "createTCPNetwork", new Object[]{multicastAddress, portNumber});
-        
-        if (localAddress != null) {
-            tcpNetwork = new TCPNetwork(this, localAddress, portNumber);
-        } else {
-            tcpNetwork = new TCPNetwork(this, portNumber);
-        }
-        
+
+        tcpReceiver = new TCPReceiver();
+
         LOGGER.exiting(CLASS_NAME, "createTCPNetwork");
+    }
+
+    private void createTCPAcceptor() {
+        LOGGER.entering(CLASS_NAME, "createTCPAcceptor", new Object[]{multicastAddress, portNumber});
+
+        if (localAddress != null) {
+            tcpAcceptor = new TCPAcceptor(localAddress, portNumber);
+        } else {
+            tcpAcceptor = new TCPAcceptor(portNumber);
+        }
+
+        LOGGER.exiting(CLASS_NAME, "createTCPAcceptor");
     }
 
     private UDPNetwork getUDPNetwork() {
         return udpNetwork;
     }
-    
-    private TCPNetwork getTCPNetwork() {
-        return tcpNetwork;
+
+    private TCPReceiver getTCPReceiver() {
+        return tcpReceiver;
     }
-    
+
+    private TCPAcceptor getTCPAcceptor() {
+        return tcpAcceptor;
+    }
+
     /**
      * TCPを有効にする。実行中に呼び出した場合には設定は変更されずfalseを返す。
+     *
      * @return 設定の変更を成功した場合にはfalse、それ以外の場合にはtrue
      */
-    public synchronized boolean enableTCP() {
+    public synchronized boolean enableTCPAcceptor() {
         if (isWorking()) {
             return false;
         }
-        
-        tcpEnabled = true;
-        
+
+        tcpAcceptorEnabled = true;
+
         return true;
     }
-    
+
     /**
      * TCPを無効にする。実行中に呼び出した場合には設定は変更されずfalseを返す。
+     *
      * @return 設定の変更を成功した場合にはfalse、それ以外の場合にはtrue
      */
-    public synchronized boolean disableTCP() {
+    public synchronized boolean disableTCPAcceptor() {
         if (isWorking()) {
             return false;
         }
-        
-        tcpEnabled = false;
-        
+
+        tcpAcceptorEnabled = false;
+
         return true;
     }
-    
+
     /**
      * TCPが有効であるかを返す。
+     *
      * @return TCPが有効であればtrue、無効であればfalse
      */
-    public boolean isTCPEnabled() {
-        return tcpEnabled;
+    public synchronized boolean isTCPAcceptorEnabled() {
+        return tcpAcceptorEnabled;
     }
-    
+
     /**
      * 設定されたネットワークインタフェースを返す。
+     *
      * @return 設定されたネットワークインタフェース
      */
     public NetworkInterface getNetworkInterface() {
         return networkInterface;
     }
-    
+
     /**
      * このInetSubnetが実行中であるか返す。
+     *
      * @return 実行中であればtrue、そうでなければfalse
      */
     public synchronized boolean isWorking() {
         UDPNetwork network = getUDPNetwork();
-        
+
         if (network == null) {
             return false;
         }
-        
+
         return network.isWorking();
     }
-    
-    /**
-     * このInetSubnetを停止する。
-     * @return 実行中から停止に変更した場合はtrue、そうでなければfalse
-     */
-    public synchronized boolean stopService() {
-        LOGGER.entering(CLASS_NAME, "stopService");
-        
-        if (!isWorking()) {
-            LOGGER.exiting(CLASS_NAME, "stopService", false);
-            return false;
-        }
-        
-        stopReceiver();
-        
-        if (tcpEnabled) {
-            getTCPNetwork().stopService();
+
+    private synchronized void startThreads() {
+        LOGGER.entering(CLASS_NAME, "startReceiver");
+
+        receiveQueue = new SynchronousQueue<Frame>();
+
+        udpReceiverThread = new InetSubnetUDPReceiverThread(this, getUDPNetwork(), receiveQueue);
+        udpReceiverThread.start();
+
+        tcpReceiverThread = new InetSubnetTCPReceiverThread(this, getTCPReceiver(), receiveQueue);
+        tcpReceiverThread.start();
+
+        if (tcpAcceptorEnabled) {
+            tcpAcceptorThread = new InetSubnetTCPAcceptorThread(this, tcpAcceptor);
+            tcpAcceptorThread.start();
         }
 
-        boolean result = getUDPNetwork().stopService();
-        
-        LOGGER.exiting(CLASS_NAME, "stopService", result);
-        return result;
-    }
-    
-    private synchronized void startReceiver(SynchronousQueue<Frame> queue) {
-        LOGGER.entering(CLASS_NAME, "startReceiver", queue);
-        
-        udpReceiver = new InetSubnetUDPReceiver(getUDPNetwork(), queue);
-        new Thread(udpReceiver).start();
-
-        if (tcpEnabled) {
-            tcpReceiver = new InetSubnetTCPReceiver(getTCPNetwork(), queue);
-            new Thread(tcpReceiver).start();
-        }
-        
         LOGGER.exiting(CLASS_NAME, "startReceiver");
     }
-    
-    private synchronized void stopReceiver() {
+
+    private synchronized void stopThreads() {
         LOGGER.entering(CLASS_NAME, "stopReceiver");
-        
-        if (udpReceiver != null) {
-            udpReceiver.terminate();
-            udpReceiver = null;
+
+        if (udpReceiverThread != null) {
+            udpReceiverThread.terminate();
+            udpReceiverThread = null;
         }
-        
-        if (tcpReceiver != null) {
-            tcpReceiver.terminate();
-            tcpReceiver = null;
+
+        if (tcpReceiverThread != null) {
+            tcpReceiverThread.terminate();
+            tcpReceiverThread = null;
         }
-        
+
+        if (tcpAcceptorThread != null) {
+            tcpAcceptorThread.terminate();
+            tcpAcceptorThread = null;
+        }
+
         LOGGER.exiting(CLASS_NAME, "stopReceiver");
     }
-    
+
     /**
      * このInetSubnetを実行する。
+     *
      * @return 停止から実行中に変更した場合はtrue、そうでなければfalse
      * @throws SubnetException 実行に失敗した場合
      */
     public synchronized boolean startService() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "startService");
-        
+
         if (isWorking()) {
             LOGGER.exiting(CLASS_NAME, "startService", false);
             return false;
         }
 
         try {
-            createUDPNetwork();
             boolean result = getUDPNetwork().startService();
             if (result == false) {
                 LOGGER.exiting(CLASS_NAME, "startService", false);
                 return false;
             }
-            
-            if (tcpEnabled) {
-                createTCPNetwork();
-                result = getTCPNetwork().startService();
-                if (result == false) {
-                    getUDPNetwork().stopService();
-                    LOGGER.exiting(CLASS_NAME, "startService", false);
-                    return false;
-                }
+
+            result = getTCPReceiver().startService();
+            if (result == false) {
+                getUDPNetwork().stopService();
+                LOGGER.exiting(CLASS_NAME, "startService", false);
+                return false;
             }
 
-            
-            receiveQueue = new SynchronousQueue<Frame>();
-            startReceiver(receiveQueue);
+            if (tcpAcceptorEnabled) {
+                result = getTCPAcceptor().startService();
+            }
 
-            LOGGER.exiting(CLASS_NAME, "startService", true);
+            startThreads();
+
+            LOGGER.exiting(CLASS_NAME, "startService", result);
             return true;
         } catch (NetworkException ex) {
             SubnetException exception = new SubnetException("catched exception", ex);
@@ -321,70 +341,106 @@ public class InetSubnet implements Subnet {
             throw exception;
         }
     }
-    
+
     /**
-     * 新たにTCP接続を確立し、フレームに設定を行う。
-     * @param frame TCP接続を利用するフレーム
-     * @throws SubnetException すでに接続が存在する、あるいは接続の確立に失敗した場合
+     * このInetSubnetを停止する。
+     *
+     * @return 実行中から停止に変更した場合はtrue、そうでなければfalse
      */
-    public void createTCPConnection(Frame frame) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "createTCPConnection", frame);
-        
+    public synchronized boolean stopService() {
+        LOGGER.entering(CLASS_NAME, "stopService");
+
+        boolean result = true;
+
+        if (!isWorking()) {
+            LOGGER.exiting(CLASS_NAME, "stopService", false);
+            return false;
+        }
+
+        stopThreads();
+
+        if (tcpAcceptorEnabled) {
+            result &= getTCPAcceptor().stopService();
+        }
+
+        result &= getTCPReceiver().stopService();
+        result &= getUDPNetwork().stopService();
+
+        LOGGER.exiting(CLASS_NAME, "stopService", result);
+        return result;
+    }
+
+    /**
+     * 新たにTCP接続を確立しTCPConnectionを生成する。
+     *
+     * @param remoteNode TCP接続先のノード
+     * @param timeout 接続確立までのタイムアウトを指定
+     * @return 新たに作成されたTCPConnection
+     * @throws SubnetException 接続の確立に失敗した場合
+     */
+    public TCPConnection newTCPConnection(Node remoteNode, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "newTCPConnection", new Object[]{remoteNode, timeout});
+
+        TCPConnection connection;
+
         try {
-            Connection connection = frame.getConnection();
-            
-            if (connection != null) {
-                SubnetException exception = new SubnetException("connection exists: " + frame.getConnection());
-                LOGGER.throwing(CLASS_NAME, "createTCPConnection", exception);
-                throw exception;
-            }
-            
-            if (getGroupNode().equals(frame.getReceiver())) {
-                SubnetException exception = new SubnetException("invalid destination: " + frame.getReceiver());
-                LOGGER.throwing(CLASS_NAME, "createTCPConnection", exception);
-                throw exception;
-            }
-            
-            getTCPNetwork().createConnection(frame);
+            connection = new TCPConnection(getLocalNode().getNodeInfo(), remoteNode.getNodeInfo(), DEFAULT_PORT_NUMBER, timeout);
         } catch (NetworkException ex) {
             SubnetException exception = new SubnetException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "createTCPConnection", exception);
+            LOGGER.throwing(CLASS_NAME, "newTCPConnection", exception);
             throw exception;
         }
+
+        LOGGER.exiting(CLASS_NAME, "newTCPConnection", connection);
+        return connection;
+    }
+
+    /**
+     * 新たにTCP接続を確立しTCPConnectionを生成する。
+     *
+     * @param remoteNode TCP接続先のノード
+     * @return 新たに作成されたTCPConnection
+     * @throws SubnetException 接続の確立に失敗した場合
+     */
+    public TCPConnection newTCPConnection(Node remoteNode) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "newTCPConnection", remoteNode);
+        
+        TCPConnection connection = newTCPConnection(remoteNode, 0);
+
+        LOGGER.exiting(CLASS_NAME, "newTCPConnection", connection);
+        return connection;
+    }
+
+    /**
+     * TCPConnectionの登録を行う。 ここで登録されたTCPConnectionからの受信処理は自動的に処理されるようになる。
+     *
+     * @param connection 登録するTCPConnection
+     */
+    public void registerTCPConnection(TCPConnection connection) {
+        LOGGER.entering(CLASS_NAME, "registerTCPConnection", connection);
+
+        getTCPReceiver().addConnection((TCPConnection) connection);
 
         LOGGER.exiting(CLASS_NAME, "createTCPConnection");
     }
-    
+
     /**
-     * TCP接続を解放し、フレームに設定を行う。
-     * @param frame TCP接続を開放するフレーム
-     * @throws SubnetException 接続が存在しない、あるいは接続の開放に失敗した場合
+     * TCPConnectionの登録の抹消を行う。
+     *
+     * @param connection 登録を抹消するTCPConnection
      */
-    public void deleteTCPConnection(Frame frame) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "deleteTCPConnection", frame);
-        
-        try {
-            Connection connection = frame.getConnection();
+    public void unregisterTCPConnection(TCPConnection connection) {
+        LOGGER.entering(CLASS_NAME, "unregisterTCPConnection", connection);
 
-            if (connection == null) {
-                SubnetException exception = new SubnetException("no connection: " + frame);
-                LOGGER.throwing(CLASS_NAME, "deleteTCPConnection", exception);
-                throw exception;
-            }
+        getTCPReceiver().removeConnection((TCPConnection) connection);
 
-            getTCPNetwork().deleteConnection(frame);
-        } catch (NetworkException ex) {
-            SubnetException exception = new SubnetException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "deleteTCPConnection", exception);
-            throw exception;
-        }
-
-        LOGGER.exiting(CLASS_NAME, "deleteTCPConnection");
+        LOGGER.exiting(CLASS_NAME, "unregisterTCPConnection");
     }
-    
+
     /**
      * このInetSubnetのサブネットにフレームを転送する。
      * フレームの送信ノードや受信ノードがこのInetSubnetに含まれない場合には例外が発生する。
+     *
      * @param frame 送信するフレーム
      * @return 常にtrue
      * @throws SubnetException 送信に失敗した場合
@@ -392,7 +448,7 @@ public class InetSubnet implements Subnet {
     @Override
     public boolean send(Frame frame) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "send", frame);
-        
+
         if (!isWorking()) {
             SubnetException exception = new SubnetException("not enabled");
             LOGGER.throwing(CLASS_NAME, "send", exception);
@@ -411,15 +467,27 @@ public class InetSubnet implements Subnet {
             throw exception;
         }
 
+        Connection connection = frame.getConnection();
+        NodeInfo remoteNodeInfo = frame.getReceiver().getNodeInfo();
+
         try {
-            Connection connection = frame.getConnection();
-            
-            if (connection == null) {
-                getUDPNetwork().send(frame);
+            if (connection != null) {
+                if (!(connection instanceof TCPConnection)) {
+                    SubnetException exception = new SubnetException("invalid connection: " + connection);
+                    LOGGER.throwing(CLASS_NAME, "send", exception);
+                    throw exception;
+                }
+
+                connection.send(frame.getCommonFrame());
             } else {
-                getTCPNetwork().send(frame);
+                if (!(remoteNodeInfo instanceof InetNodeInfo)) {
+                    SubnetException exception = new SubnetException("invalid remote node: " + remoteNodeInfo);
+                    LOGGER.throwing(CLASS_NAME, "send", exception);
+                    throw exception;
+                }
+                getUDPNetwork().send((InetNodeInfo) remoteNodeInfo, frame.getCommonFrame());
             }
-            
+
             LOGGER.exiting(CLASS_NAME, "send", true);
             return true;
         } catch (NetworkException ex) {
@@ -428,23 +496,23 @@ public class InetSubnet implements Subnet {
             throw exception;
         }
     }
-    
+
     /**
-     * このInetSubnetのサブネットからフレームを受信する。
-     * 少なくとも1つのフレームの受信を行うまで待機する。
+     * このInetSubnetのサブネットからフレームを受信する。 少なくとも1つのフレームの受信を行うまで待機する。
+     *
      * @return 受信したFrame
      * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
      */
     @Override
-    public Frame receive()  throws SubnetException {
+    public Frame receive() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "receive");
-        
+
         if (!isWorking()) {
             SubnetException exception = new SubnetException("not enabled");
             LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
         }
-        
+
         try {
             Frame frame = receiveQueue.take();
             LOGGER.exiting(CLASS_NAME, "receive", frame);
@@ -455,105 +523,31 @@ public class InetSubnet implements Subnet {
             throw exception;
         }
     }
-    
-    private SynchronousQueue<Frame> receiveQueue = null;
-    
-    private class InetSubnetUDPReceiver implements Runnable {
-        private UDPNetwork network;
-        private SynchronousQueue<Frame> queue;
-        private boolean terminated = false;
-        
-        public InetSubnetUDPReceiver(UDPNetwork network, SynchronousQueue<Frame> queue) {
-            this.network = network;
-            this.queue = queue;
-        }
-        
-        public void terminate() {
-            terminated = true;
-        }
-        
-        @Override
-        public void run() {
-            while (!terminated) {
-                try {
-                    Frame frame = network.receive();
-                    queue.put(frame);
-                } catch (InterruptedException ex) {
-                    if (terminated) {
-                        LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
-                    } else {
-                        LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
-                    }
-                } catch (NetworkException ex) {
-                    if (terminated) {
-                        LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
-                    } else {
-                        LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
-                    }
-                }
-            }
-        }
-    }
 
-    private class InetSubnetTCPReceiver implements Runnable {
-        private TCPNetwork network;
-        private SynchronousQueue<Frame> queue;
-        private boolean terminated = false;
-        
-        public InetSubnetTCPReceiver(TCPNetwork network, SynchronousQueue<Frame> queue) {
-            this.network = network;
-            this.queue = queue;
-        }
-        
-        public void terminate() {
-            terminated = true;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (!terminated) {
-                    Frame frame = network.receive();
-                    queue.put(frame);
-                }
-            } catch (InterruptedException ex) {
-                if (terminated) {
-                    LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetTCPReceiver.run", "interrupted", ex);
-                } else {
-                    LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetTCPReceiver.run", "interrupted", ex);
-                }
-            } catch (NetworkException ex) {
-                if (terminated) {
-                    LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetTCPReceiver.run", "catched exception", ex);
-                } else {
-                    LOGGER.logp(Level.SEVERE, CLASS_NAME, "InetSubnetTCPReceiver.run", "catched exception", ex);
-                }
-            }
-        }
-    }
-    
     /**
      * 指定されたアドレスが有効であるか返す。
+     *
      * @param address アドレスの指定
      * @return アドレスが有効であればtrue、それ以外の場合にはfalse
      */
     public boolean isValidAddress(InetAddress address) {
         return true;
     }
-    
-    
+
     /**
      * 指定されたノード情報が有効であるか返す。
+     *
      * @param nodeInfo ノード情報の指定
      * @return ノード情報が有効であればtrue、それ以外の場合にはfalse
      */
     public boolean isValidNodeInfo(InetNodeInfo nodeInfo) {
         return isValidAddress(nodeInfo.getAddress());
     }
-    
+
     /**
      * リモートノードを表すNodeを生成する。
-     * @param addr リモートノードのIPv4アドレス
+     *
+     * @param addr リモートノードのIPアドレス
      * @return リモートノードのNode
      * @throws SubnetException 無効なアドレスが指定された場合
      */
@@ -564,9 +558,10 @@ public class InetSubnet implements Subnet {
             throw new SubnetException("invalid address: " + addr);
         }
     }
-    
+
     /**
      * リモートノードを表すNodeを生成する。
+     *
      * @param nodeInfo リモートノードの情報
      * @return リモートノードのNode
      * @throws SubnetException 無効なノード情報が指定された場合
@@ -574,10 +569,10 @@ public class InetSubnet implements Subnet {
     @Override
     public Node getRemoteNode(NodeInfo nodeInfo) throws SubnetException {
         if (nodeInfo instanceof InetNodeInfo) {
-            InetNodeInfo inetNodeInfo = (InetNodeInfo)nodeInfo;
-            
+            InetNodeInfo inetNodeInfo = (InetNodeInfo) nodeInfo;
+
             if (isValidNodeInfo(inetNodeInfo)) {
-                return new InetNode(this, (InetNodeInfo)nodeInfo);
+                return new InetNode(this, (InetNodeInfo) nodeInfo);
             } else {
                 throw new SubnetException("invalid nodeInfo: " + nodeInfo);
             }
@@ -593,9 +588,10 @@ public class InetSubnet implements Subnet {
             return loopbackAddress;
         }
     }
-    
+
     /**
      * ローカルノードを表すNodeを返す。
+     *
      * @return ローカルノードのNode
      */
     @Override
@@ -603,13 +599,13 @@ public class InetSubnet implements Subnet {
         if (localNode == null) {
             localNode = new InetNode(this, getLocalAddress());
         }
-        
+
         return localNode;
     }
-    
+
     /**
-     * グループを表すNodeを返す。
-     * このノード宛にフレームを転送するとマルチキャスト転送になる。
+     * グループを表すNodeを返す。 このノード宛にフレームを転送するとマルチキャスト転送になる。
+     *
      * @return グループのNode
      */
     @Override
@@ -617,7 +613,7 @@ public class InetSubnet implements Subnet {
         if (groupNode == null) {
             groupNode = new InetNode(this, multicastAddress);
         }
-        
+
         return groupNode;
     }
 }

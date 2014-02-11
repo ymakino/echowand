@@ -17,6 +17,6 @@ public class SubnetExceptionTest {
         
         Exception internal = new Exception();
         SubnetException e2 = new SubnetException("message", internal);
-        assertEquals(internal, e2.getInternalException());
+        assertEquals(internal, e2.getCause());
     }
 }

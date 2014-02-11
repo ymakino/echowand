@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * フレームの送受信を行うサンプルプログラム
  * @author Yoshiki Makino
  */
-public class TCPSample0 {
+public class TCPConnectionSample0 {
     /*
      * リモートノードのIPアドレス
      */
@@ -90,8 +90,12 @@ public class TCPSample0 {
         t.start();
     }
     
-    public static void main(String[] args) {
-        LoggerConfig.changeLogLevelAll(TCPConnection.class.getName());
+    public static void main(String[] args) throws NetworkException {
+        
+        //LoggerConfig.changeLogLevelAll(TCPConnectionPool.class.getName());
+        //LoggerConfig.changeLogLevelAll(TCPConnection.class.getName());
+        //LoggerConfig.changeLogLevelAll(TCPNetwork.class.getName());
+        //LoggerConfig.changeLogLevelAll(TCPReceiveTask.class.getName());
         
         //3秒後にプログラムが終了するように設定
         // setTimeout(3000);
@@ -100,62 +104,45 @@ public class TCPSample0 {
 
             // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
             Inet4Subnet subnet = new Inet4Subnet();
-            
-            subnet.startService();
 
             //========================= Get =========================
             // メッセージの宛先のNodeを取得
-            Node remoteNode1 = subnet.getRemoteNode(Inet4Address.getByName(peerAddress));
+            Node remoteNode = subnet.getRemoteNode(Inet4Address.getByName(peerAddress));
+            
+            // Connectionの生成
+            Connection connection1 = subnet.newTCPConnection(remoteNode);
 
-            // Getフレームを作成
-            TCPConnection connection1 = subnet.newTCPConnection(remoteNode1);
-            Frame frame1 = new Frame(subnet.getLocalNode(), remoteNode1, createCommonFrameGet(), connection1);
-            subnet.registerTCPConnection(connection1);
+            // Get共通フレームを作成
+            CommonFrame commonFrame1 = createCommonFrameGet();
             
-            // フレームを送信
-            System.out.println("Sending:  " + frame1);
-            subnet.send(frame1);
+            // 共通フレームを送信
+            System.out.println("Sending to " + connection1 + ":  " + commonFrame1);
+            connection1.send(commonFrame1);
             
-            // フレームを受信
+            // 共通フレームを受信
             // 受信するフレームが存在しない場合には、ここでタイムアウトする
-            System.out.println("Received: " + subnet.receive());
+            System.out.println("Received from " + connection1 + ": " + connection1.receive());
             System.out.println();
-            subnet.unregisterTCPConnection(connection1);
+            
+            connection1.close();
             
             
             //========================= SetGet =========================
             // メッセージの宛先のNodeを取得
-            Node remoteNode2 = subnet.getRemoteNode(Inet4Address.getByName(peerAddress));
+            Connection connection2 = subnet.newTCPConnection(remoteNode);
             
-            // SetGetフレームを作成
-            TCPConnection connection2 = subnet.newTCPConnection(remoteNode2);
-            Frame frame2 = new Frame(subnet.getLocalNode(), remoteNode2, createCommonFrameSetGet(), connection2);
-            subnet.registerTCPConnection(connection2);
+            // SetGet共通フレームを作成
+            CommonFrame commonFrame2 = createCommonFrameSetGet();
             
-            // フレームを送信
-            System.out.println("Sending:  " + frame2);
-            subnet.send(frame2);
+            // 共通フレームを送信
+            System.out.println("Sending to " + connection2 + ":  " + commonFrame2);
+            connection2.send(commonFrame2);
             
-            // フレームを受信
+            // 共通フレームを受信
             // 受信するフレームが存在しない場合には、ここでタイムアウトする
-            Frame rframe2 = subnet.receive();
-            System.out.println("Received: " + rframe2);
+            System.out.println("Received from " + connection2 + ": " + connection2.receive());
             System.out.println();
-            subnet.unregisterTCPConnection(connection2);
-            
-            
-            //========================= INFC =========================
-            // INFCフレームを作成、宛先はグループにする。
-            Frame frame3 = new Frame(subnet.getLocalNode(), subnet.getGroupNode(), createCommonFrameINFC());
-            
-            // フレームを送信
-            System.out.println("Sending:  " + frame3);
-            subnet.send(frame3);
-            
-            for (;;) {
-                // フレームを受信
-                System.out.println("Received: " + subnet.receive());
-            }
+            connection2.close();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SubnetException e) {

@@ -127,6 +127,7 @@ public class RemoteObjectTest {
             this.doLoop = doLoop;
         }
         
+        @Override
         public void run() {
             try {
                 do {

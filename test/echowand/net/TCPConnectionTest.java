@@ -85,6 +85,7 @@ public class TCPConnectionTest {
             }
         }
         
+        @Override
         public void run() {
             try {
                 socket = new Socket("localhost", port);
@@ -236,5 +237,24 @@ public class TCPConnectionTest {
 
         assertTrue(Arrays.equals(commonFrame1.toBytes(), commonFrame3.toBytes()));
         assertTrue(Arrays.equals(commonFrame2.toBytes(), commonFrame4.toBytes()));
+    }
+    
+    @Test
+    public void testCreateTCPConnection() throws SubnetException, NetworkException {
+        Inet4Subnet subnet = new Inet4Subnet();
+        subnet.enableTCPAcceptor();
+
+        try {
+            subnet.startService();
+
+            InetNodeInfo localNodeInfo = (InetNodeInfo) subnet.getLocalNode().getNodeInfo();
+            InetNodeInfo remoteNodeInfo = (InetNodeInfo) subnet.getLocalNode().getNodeInfo();
+            TCPConnection connection = new TCPConnection(localNodeInfo, remoteNodeInfo, 3610);
+
+            assertNotNull(connection);
+            assertEquals(remoteNodeInfo, connection.getRemoteNodeInfo());
+        } finally {
+            subnet.stopService();
+        }
     }
 }

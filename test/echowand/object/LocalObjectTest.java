@@ -226,7 +226,7 @@ public class LocalObjectTest {
         assertTrue(object.isGettable(EPC.x80));
         
         assertTrue(object.isSettable(EPC.xB0));
-        assertFalse(object.isSettable(EPC.x80));
+        assertTrue(object.isSettable(EPC.x80));
         
         assertTrue(object.isObservable(EPC.xB0));
         assertFalse(object.isObservable(EPC.xB1));

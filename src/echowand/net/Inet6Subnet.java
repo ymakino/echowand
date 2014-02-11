@@ -21,11 +21,6 @@ public class Inet6Subnet extends InetSubnet {
      */
     public static final String MULTICAST_ADDRESS = "ff02::1";
     
-    /**
-     * ECHONET Liteが利用するポート番号
-     */
-    public static final short  DEFAULT_PORT_NUMBER = 3610;
-    
     
     /**
      * Inet6Subnetを生成する。

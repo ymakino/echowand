@@ -7,18 +7,6 @@ package echowand.net;
 public interface TCPConnectionObserver {
     
     /**
-     * アクティブに外部への接続を開始した時の処理を行う。
-     * @param connection 新たに受け付けた接続
-     */
-    public void notifyConnected(TCPConnection connection);
-    
-    /**
-     * パッシブに新たに外部からの接続を受け付けた時の処理を行う。
-     * @param connection 新たに受け付けた接続
-     */
-    public void notifyAccepted(TCPConnection connection);
-    
-    /**
      * 新たに外部からフレームを受信した時の処理を行う。
      * @param connection フレームを受信したコネクション
      * @param commonFrame 受信したフレーム
