@@ -192,4 +192,33 @@ public class LocalObjectManagerTest {
             fail();
         }
     }
+    
+    @Test
+    public void testAddRaw() {
+        try {
+            LocalObjectManager manager = new LocalObjectManager();
+            assertEquals(0, manager.size());
+
+            LocalObject object1 = new LocalObject(new TemperatureSensorInfo());
+            object1.setInstanceCode((byte)0x7f);
+            manager.add(object1, true);
+            assertEquals(1, manager.size());
+            assertEquals(new EOJ("001101"), manager.getAtIndex(0).getEOJ());
+
+            LocalObject object2 = new LocalObject(new TemperatureSensorInfo());
+            object2.setInstanceCode((byte)0x7f);
+            manager.add(object2);
+            assertEquals(2, manager.size());
+            assertEquals(new EOJ("001102"), manager.getAtIndex(1).getEOJ());
+
+            LocalObject object3 = new LocalObject(new TemperatureSensorInfo());
+            object3.setInstanceCode((byte)0x7f);
+            manager.add(object3, false);
+            assertEquals(3, manager.size());
+            assertEquals(new EOJ("00117f"), manager.getAtIndex(2).getEOJ());
+        } catch (TooManyObjectsException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }

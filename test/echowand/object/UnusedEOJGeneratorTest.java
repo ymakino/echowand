@@ -50,4 +50,44 @@ public class UnusedEOJGeneratorTest {
         }
         instance.generate(ceoj1);
     }
+    
+    @Test
+    public void testAddUsed() throws TooManyObjectsException {
+        ClassEOJ ceoj1 = new ClassEOJ("0011");
+
+        UnusedEOJGenerator instance = new UnusedEOJGenerator();
+        
+        instance.addUsed(new EOJ("001101"));
+        instance.addUsed(new EOJ("001103"));
+        
+        EOJ eoj1 = instance.generate(ceoj1);
+        assertEquals(new EOJ("001102"), eoj1);
+        
+        EOJ eoj2 = instance.generate(ceoj1);
+        assertEquals(new EOJ("001104"), eoj2);
+    }
+    
+    @Test
+    public void testIsUsed() throws TooManyObjectsException {
+
+        UnusedEOJGenerator instance = new UnusedEOJGenerator();
+        instance.addUsed(new EOJ("001102"));
+        
+        ClassEOJ ceoj = new ClassEOJ("0011");
+        EOJ eoj1 = instance.generate(ceoj);
+        EOJ eoj2 = instance.generate(ceoj);
+        
+        instance.addUsed(new EOJ("00117f"));
+        
+        for (byte i=0x01; i<0x7f; i++) {
+            switch (i) {
+            case 0x01: case 0x02: case 0x03: case 0x7f:
+                assertTrue(instance.isUsed(ceoj.getEOJWithInstanceCode(i)));
+                break;
+            default:
+                assertFalse(instance.isUsed(ceoj.getEOJWithInstanceCode(i)));
+                break;
+            }
+        }
+    }
 }
