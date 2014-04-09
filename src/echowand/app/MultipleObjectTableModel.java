@@ -270,7 +270,7 @@ public class MultipleObjectTableModel extends AbstractObjectTableModel{
             return;
         }
         
-        EPC epc = cachedObject.getEPC(rowIndex);
+        EPC epc = index2epc(rowIndex);
         
         if (epc.isInvalid()) {
             return;
