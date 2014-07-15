@@ -1,7 +1,5 @@
 package echowand.common;
 
-import echowand.common.EPC;
-import echowand.common.PropertyMap;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -101,6 +99,54 @@ public class PropertyMapTest {
     }
     
     @Test
+    public void testCreationInvalidArraySize() {
+        byte [] dataEmpty = new byte[0];
+        
+        PropertyMap mapEmpty = new PropertyMap(dataEmpty);
+        assertEquals(0, mapEmpty.count());
+        
+        byte[] data = new byte[]{
+            0x10,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+        
+        PropertyMap map = new PropertyMap(data);
+        assertEquals(16, map.count());
+    }
+    
+    @Test
+    public void testCreationInvalidLessThanSize() {
+        byte[] data = new byte[]{ (byte)0x02, (byte)0x80 };
+        
+        PropertyMap map = new PropertyMap(data);
+        assertEquals(1, map.count());
+        for (int i=0x80; i<=0xff; i++) {
+            EPC epc = EPC.fromByte((byte)i);
+            if (epc == EPC.x80) {
+                assertTrue(map.isSet(epc));
+            } else {
+                assertFalse(map.isSet(epc));
+            }
+        }
+    }
+    
+    @Test
+    public void testCreationMoreThanSizeData() {
+        byte[] data = new byte[]{ (byte)0x01, (byte)0x80, (byte)0x81 };
+        
+        PropertyMap map = new PropertyMap(data);
+        assertEquals(1, map.count());
+        for (int i=0x80; i<=0xff; i++) {
+            EPC epc = EPC.fromByte((byte)i);
+            if (epc == EPC.x80) {
+                assertTrue(map.isSet(epc));
+            } else {
+                assertFalse(map.isSet(epc));
+            }
+        }
+    }
+    
+    @Test
     public void testSupportInvalid17MapAllZero() {
         byte[] data1 = new byte[]{
             0x00,
@@ -135,5 +181,56 @@ public class PropertyMapTest {
         for (int i=0x90; i<=0xff; i++) {
             assertFalse(map1.isSet(EPC.fromByte((byte)i)));
         }
+    }
+    
+    @Test
+    public void testInvalidSize17Map() {
+        byte[] data1 = new byte[]{
+            0x00,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+        byte[] data2 = new byte[]{
+            0x10,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+        byte[] data3 = new byte[]{
+            (byte)0xff,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+        
+        PropertyMap map1 = new PropertyMap(data1);
+        PropertyMap map2 = new PropertyMap(data2);
+        PropertyMap map3 = new PropertyMap(data3);
+        
+        assertEquals(map1, map2);
+        assertEquals(map1, map3);
+        assertEquals(map2, map3);
+    }
+    
+    @Test
+    public void testEquals() {
+        byte[] data1 = new byte[]{
+            0x00,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+        byte[] data2 = new byte[]{
+            0x10,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+            0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+        byte[] data3 = new byte[]{ (byte)0x01, (byte)0x80 };
+        
+        PropertyMap map1 = new PropertyMap(data1);
+        PropertyMap map2 = new PropertyMap(data2);
+        PropertyMap map3 = new PropertyMap(data3);
+        
+        assertTrue(map1.equals(map1));
+        assertTrue(map2.equals(map2));
+        assertTrue(map3.equals(map3));
+        
+        assertTrue(map1.equals(map2));
+        assertTrue(map2.equals(map1));
+        
+        assertFalse(map1.equals(map3));
+        assertFalse(map3.equals(map1));
     }
 }
