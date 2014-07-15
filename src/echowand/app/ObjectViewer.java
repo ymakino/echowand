@@ -75,6 +75,8 @@ public class ObjectViewer implements Runnable {
     private RequestDispatcher requestDispatcher;
     private MainLoop loop;
     
+    private boolean dummyDeviceEnabled = false;
+    
     private int width;
     private int height;
     
@@ -113,6 +115,10 @@ public class ObjectViewer implements Runnable {
             frame.setMessage(ex.getCause().getMessage());
         }
         frame.setVisible(true);
+    }
+    
+    public void enableDummyDevice() {
+        dummyDeviceEnabled = true;
     }
 
     private void initialize() {
@@ -248,7 +254,9 @@ public class ObjectViewer implements Runnable {
     public void run() {
         initialize();
         
-        createDummyDevices();
+        if (dummyDeviceEnabled) {
+            createDummyDevices();
+        }
         
         Thread loopThread = new Thread(loop);
         loopThread.setDaemon(true);
