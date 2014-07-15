@@ -403,7 +403,6 @@ public class RemoteObject implements EchonetObject {
 
     private PropertyMap getPropertyMap(EPC epc) throws EchonetObjectException {
         return new PropertyMap(getData(epc).toBytes());
-
     }
     
     /**
