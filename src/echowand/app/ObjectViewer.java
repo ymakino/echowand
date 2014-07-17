@@ -7,9 +7,13 @@ import echowand.info.NodeProfileInfo;
 import echowand.info.PropertyConstraintHumidity;
 import echowand.info.PropertyConstraintTemperature;
 import echowand.info.TemperatureSensorInfo;
+import echowand.logic.AnnounceTransactionConfig;
 import echowand.logic.MainLoop;
 import echowand.logic.RequestDispatcher;
+import echowand.logic.SetGetTransactionConfig;
 import echowand.logic.TooManyObjectsException;
+import echowand.logic.Transaction;
+import echowand.logic.TransactionConfig;
 import echowand.logic.TransactionManager;
 import echowand.net.Inet4Subnet;
 import echowand.net.Inet6Subnet;
@@ -75,6 +79,8 @@ public class ObjectViewer implements Runnable {
     private RequestDispatcher requestDispatcher;
     private MainLoop loop;
     
+    private boolean dummyDeviceEnabled = false;
+    
     private int width;
     private int height;
     
@@ -113,6 +119,10 @@ public class ObjectViewer implements Runnable {
             frame.setMessage(ex.getCause().getMessage());
         }
         frame.setVisible(true);
+    }
+    
+    public void enableDummyDevice() {
+        dummyDeviceEnabled = true;
     }
 
     private void initialize() {
@@ -248,7 +258,9 @@ public class ObjectViewer implements Runnable {
     public void run() {
         initialize();
         
-        createDummyDevices();
+        if (dummyDeviceEnabled) {
+            createDummyDevices();
+        }
         
         Thread loopThread = new Thread(loop);
         loopThread.setDaemon(true);
@@ -259,6 +271,17 @@ public class ObjectViewer implements Runnable {
     
     private static void usage() {
         System.out.println("Usage: ObjectViewer [--help] [-i interface] [-w width] [-h height]");
+    }
+    
+    public static NetworkInterface selectNetworkInterface() {
+        NetworkInterfaceSelectorFrame selector = new NetworkInterfaceSelectorFrame();
+        
+        selector.setSize(400, 300);
+        selector.setLocationRelativeTo(null);
+        selector.setVisible(true);
+        
+        selector.join();
+        return selector.getSelectedInterface();
     }
 
     public static void main(String[] args) {
@@ -349,13 +372,20 @@ public class ObjectViewer implements Runnable {
         
         try {
             Inet4Subnet subnet;
+            NetworkInterface nif;
+                
             if (interfaceName == null) {
-                subnet = new Inet4Subnet();
+                nif = selectNetworkInterface();
             } else {
-                NetworkInterface nif = NetworkInterface.getByName(interfaceName);
-                subnet = new Inet4Subnet(nif);
+                nif = NetworkInterface.getByName(interfaceName);
             }
-            subnet.startService();
+            
+            if (nif == null) {
+                subnet = Inet4Subnet.startSubnet();
+            } else {
+                subnet = Inet4Subnet.startSubnet(nif);
+            }
+            
             ObjectViewer viewer = new ObjectViewer(subnet, width, height);
             java.awt.EventQueue.invokeLater(viewer);
         } catch (SubnetException ex) {
