@@ -17,14 +17,12 @@ import java.util.logging.Logger;
 public class TransactionSample {
     public static void main(String[] args) {
         try {
-            final Inet4Subnet subnet = new Inet4Subnet();
+            final Inet4Subnet subnet = Inet4Subnet.startSubnet();
             final TransactionManager transactionManager = new TransactionManager(subnet);
 
             MainLoop mainLoop = new MainLoop();
             mainLoop.setSubnet(subnet);
             mainLoop.addListener(transactionManager);
-            
-            subnet.startService();
             
             Thread mainThread = new Thread(mainLoop);
             mainThread.setDaemon(true);

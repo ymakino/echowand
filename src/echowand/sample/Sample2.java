@@ -38,12 +38,10 @@ public class Sample2 {
 
         try {
             if (interfaceName == null) {
-                subnet = new Inet4Subnet();
-                subnet.startService();
+                subnet = Inet4Subnet.startSubnet();
             } else {
                 NetworkInterface networkInterface = NetworkInterface.getByName(args[0]);
-                subnet = new Inet4Subnet(networkInterface);
-                subnet.startService();
+                subnet = Inet4Subnet.startSubnet(networkInterface);
             }
         } catch (SubnetException ex) {
             ex.printStackTrace();

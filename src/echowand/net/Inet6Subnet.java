@@ -59,7 +59,7 @@ public class Inet6Subnet extends InetSubnet {
     }
     
     /**
-     * Inet4Subnetを生成する。
+     * Inet6Subnetを生成する。
      * networkInterfaceにより利用するネットワークインタフェースの指定を行う。
      * @param networkInterface 利用するネットワークインタフェース
      * @throws SubnetException 生成に失敗した場合
@@ -77,6 +77,40 @@ public class Inet6Subnet extends InetSubnet {
         } catch (UnknownHostException ex) {
             throw new SubnetException("catched exception", ex);
         }
+    }
+    
+    /**
+     * Inet6Subnetを生成し、サービスを開始する。
+     * @throws SubnetException 生成やサービス開始に失敗した場合
+     */
+    public static Inet6Subnet startSubnet() throws SubnetException {
+        Inet6Subnet subnet = new Inet6Subnet();
+        subnet.startService();
+        return subnet;
+    }
+    
+    /**
+     * Inet6Subnetを生成し、サービスを開始する。
+     * localAddressにより利用するネットワークインタフェースの指定を行う。
+     * @param localAddress 利用するネットワークインタフェースにつけられたアドレス
+     * @throws SubnetException 生成やサービス開始に失敗した場合
+     */
+    public static Inet6Subnet startSubnet(Inet6Address localAddress) throws SubnetException {
+        Inet6Subnet subnet = new Inet6Subnet(localAddress);
+        subnet.startService();
+        return subnet;
+    }
+    
+    /**
+     * Inet6Subnetを生成し、サービスを開始する。
+     * networkInterfaceにより利用するネットワークインタフェースの指定を行う。
+     * @param networkInterface 利用するネットワークインタフェース
+     * @throws SubnetException 生成やサービス開始に失敗した場合
+     */
+    public static Inet6Subnet startSubnet(NetworkInterface networkInterface) throws SubnetException {
+        Inet6Subnet subnet = new Inet6Subnet(networkInterface);
+        subnet.startService();
+        return subnet;
     }
 
     @Override

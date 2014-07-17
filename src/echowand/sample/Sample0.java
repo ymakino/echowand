@@ -93,9 +93,7 @@ public class Sample0 {
         try {
 
             // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
-            Inet4Subnet subnet = new Inet4Subnet();
-            
-            subnet.startService();
+            Inet4Subnet subnet = Inet4Subnet.startSubnet();
 
             //========================= Get =========================
             // メッセージの宛先のNodeを取得

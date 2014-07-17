@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class RemoteObjectGetSample {
     public static void main(String[] args) {
         try {
-            final Inet4Subnet subnet = new Inet4Subnet();
+            final Inet4Subnet subnet = Inet4Subnet.startSubnet();
             final TransactionManager transactionManager = new TransactionManager(subnet);
             RemoteObjectManager remoteManager = new RemoteObjectManager();
             LocalObjectManager localManager = new LocalObjectManager();
@@ -34,8 +34,6 @@ public class RemoteObjectGetSample {
             Thread mainThread = new Thread(mainLoop);
             mainThread.setDaemon(true);
             mainThread.start();
-            
-            subnet.startService();
 
             InstanceListRequestExecutor instanceListRequest = new InstanceListRequestExecutor(subnet, transactionManager, remoteManager);
             instanceListRequest.execute();

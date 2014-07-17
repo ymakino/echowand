@@ -133,11 +133,11 @@ public class Inet4SubnetTest {
         
         assertTrue(subnet.startService());
         assertFalse(subnet.startService());
-        assertTrue(subnet.isWorking());
+        assertTrue(subnet.isInService());
         
         assertTrue(subnet.stopService());
         assertFalse(subnet.stopService());
-        assertFalse(subnet.isWorking());
+        assertFalse(subnet.isInService());
     }
     
     @Test
@@ -183,7 +183,7 @@ public class Inet4SubnetTest {
 
         for (NetworkInterface nif : getInetInterfaces()) {
             subnet = newInetSubnet(nif);
-            assertFalse(subnet.isWorking());
+            assertFalse(subnet.isInService());
             assertEquals(subnet.getNetworkInterface(), nif);
             subnet.stopService();
         }
@@ -202,7 +202,7 @@ public class Inet4SubnetTest {
         for (InetAddress addr : getInetAddresses()) {
             NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
             subnet = newInetSubnet(addr);
-            assertFalse(subnet.isWorking());
+            assertFalse(subnet.isInService());
             assertEquals(nif, subnet.getNetworkInterface());
             subnet.stopService();
         }
@@ -216,17 +216,17 @@ public class Inet4SubnetTest {
 
     @Test
     public void testStartAndStopService() throws SubnetException {
-        assertFalse(subnet.isWorking());
+        assertFalse(subnet.isInService());
 
         assertTrue(subnet.startService());
-        assertTrue(subnet.isWorking());
+        assertTrue(subnet.isInService());
         assertFalse(subnet.startService());
-        assertTrue(subnet.isWorking());
+        assertTrue(subnet.isInService());
 
         assertTrue(subnet.stopService());
-        assertFalse(subnet.isWorking());
+        assertFalse(subnet.isInService());
         assertFalse(subnet.stopService());
-        assertFalse(subnet.isWorking());
+        assertFalse(subnet.isInService());
     }
     
     @Test(expected=SubnetException.class)

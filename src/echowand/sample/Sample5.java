@@ -66,8 +66,7 @@ public class Sample5 {
 
         try {
             // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
-            subnet = new Inet4Subnet();
-            subnet.startService();
+            subnet = Inet4Subnet.startSubnet();
         } catch (SubnetException e) {
             e.printStackTrace();
             return;

@@ -77,7 +77,7 @@ public class TCPAcceptor {
      * このTCPAcceptorが有効であるかどうか返す。
      * @return 有効であればtrue、そうでなければfalse
      */
-    public synchronized boolean isWorking() {
+    public synchronized boolean isInService() {
         return serverSocket != null;
     }
     

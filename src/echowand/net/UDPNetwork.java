@@ -28,7 +28,7 @@ public class UDPNetwork {
     private MulticastSocket multicastSocket;
     private int portNumber;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
-    private boolean working = false;
+    private boolean inService = false;
     
     /**
      * 利用するUDPネットワークおよびローカルアドレス、マルチキャストアドレスを指定してUDPNetworkを生成する。
@@ -76,7 +76,7 @@ public class UDPNetwork {
             multicastSocket = null;
         }
             
-        working = false;
+        inService = false;
         
         LOGGER.exiting(CLASS_NAME, "closeSocket");
     }
@@ -97,7 +97,7 @@ public class UDPNetwork {
             multicastSocket.setLoopbackMode(false);
             multicastSocket.setReuseAddress(false);
 
-            working = true;
+            inService = true;
         } catch (IOException ex) {
             closeSocket();
             NetworkException exception = new NetworkException("catched exception", ex);
@@ -137,8 +137,8 @@ public class UDPNetwork {
      * このUDPNetworkが有効であるかどうか返す。
      * @return 有効であればtrue、そうでなければfalse
      */
-    public synchronized boolean isWorking() {
-        return working;
+    public synchronized boolean isInService() {
+        return inService;
     }
     
     /**
@@ -149,9 +149,9 @@ public class UDPNetwork {
         LOGGER.entering(CLASS_NAME, "stopService");
         boolean result;
         
-        if (working) {
+        if (inService) {
             closeSocket();
-            result = !working;
+            result = !inService;
         } else {
             result = false;
         }
@@ -170,12 +170,12 @@ public class UDPNetwork {
         
         boolean result;
         
-        if (working) {
+        if (inService) {
             result = false;
         } else {
             closeSocket();
             openSocket();
-            result = working;
+            result = inService;
         }
         
         LOGGER.exiting(CLASS_NAME, "startService", result);
@@ -191,7 +191,7 @@ public class UDPNetwork {
     public synchronized void send(InetNodeInfo remoteNodeInfo, CommonFrame commonFrame) throws NetworkException {
         LOGGER.entering(CLASS_NAME, "send", new Object[]{remoteNodeInfo, commonFrame});
         
-        if (!isWorking()) {
+        if (!isInService()) {
             NetworkException exception = new NetworkException("not working");
             LOGGER.throwing(CLASS_NAME, "send", exception);
             throw exception;
@@ -242,7 +242,7 @@ public class UDPNetwork {
     public Pair<InetNodeInfo, CommonFrame> receive()  throws NetworkException {
         LOGGER.entering(CLASS_NAME, "receive");
         
-        if (!isWorking()) {
+        if (!isInService()) {
             throw new NetworkException("not working");
         }
         

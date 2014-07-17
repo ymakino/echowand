@@ -78,6 +78,40 @@ public class Inet4Subnet extends InetSubnet {
             throw new SubnetException("catched exception", ex);
         }
     }
+    
+    /**
+     * Inet4Subnetを生成し、サービスを開始する。
+     * @throws SubnetException 生成やサービス開始に失敗した場合
+     */
+    public static Inet4Subnet startSubnet() throws SubnetException {
+        Inet4Subnet subnet = new Inet4Subnet();
+        subnet.startService();
+        return subnet;
+    }
+    
+    /**
+     * Inet4Subnetを生成し、サービスを開始する。
+     * localAddressにより利用するネットワークインタフェースの指定を行う。
+     * @param localAddress 利用するネットワークインタフェースにつけられたアドレス
+     * @throws SubnetException 生成やサービス開始に失敗した場合
+     */
+    public static Inet4Subnet startSubnet(Inet4Address localAddress) throws SubnetException {
+        Inet4Subnet subnet = new Inet4Subnet(localAddress);
+        subnet.startService();
+        return subnet;
+    }
+    
+    /**
+     * Inet4Subnetを生成し、サービスを開始する。
+     * networkInterfaceにより利用するネットワークインタフェースの指定を行う。
+     * @param networkInterface 利用するネットワークインタフェース
+     * @throws SubnetException 生成やサービス開始に失敗した場合
+     */
+    public static Inet4Subnet startSubnet(NetworkInterface networkInterface) throws SubnetException {
+        Inet4Subnet subnet = new Inet4Subnet(networkInterface);
+        subnet.startService();
+        return subnet;
+    }
 
     @Override
     public boolean isValidAddress(InetAddress address) {

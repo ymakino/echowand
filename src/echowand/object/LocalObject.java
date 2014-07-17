@@ -319,28 +319,56 @@ public class LocalObject implements EchonetObject {
         return result;
     }
     
+    public synchronized int countDelegates() {
+        logger.entering(className, "countDelegates");
+        
+        int count = delegates.size();
+        
+        logger.entering(className, "countDelegates", count);
+        return count;
+    }
+    
     /**
      * Delegateを登録する。
      * @param delegate 登録するDelegate
+     * @return 登録が成功した場合にはtrue、そうでなければfalse
      */
-    public synchronized void addDelegate(LocalObjectDelegate delegate) {
+    public synchronized boolean addDelegate(LocalObjectDelegate delegate) {
         logger.entering(className, "addDelegate", delegate);
         
-        delegates.add(delegate);
+        boolean result;
         
-        logger.entering(className, "addDelegate");
+        if (delegates.contains(delegate)) {
+            result = false;
+        } else {
+            result = delegates.add(delegate);
+        }
+        
+        logger.entering(className, "addDelegate", result);
+        return result;
     }
     
     /**
      * Delegateの登録を抹消する。
      * @param delegate 抹消するDelegate
+     * @return 登録の抹消が成功した場合にはtrue、そうでなければfalse
      */
-    public synchronized void removeDelegate(LocalObjectDelegate delegate) {
+    public synchronized boolean removeDelegate(LocalObjectDelegate delegate) {
         logger.entering(className, "removeDelegate", delegate);
         
-        delegates.remove(delegate);
+        boolean result = delegates.remove(delegate);
         
-        logger.entering(className, "removeDelegate");
+        logger.entering(className, "removeDelegate", result);
+        return result;
+    }
+    
+    public synchronized LocalObjectDelegate getDelegate(int index) {
+        logger.entering(className, "getDelegate", index);
+        
+        LocalObjectDelegate delegate = delegates.get(index);
+        
+        logger.entering(className, "getDelegate", delegate);
+        return delegate;
     }
     
     @Override

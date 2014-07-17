@@ -16,7 +16,7 @@ public class TCPReceiver implements TCPConnectionObserver {
     
     private LinkedBlockingQueue<Pair<TCPConnection, CommonFrame>> receiveQueue;
     private HashMap<TCPConnection, TCPConnectionReceiverThread> receiverThreadMap;
-    private boolean working = false;
+    private boolean inService = false;
 
     public TCPReceiver() {
         receiveQueue = new LinkedBlockingQueue<Pair<TCPConnection, CommonFrame>>();
@@ -27,8 +27,8 @@ public class TCPReceiver implements TCPConnectionObserver {
      * このTCPReceiverが有効であるかどうか返す。
      * @return 有効であればtrue、そうでなければfalse
      */
-    public synchronized boolean isWorking() {
-        return working;
+    public synchronized boolean isInService() {
+        return inService;
     }
     
     /**
@@ -38,12 +38,12 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized boolean startService() {
         LOGGER.entering(CLASS_NAME, "startService");
         
-        if (working) {
+        if (inService) {
             LOGGER.exiting(CLASS_NAME, "startService", false);
             return false;
         }
 
-        working = true;
+        inService = true;
 
         LOGGER.exiting(CLASS_NAME, "startService", true);
         return true;
@@ -56,14 +56,14 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized boolean stopService() {
         LOGGER.entering(CLASS_NAME, "stopService");
         
-        if (!working) {
+        if (!inService) {
             LOGGER.entering(CLASS_NAME, "stopService", false);
             return false;
         }
         
         removeAllConnections();
 
-        working = false;
+        inService = false;
 
         LOGGER.entering(CLASS_NAME, "stopService", true);
         return true;
@@ -78,7 +78,7 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized boolean addConnection(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "addConnection", connection);
         
-        if (!isWorking()) {
+        if (!isInService()) {
             LOGGER.exiting(CLASS_NAME, "addConnection", false);
             return false;
         }
@@ -106,7 +106,7 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized boolean removeConnection(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "removeConnection", connection);
         
-        if (!isWorking()) {
+        if (!isInService()) {
             LOGGER.exiting(CLASS_NAME, "removeConnection", false);
             return false;
         }
@@ -162,7 +162,7 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized void notifySent(TCPConnection connection, CommonFrame commonFrame) {
         LOGGER.entering(CLASS_NAME, "notifySent", new Object[]{connection, commonFrame});
         
-        if (!isWorking()) {
+        if (!isInService()) {
             LOGGER.logp(Level.INFO, CLASS_NAME, "notifySent", "not working");
             return;
         }
@@ -174,7 +174,7 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized void notifyReceived(TCPConnection connection, CommonFrame commonFrame) {
         LOGGER.entering(CLASS_NAME, "notifyReceived", new Object[]{connection, commonFrame});
         
-        if (!isWorking()) {
+        if (!isInService()) {
             LOGGER.logp(Level.INFO, CLASS_NAME, "notifyReceived", "not working");
             return;
         }
@@ -188,7 +188,7 @@ public class TCPReceiver implements TCPConnectionObserver {
     public synchronized void notifyClosed(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "notifyClosed", connection);
         
-        if (!isWorking()) {
+        if (!isInService()) {
             LOGGER.logp(Level.INFO, CLASS_NAME, "notifyClosed", "not working");
             return;
         }

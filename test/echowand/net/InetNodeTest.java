@@ -49,7 +49,7 @@ public class InetNodeTest {
     @Test
     public void testIsMemberOf() throws UnknownHostException, SubnetException {
         Inet4Subnet subnet2 = new Inet4Subnet();
-        assertFalse(subnet2.isWorking());
+        assertFalse(subnet2.isInService());
         
         InetNode node = new InetNode(subnet, Inet4Address.getByName("127.0.0.1"));
         assertTrue(node.isMemberOf(subnet));
@@ -62,7 +62,7 @@ public class InetNodeTest {
     @Test
     public void testEquals() throws UnknownHostException, SubnetException {
         Inet4Subnet subnet2 = new Inet4Subnet();
-        assertFalse(subnet2.isWorking());
+        assertFalse(subnet2.isInService());
         
         InetNode node = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"));
         InetNode node1 = new InetNode(subnet, Inet4Address.getByName("172.16.1.1"));

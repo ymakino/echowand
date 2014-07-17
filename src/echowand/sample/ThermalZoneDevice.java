@@ -8,6 +8,7 @@ import echowand.logic.RequestDispatcher;
 import echowand.logic.TooManyObjectsException;
 import echowand.logic.TransactionManager;
 import echowand.net.Inet4Subnet;
+import echowand.net.InetSubnet;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.object.AnnounceRequestProcessor;
@@ -21,6 +22,7 @@ import echowand.object.NodeProfileObjectDelegate;
 import echowand.object.ObjectData;
 import echowand.object.RemoteObjectManager;
 import echowand.object.SetGetRequestProcessor;
+import echowand.util.LoggerConfig;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -157,17 +159,16 @@ public class ThermalZoneDevice implements Runnable {
             System.err.println("Usage: ThermalZoneDevice [ifname]");
             return;
         }
-
+        
         Inet4Subnet subnet;
         
         if (args.length == 0) {
-            subnet = new Inet4Subnet();
+            subnet = Inet4Subnet.startSubnet();
         } else {
             NetworkInterface nif = NetworkInterface.getByName(args[0]);
-            subnet = new Inet4Subnet(nif);
+            subnet = Inet4Subnet.startSubnet(nif);
         }
         
-        subnet.startService();
         ThermalZoneDevice thermalZoneDevice = new ThermalZoneDevice(subnet);
 
         Thread mainThread = new Thread(thermalZoneDevice);

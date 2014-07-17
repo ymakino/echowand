@@ -202,7 +202,7 @@ public class InetSubnet implements Subnet {
      * @return 設定の変更を成功した場合にはfalse、それ以外の場合にはtrue
      */
     public synchronized boolean enableTCPAcceptor() {
-        if (isWorking()) {
+        if (isInService()) {
             return false;
         }
 
@@ -217,7 +217,7 @@ public class InetSubnet implements Subnet {
      * @return 設定の変更を成功した場合にはfalse、それ以外の場合にはtrue
      */
     public synchronized boolean disableTCPAcceptor() {
-        if (isWorking()) {
+        if (isInService()) {
             return false;
         }
 
@@ -249,14 +249,14 @@ public class InetSubnet implements Subnet {
      *
      * @return 実行中であればtrue、そうでなければfalse
      */
-    public synchronized boolean isWorking() {
+    public synchronized boolean isInService() {
         UDPNetwork network = getUDPNetwork();
 
         if (network == null) {
             return false;
         }
 
-        return network.isWorking();
+        return network.isInService();
     }
 
     private synchronized void startThreads() {
@@ -308,7 +308,7 @@ public class InetSubnet implements Subnet {
     public synchronized boolean startService() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "startService");
 
-        if (isWorking()) {
+        if (isInService()) {
             LOGGER.exiting(CLASS_NAME, "startService", false);
             return false;
         }
@@ -352,7 +352,7 @@ public class InetSubnet implements Subnet {
 
         boolean result = true;
 
-        if (!isWorking()) {
+        if (!isInService()) {
             LOGGER.exiting(CLASS_NAME, "stopService", false);
             return false;
         }
@@ -449,7 +449,7 @@ public class InetSubnet implements Subnet {
     public boolean send(Frame frame) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "send", frame);
 
-        if (!isWorking()) {
+        if (!isInService()) {
             SubnetException exception = new SubnetException("not enabled");
             LOGGER.throwing(CLASS_NAME, "send", exception);
             throw exception;
@@ -507,7 +507,7 @@ public class InetSubnet implements Subnet {
     public Frame receive() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "receive");
 
-        if (!isWorking()) {
+        if (!isInService()) {
             SubnetException exception = new SubnetException("not enabled");
             LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;

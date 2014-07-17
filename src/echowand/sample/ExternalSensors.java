@@ -242,8 +242,7 @@ public class ExternalSensors implements Runnable {
     }
 
     private void initialize() throws SubnetException {
-        subnet = new Inet4Subnet();
-        subnet.startService();
+        subnet = Inet4Subnet.startSubnet();
         transactionManager = new TransactionManager(subnet);
         remoteManager = new RemoteObjectManager();
         localManager = new LocalObjectManager();
