@@ -5,6 +5,7 @@ import echowand.common.EPC;
 import echowand.common.ESV;
 import echowand.logic.TransactionManager;
 import echowand.net.*;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.AfterClass;
@@ -94,5 +95,61 @@ public class InstanceListRequestExecutorTest {
         assertEquals((byte) 0x01, payload.getFirstOPC());
         assertEquals(EPC.xD6, payload.getFirstPropertyAt(0).getEPC());
         assertEquals((byte) 0x00, payload.getFirstPropertyAt(0).getPDC());
+    }
+    
+    @Test
+    public void testTimeoutDefault() {
+        doTestTimeout(2000, true);
+    }
+    
+    @Test
+    public void testTimeout1000() {
+        doTestTimeout(500, false);
+    }
+    
+    @Test
+    public void testTimeout2000() {
+        doTestTimeout(2000, false);
+    }
+    
+    private long time() {
+        return GregorianCalendar.getInstance().getTimeInMillis();
+    }
+    
+    public void doTestTimeout(int timeout, boolean useDefault) {
+        
+        try {
+            System.out.println("doTestTimeout timeout: " + timeout + " default: " + useDefault);
+            if (!useDefault) {
+                executor.setTimeout(timeout);
+            }
+            
+            assertTrue(executor.execute());
+            long t1 = time();
+            
+            for (;;) {
+                long t2 = time();
+                if (executor.isDone()) {
+                    break;
+                } else {
+                    assertTrue(timeout > (t2 - t1));
+                }
+                Thread.sleep(100);
+            }
+            
+            long t3 = time();
+            
+            assertTrue(timeout < (t3 - t1));
+            
+            
+            assertTrue(executor.join());
+            
+            assertFalse(executor.execute());
+            assertFalse(executor.join());
+        } catch (SubnetException e) {
+            fail();
+        } catch (InterruptedException e) {
+            fail();
+        }
     }
 }

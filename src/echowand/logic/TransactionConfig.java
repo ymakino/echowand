@@ -67,7 +67,7 @@ public abstract class TransactionConfig {
      * @param receiverNode 受信ノード
      */
     public void setReceiverNode(Node receiverNode) {
-        logger.entering(className, "setReceiverNode", senderNode);
+        logger.entering(className, "setReceiverNode", receiverNode);
         
         this.receiverNode = receiverNode;
         
