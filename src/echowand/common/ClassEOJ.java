@@ -85,6 +85,14 @@ public class ClassEOJ {
         return new EOJ(classGroupCode, classCode, instanceCode);
     }
     
+    /**
+     * このClassEOJのクラスグループコードとクラスコードを用いて、全インスタンス対象のEOJを生成する。
+     * @return 全インスタンス対象のEOJオブジェクト
+     */
+    public EOJ getAllInstanceEOJ() {
+        return getEOJWithInstanceCode((byte)0x00);
+    }
+    
     
     /**
      * このClassEOJが機器オブジェクトであるか調べる。
