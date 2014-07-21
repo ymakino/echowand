@@ -23,15 +23,22 @@ public class PropertyMap {
     public PropertyMap(byte[] newMap) {
         this();
         
-        if (newMap.length == 17) {
+        if (newMap.length == 0) {
+            return;
+        }
+        
+        if (newMap.length >= 17) {
             System.arraycopy(newMap, 0, this.map, 0, 17);
-            newMap[0] = countEPC();
+            this.map[0] = countEPC();
         } else {
             int len = byteToInt(newMap[0]);
-            if (len < 16) {
-                for (int i=1; i<=len; i++) {
-                    setBit(EPC.fromByte(newMap[i]), true);
-                }
+            
+            if (len > newMap.length-1) {
+                len = newMap.length - 1;
+            }
+
+            for (int i = 1; i <= len; i++) {
+                setBit(EPC.fromByte(newMap[i]), true);
             }
         }
     }
@@ -162,5 +169,21 @@ public class PropertyMap {
         } else {
             return Arrays.copyOf(map, map.length);
         }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PropertyMap)) {
+            return false;
+        }
+        
+        PropertyMap other = (PropertyMap)o;
+        
+        return Arrays.equals(other.toBytes(), toBytes());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(toBytes());
     }
 }

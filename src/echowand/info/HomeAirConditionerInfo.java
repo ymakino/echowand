@@ -15,6 +15,7 @@ public class HomeAirConditionerInfo extends DeviceObjectInfo {
     public HomeAirConditionerInfo(){
         setClassEOJ(new ClassEOJ((byte)0x01, (byte)0x30));
         
+        add(EPC.x80, true, true, true, new byte[]{0x31}, new PropertyConstraintOnOff());
         add(EPC.xB0, true, true, true, new byte[]{0x41}, new ConstraintByte((byte)0x40, (byte)0x45));
         add(EPC.xB3, true, true, false, new byte[]{0x1c}, new ConstraintByte((byte)0x00, (byte)0x32));
     }

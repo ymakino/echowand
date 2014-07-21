@@ -16,7 +16,7 @@ public class InternalSubnet implements Subnet {
     }
     
     private Node localNode;
-    private static Node groupNode;
+    private Node groupNode;
     private InternalNetworkPort port;
     
     /**
@@ -58,7 +58,7 @@ public class InternalSubnet implements Subnet {
     
     private boolean shouldLocalNodeReceive(Frame frame) {
             Node node = frame.getReceiver();
-            return (node == getGroupNode() || node == getLocalNode());
+            return (node.equals(getGroupNode()) || node.equals(getLocalNode()));
     }
     
     /**
@@ -90,7 +90,7 @@ public class InternalSubnet implements Subnet {
      * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
      */
     @Override
-    public Frame recv() throws SubnetException {
+    public Frame receive() throws SubnetException {
         for (;;) {
             Frame frame = port.recv();
             
@@ -128,6 +128,20 @@ public class InternalSubnet implements Subnet {
      */
     public synchronized Node getRemoteNode(String name) {
         return new InternalNode(this, name);
+    }
+    
+    /**
+     * リモートノードを表すNodeを生成する。
+     * @param nodeInfo リモートノードの情報
+     * @return リモートノードのNode
+     */
+    @Override
+    public synchronized Node getRemoteNode(NodeInfo nodeInfo) throws SubnetException {
+        if (nodeInfo instanceof InternalNodeInfo) {
+            return new InternalNode(this, (InternalNodeInfo)nodeInfo);
+        } else {
+            throw new SubnetException("invalid nodeInfo: " + nodeInfo);
+        }
     }
     
     /**

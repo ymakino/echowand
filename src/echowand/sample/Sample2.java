@@ -9,6 +9,10 @@ import echowand.logic.*;
 import echowand.net.Inet4Subnet;
 import echowand.net.SubnetException;
 import echowand.object.*;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,11 +29,26 @@ public class Sample2 {
     public static void main(String[] args) throws TooManyObjectsException {
         MainLoop loop = new MainLoop();
         Inet4Subnet subnet;
+        
+        String interfaceName = null;
+        
+        if (args.length == 1) {
+            interfaceName = args[0];
+        }
 
         try {
-            subnet = new Inet4Subnet();
-        } catch (SubnetException e) {
-            e.printStackTrace();
+            if (interfaceName == null) {
+                subnet = Inet4Subnet.startSubnet();
+            } else {
+                NetworkInterface networkInterface = NetworkInterface.getByName(args[0]);
+                subnet = Inet4Subnet.startSubnet(networkInterface);
+            }
+        } catch (SubnetException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(Sample2.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        } catch (SocketException ex) {
+            Logger.getLogger(Sample2.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
         

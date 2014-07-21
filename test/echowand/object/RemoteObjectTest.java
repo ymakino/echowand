@@ -127,10 +127,11 @@ public class RemoteObjectTest {
             this.doLoop = doLoop;
         }
         
+        @Override
         public void run() {
             try {
                 do {
-                    Frame frame = subnet.recv();
+                    Frame frame = subnet.receive();
                     StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
                     switch (payload.getESV()) {
                         case Get:

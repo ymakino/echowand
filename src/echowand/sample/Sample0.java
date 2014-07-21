@@ -93,7 +93,7 @@ public class Sample0 {
         try {
 
             // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
-            Inet4Subnet subnet = new Inet4Subnet();
+            Inet4Subnet subnet = Inet4Subnet.startSubnet();
 
             //========================= Get =========================
             // メッセージの宛先のNodeを取得
@@ -108,7 +108,7 @@ public class Sample0 {
             
             // フレームを受信
             // 宛先ノードが存在しない場合には、ここでタイムアウトする
-            System.out.println("Received: " + subnet.recv());
+            System.out.println("Received: " + subnet.receive());
             System.out.println();
             
             
@@ -125,7 +125,7 @@ public class Sample0 {
             
             // フレームを受信
             // 宛先ノードが存在しない場合や宛先エアコンオブジェクトが存在しない場合には、ここでタイムアウトする
-            System.out.println("Received: " + subnet.recv());
+            System.out.println("Received: " + subnet.receive());
             System.out.println();
             
             
@@ -139,7 +139,7 @@ public class Sample0 {
             
             for (;;) {
                 // フレームを受信
-                System.out.println("Received: " + subnet.recv());
+                System.out.println("Received: " + subnet.receive());
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();

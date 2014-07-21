@@ -43,6 +43,18 @@ public class InstanceListRequestExecutor {
         logger.exiting(className, "InstanceListRequestExecutor");
     }
     
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+    
+    public int getTimeout() {
+        return timeout;
+    }
+    
+    public boolean isDone() {
+        return transaction.isDone();
+    }
+    
     private Transaction createTransaction() {
         logger.entering(className, "createTransaction");
         

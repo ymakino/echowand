@@ -226,7 +226,7 @@ public class LocalObjectTest {
         assertTrue(object.isGettable(EPC.x80));
         
         assertTrue(object.isSettable(EPC.xB0));
-        assertFalse(object.isSettable(EPC.x80));
+        assertTrue(object.isSettable(EPC.x80));
         
         assertTrue(object.isObservable(EPC.xB0));
         assertFalse(object.isObservable(EPC.xB1));
@@ -432,5 +432,64 @@ public class LocalObjectTest {
         assertTrue(result);
         assertEquals(new ObjectData((byte)0x11), object.getData(EPC.x80));
         assertEquals(1,  notifyDelegate.getCountNotify());
+    }
+    
+    @Test
+    public void testAddDelegate() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        CountDelegate notifyDelegate1 = new CountDelegate();
+        CountDelegate notifyDelegate2 = new CountDelegate();
+        
+        assertEquals(0, object.countDelegates());
+        
+        assertTrue(object.addDelegate(notifyDelegate1));
+        
+        assertEquals(1, object.countDelegates());
+        
+        assertFalse(object.addDelegate(notifyDelegate1));
+        
+        assertEquals(1, object.countDelegates());
+        
+        assertTrue(object.addDelegate(notifyDelegate2));
+        
+        assertEquals(2, object.countDelegates());
+        
+        assertEquals(notifyDelegate1, object.getDelegate(0));
+        
+        assertEquals(notifyDelegate2, object.getDelegate(1));
+    }
+    
+    @Test
+    public void testRemoveDelegate() {
+        DeviceObjectInfo info = new HomeAirConditionerInfo();
+        info.add(new PropertyInfo(EPC.x80, true, true, true, 1));
+        LocalObject object = new LocalObject(info);
+        
+        CountDelegate notifyDelegate1 = new CountDelegate();
+        CountDelegate notifyDelegate2 = new CountDelegate();
+        
+        assertFalse(object.removeDelegate(notifyDelegate1));
+        assertFalse(object.removeDelegate(notifyDelegate2));
+        
+        assertTrue(object.addDelegate(notifyDelegate1));
+        assertTrue(object.addDelegate(notifyDelegate2));
+        
+        assertEquals(2, object.countDelegates());
+        
+        assertTrue(object.removeDelegate(notifyDelegate1));
+        assertFalse(object.removeDelegate(notifyDelegate1));
+        
+        assertEquals(1, object.countDelegates());
+        
+        assertTrue(object.removeDelegate(notifyDelegate2));
+        assertFalse(object.removeDelegate(notifyDelegate2));
+        
+        assertEquals(0, object.countDelegates());
+        
+        assertFalse(object.removeDelegate(notifyDelegate1));
+        assertFalse(object.removeDelegate(notifyDelegate2));
     }
 }

@@ -100,6 +100,14 @@ public class EOJ {
     }
     
     /**
+     * このEOJのクラスグループコードとクラスコードを用いて、全インスタンス対象のEOJを生成する。
+     * @return 全インスタンス対象のEOJオブジェクト
+     */
+    public EOJ getAllInstanceEOJ() {
+        return getEOJWithInstanceCode((byte)0x00);
+    }
+    
+    /**
      * このEOJが指定されたClassEOJのクラスグループとクラスに含まれるか調べる。
      * @param ceoj クラスグループとクラスを指定するためのClassEOJ
      * @return 指定されたClassEOJに含まれるのであればtrue、そうでなければfalse

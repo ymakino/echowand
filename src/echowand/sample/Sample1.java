@@ -76,12 +76,12 @@ public class Sample1 {
 
         try {
             // ECHONET Liteメッセージ送受信に利用するIPのサブネットを作成
-            subnet = new Inet4Subnet();
+            subnet = Inet4Subnet.startSubnet();
         } catch (SubnetException e) {
             e.printStackTrace();
             return;
         }
-
+        
         // トランザクション管理オブジェクトを生成
         TransactionManager transactionManager = new TransactionManager(subnet);
         

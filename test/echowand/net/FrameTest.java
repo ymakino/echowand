@@ -29,7 +29,7 @@ public class FrameTest {
 
         try {
             subnet.send(frame);
-            assertTrue(Arrays.equals(frame.getCommonFrame().toBytes(), subnet.recv().getCommonFrame().toBytes()));
+            assertTrue(Arrays.equals(frame.getCommonFrame().toBytes(), subnet.receive().getCommonFrame().toBytes()));
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();

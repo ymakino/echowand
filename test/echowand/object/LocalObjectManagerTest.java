@@ -149,6 +149,29 @@ public class LocalObjectManagerTest {
     }
 
     @Test
+    public void testGetAllObjects() {
+        try {
+            LocalObjectManager manager = new LocalObjectManager();
+            assertEquals(0, manager.size());
+
+            manager.add(new LocalObject(new TemperatureSensorInfo()));
+            manager.add(new LocalObject(new NodeProfileInfo()));
+            manager.add(new LocalObject(new TemperatureSensorInfo()));
+            manager.add(new LocalObject(new HomeAirConditionerInfo()));
+            assertEquals(4, manager.size());
+            List<LocalObject> list = manager.getAllObjects();
+            assertEquals(4, list.size());
+            assertTrue(list.get(0).getEOJ().isMemberOf(new ClassEOJ("0011")));
+            assertTrue(list.get(1).getEOJ().isMemberOf(new ClassEOJ("0ef0")));
+            assertTrue(list.get(2).getEOJ().isMemberOf(new ClassEOJ("0011")));
+            assertTrue(list.get(3).getEOJ().isMemberOf(new ClassEOJ("0130")));
+        } catch (TooManyObjectsException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
     public void testGetDeviceObjects() {
         try {
             LocalObjectManager manager = new LocalObjectManager();
@@ -164,6 +187,35 @@ public class LocalObjectManagerTest {
             assertTrue(list.get(0).getEOJ().isMemberOf(new ClassEOJ("0011")));
             assertTrue(list.get(1).getEOJ().isMemberOf(new ClassEOJ("0011")));
             assertTrue(list.get(2).getEOJ().isMemberOf(new ClassEOJ("0130")));
+        } catch (TooManyObjectsException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test
+    public void testAddRaw() {
+        try {
+            LocalObjectManager manager = new LocalObjectManager();
+            assertEquals(0, manager.size());
+
+            LocalObject object1 = new LocalObject(new TemperatureSensorInfo());
+            object1.setInstanceCode((byte)0x7f);
+            manager.add(object1, true);
+            assertEquals(1, manager.size());
+            assertEquals(new EOJ("001101"), manager.getAtIndex(0).getEOJ());
+
+            LocalObject object2 = new LocalObject(new TemperatureSensorInfo());
+            object2.setInstanceCode((byte)0x7f);
+            manager.add(object2);
+            assertEquals(2, manager.size());
+            assertEquals(new EOJ("001102"), manager.getAtIndex(1).getEOJ());
+
+            LocalObject object3 = new LocalObject(new TemperatureSensorInfo());
+            object3.setInstanceCode((byte)0x7f);
+            manager.add(object3, false);
+            assertEquals(3, manager.size());
+            assertEquals(new EOJ("00117f"), manager.getAtIndex(2).getEOJ());
         } catch (TooManyObjectsException e) {
             e.printStackTrace();
             fail();

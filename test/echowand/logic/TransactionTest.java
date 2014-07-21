@@ -71,7 +71,7 @@ public class TransactionTest {
     
     @After
     public void tearDown() {
-        inet4Subnet.disable();
+        inet4Subnet.stopService();
     }
     
     @Test
@@ -159,7 +159,7 @@ public class TransactionTest {
         assertFalse(t.isDone());
 
         try {
-            Frame reqFrame = subnet.recv();
+            Frame reqFrame = subnet.receive();
             assertTrue(reqFrame != null);
             t.recvResponse(createReplyFrame(reqFrame));
         } catch (SubnetException e) {
@@ -194,7 +194,7 @@ public class TransactionTest {
         assertFalse(t.isDone());
 
         try {
-            Frame reqFrame = subnet.recv();
+            Frame reqFrame = subnet.receive();
             assertTrue(reqFrame != null);
             t.finish();
             t.recvResponse(createReplyFrame(reqFrame));
@@ -278,7 +278,7 @@ public class TransactionTest {
         }
         
         try {
-            Frame reqFrame = subnet.recv();
+            Frame reqFrame = subnet.receive();
             Frame resFrame1 = createReplyFrame(reqFrame);
             t.recvResponse(resFrame1);
             Frame resFrame2 = createReplyFrame(reqFrame);
@@ -343,7 +343,7 @@ public class TransactionTest {
         
         try {
             t.execute();
-            Frame reqFrame = subnet.recv();
+            Frame reqFrame = subnet.receive();
             assertTrue(reqFrame != null);
             Frame repFrame = createReplyFrame(reqFrame);
             CommonFrame cf = repFrame.getCommonFrame();
@@ -370,7 +370,7 @@ public class TransactionTest {
         
         try {
             t.execute();
-            Frame reqFrame = subnet.recv();
+            Frame reqFrame = subnet.receive();
             assertTrue(reqFrame != null);
             Frame repFrame = createReplyFrame(reqFrame);
             CommonFrame cf = repFrame.getCommonFrame();

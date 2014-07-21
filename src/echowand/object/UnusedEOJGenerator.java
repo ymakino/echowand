@@ -4,6 +4,7 @@ import echowand.common.ClassEOJ;
 import echowand.common.EOJ;
 import echowand.logic.TooManyObjectsException;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * ユニークなEOJの生成管理
@@ -11,12 +12,18 @@ import java.util.HashMap;
  */
 public class UnusedEOJGenerator {
     private HashMap<ClassEOJ, Byte> usedEOJMap;
+    private HashSet<EOJ> usedEOJSet;
     
     /**
      * UnusedEOJGeneratorを生成する。
      */
     public UnusedEOJGenerator() {
         usedEOJMap = new HashMap<ClassEOJ, Byte>();
+        usedEOJSet = new HashSet<EOJ>();
+    }
+    
+    private boolean isValidInstanceCode(byte instanceCode) {
+        return (1 <= instanceCode && instanceCode <= 0x7f);
     }
     
     /**
@@ -26,19 +33,49 @@ public class UnusedEOJGenerator {
      * @throws TooManyObjectsException EOJをこれ以上生成できない場合
      */
     public synchronized EOJ generate(ClassEOJ ceoj) throws TooManyObjectsException {
-        byte unused = 1;
+        byte unusedCode = 1;
         Byte b = usedEOJMap.get(ceoj);
         
         if (b != null) {
-            unused = (byte)(b + 1);
+            unusedCode = (byte)(b + 1);
         }
         
-        if (unused <= 0) {
-            throw new TooManyObjectsException("too many generated eojs for " + ceoj);
+        for (;;) {
+            if (!isValidInstanceCode(unusedCode)) {
+                throw new TooManyObjectsException("too many generated eojs for " + ceoj);
+            }
+            
+            if (!usedEOJSet.contains(ceoj.getEOJWithInstanceCode(unusedCode))) {
+                break;
+            }
+            
+            unusedCode += 1;
+        }
+
+        usedEOJMap.put(ceoj, unusedCode);
+        
+        return ceoj.getEOJWithInstanceCode(unusedCode);
+    }
+    
+    /**
+     * 指定されたEOJを利用済みとして登録する。
+     * @param eoj EOJの指定
+     */
+    public synchronized void addUsed(EOJ eoj) {
+        usedEOJSet.add(eoj);
+    }
+    
+    /**
+     * 指定されたEOJが利用済みであるかを返す。
+     * @param eoj EOJの指定
+     * @return 利用済みの場合にはtrue、そうでなければfalse
+     */
+    public synchronized boolean isUsed(EOJ eoj) {
+        Byte b = usedEOJMap.get(eoj.getClassEOJ());
+        if (b != null && (eoj.getInstanceCode() <= b)) {
+            return true;
         }
         
-        usedEOJMap.put(ceoj, unused);
-        
-        return ceoj.getEOJWithInstanceCode(unused);
+        return usedEOJSet.contains(eoj);
     }
 }

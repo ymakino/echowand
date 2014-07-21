@@ -129,6 +129,7 @@ public class Property {
      * このPropertyの文字列表現を返す。
      * @return このPropertyの文字列表現
      */
+    @Override
     public String toString() {
         if (getPDC() == 0) {
             String format = "EPC=%02x PDC=%02x";

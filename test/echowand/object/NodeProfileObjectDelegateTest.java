@@ -78,6 +78,29 @@ public class NodeProfileObjectDelegateTest {
     }
     
     @Test
+    public void testCountClassesIncludingNodeProfileObject() {
+        assertTrue(delegate.getCountOnlyDeviceClass());
+        ObjectData data1 = object.getData(EPC.xD4);
+        assertEquals(2, data1.size());
+        assertEquals((byte)0x00, data1.get(0));
+        assertEquals((byte)0x00, data1.get(1));
+        
+        delegate.setCountOnlyDeviceClass(false);
+        assertFalse(delegate.getCountOnlyDeviceClass());
+        ObjectData data2 = object.getData(EPC.xD4);
+        assertEquals(2, data2.size());
+        assertEquals((byte)0x00, data2.get(0));
+        assertEquals((byte)0x01, data2.get(1));
+        
+        delegate.setCountOnlyDeviceClass(true);
+        assertTrue(delegate.getCountOnlyDeviceClass());
+        ObjectData data3 = object.getData(EPC.xD4);
+        assertEquals(2, data3.size());
+        assertEquals((byte)0x00, data3.get(0));
+        assertEquals((byte)0x00, data3.get(1));
+    }
+    
+    @Test
     public void testInstanceList() {
         ObjectData data = object.getData(EPC.xD6);
         assertEquals((byte)0x0, data.get(0));

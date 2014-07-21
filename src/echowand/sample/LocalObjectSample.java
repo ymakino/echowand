@@ -45,7 +45,7 @@ class LocalObjectSampleDelegate extends LocalObjectDefaultDelegate {
 public class LocalObjectSample {
     public static void main(String[] args) {
         try {
-            Inet4Subnet subnet = new Inet4Subnet();
+            Inet4Subnet subnet = Inet4Subnet.startSubnet();
             TransactionManager transactionManager = new TransactionManager(subnet);
             RemoteObjectManager remoteManager = new RemoteObjectManager();
             LocalObjectManager localManager = new LocalObjectManager();

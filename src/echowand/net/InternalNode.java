@@ -6,7 +6,7 @@ package echowand.net;
  */
 public class InternalNode implements Node{
     private InternalSubnet subnet;
-    private String name;
+    private InternalNodeInfo nodeInfo;
     
     /**
      * InternalNodeを生成する。
@@ -15,8 +15,18 @@ public class InternalNode implements Node{
      * @param name このノードの名前
      */
     public InternalNode(InternalSubnet subnet, String name) {
+        this(subnet, new InternalNodeInfo(name));
+    }
+    
+    /**
+     * InternalNodeを生成する。
+     * 直接生成は行わずにInternalSubnetのgetRemoteNodeメソッドの利用を推奨する。
+     * @param subnet このノードの存在するサブネット
+     * @param nodeInfo このノードの情報
+     */
+    public InternalNode(InternalSubnet subnet, InternalNodeInfo nodeInfo) {
         this.subnet = subnet;
-        this.name = name;
+        this.nodeInfo = nodeInfo;
     }
     
     /**
@@ -24,7 +34,12 @@ public class InternalNode implements Node{
      * @return このノードの名前
      */
     public String getName() {
-        return name;
+        return nodeInfo.getName();
+    }
+    
+    @Override
+    public NodeInfo getNodeInfo() {
+        return nodeInfo;
     }
     
     @Override
@@ -34,7 +49,7 @@ public class InternalNode implements Node{
     
     @Override
     public String toString() {
-        return name;
+        return nodeInfo.toString();
     }
     
     @Override
@@ -45,7 +60,7 @@ public class InternalNode implements Node{
             InternalNetwork n1 = subnet.getNetwork();
             InternalNetwork n2 = node.subnet.getNetwork();
             
-            return n1.equals(n2) && name.equals(node.name);
+            return n1.equals(n2) && nodeInfo.equals(node.nodeInfo);
         } else {
             return false;
         }
@@ -53,8 +68,8 @@ public class InternalNode implements Node{
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
+        int hash = 3;
+        hash = 67 * hash + (this.nodeInfo != null ? this.nodeInfo.hashCode() : 0);
         return hash;
     }
 }

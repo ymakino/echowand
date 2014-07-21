@@ -42,7 +42,7 @@ public class RemoteObjectManagerTest {
         @Override
         public void run() {
             try {
-                Frame recvFrame = subnet.recv();
+                Frame recvFrame = subnet.receive();
                 CommonFrame recvCommonFrame = recvFrame.getCommonFrame();
                 StandardPayload recvPayload = (StandardPayload) recvCommonFrame.getEDATA();
 

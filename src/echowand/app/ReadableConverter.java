@@ -236,6 +236,25 @@ class ReadableConverterToggle extends ReadableConverter {
     }
 }
 
+class ReadableConverterStandardVersion extends ReadableConverter {
+    @Override
+    public String dataToString(ObjectData data) {
+        int dataSize = data.size();
+
+        if (dataSize != 4) {
+            return INVALID;
+        }
+
+        if (data.get(0) != 0 || data.get(1) != 0 || data.get(3) != 0) {
+            return INVALID;
+        }
+
+        String releaseString = new String(new byte[]{(byte) data.get(2)});
+        String versionString = String.format("%s", releaseString);
+
+        return versionString;
+    }
+}
 
 class ReadableConverterVersion extends ReadableConverter {
     @Override
@@ -248,19 +267,19 @@ class ReadableConverterVersion extends ReadableConverter {
         
         int major = (0x000000ff) & data.get(0);
         int minor = (0x000000ff) & data.get(1);
-        byte release = data.get(2);
-        byte extra = data.get(3);
+        byte b3 = data.get(2);
+        byte b4 = data.get(3);
         
-        if (extra != 0x00) {
-            return INVALID;
+        String supported;
+        if ((b3 & 0xfc) == 0 && b4 == 0) {
+            boolean specified = (b3 & 0x01) != 0;
+            boolean arbitrary = (b3 & 0x02) != 0;
+            supported = (specified ? "S" : "") + (arbitrary ? "A" : "");
+        } else {
+            supported = INVALID;
         }
         
-        String versionString = String.format("%d.%d", major, minor);
-        
-        if (release != 0x00) {
-            String releaseString = new String(new byte[]{(byte)release});
-            versionString = String.format("%s Release %s", versionString, releaseString);
-        }
+        String versionString = String.format("%d.%d (%s)", major, minor, supported);
         
         return versionString;
     }

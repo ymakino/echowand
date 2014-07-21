@@ -257,7 +257,7 @@ public class ObjectTableModelTest {
                     CommonFrame commonFrame;
                     StandardPayload payload;
                     for (;;) {
-                        frame = subnet.recv();
+                        frame = subnet.receive();
                         commonFrame = frame.getCommonFrame();
                         payload = (StandardPayload) commonFrame.getEDATA();
 
@@ -281,7 +281,7 @@ public class ObjectTableModelTest {
             
             private void processGet() {
                 try {
-                    Frame frame = subnet.recv();
+                    Frame frame = subnet.receive();
                     CommonFrame commonFrame = frame.getCommonFrame();
                     StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
                     

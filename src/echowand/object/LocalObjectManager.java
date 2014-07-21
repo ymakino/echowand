@@ -54,6 +54,29 @@ public class LocalObjectManager {
     
     /**
      * ローカルオブジェクトを登録する。
+     * updateInstanceCodeがtrueの場合には、ローカルオブジェクトのEOJは重複がないようにインスタンスコードが更新される。
+     * @param object 登録するローカルのオブジェクト
+     * @param updateInstanceCode インスタンスコードの更新を指定
+     * @exception TooManyObjectsException 新しいEOJを割り当てられない場合
+     */
+    public void add(LocalObject object, boolean updateInstanceCode) throws TooManyObjectsException {
+        logger.entering(className, "add", new Object[]{object, updateInstanceCode});
+        
+        if (updateInstanceCode) {
+            ClassEOJ classEOJ = object.getEOJ().getClassEOJ();
+            EOJ newEOJ = eojGenerator.generate(classEOJ);
+            object.setInstanceCode(newEOJ.getInstanceCode());
+        } else {
+            eojGenerator.addUsed(object.getEOJ());
+        }
+        
+        addObject(object);
+
+        logger.exiting(className, "add");
+    }
+    
+    /**
+     * ローカルオブジェクトを登録する。
      * ローカルオブジェクトのEOJは重複がないようにインスタンスコードが更新される。
      * @param object 登録するローカルのオブジェクト
      * @exception TooManyObjectsException 新しいEOJを割り当てられない場合
@@ -61,12 +84,9 @@ public class LocalObjectManager {
     public void add(LocalObject object) throws TooManyObjectsException {
         logger.entering(className, "add", object);
 
-        ClassEOJ classEOJ = object.getEOJ().getClassEOJ();
-        EOJ newEOJ = eojGenerator.generate(classEOJ);
-        object.setInstanceCode(newEOJ.getInstanceCode());
-        addObject(object);
+        add(object, true);
 
-        logger.exiting(className, "add", object);
+        logger.exiting(className, "add");
     }
     
     /**
@@ -132,6 +152,24 @@ public class LocalObjectManager {
         return objectList;
     }
     
+    
+    /**
+     * 機器オブジェクトを含む、ローカルオブジェクトのリストを返す。
+     * @return オブジェクトのリスト
+     */
+    public synchronized LinkedList<LocalObject> getAllObjects() {
+        logger.entering(className, "getObjects");
+        
+        LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {
+            @Override
+            public boolean select(LocalObject object) {
+                return true;
+            }
+        });
+        
+        logger.exiting(className, "getObjects", objectList);
+        return objectList;
+    }
     
     /**
      * 機器オブジェクトに属するローカルオブジェクトのリストを返す。
