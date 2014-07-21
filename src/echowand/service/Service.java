@@ -228,12 +228,6 @@ public class Service {
         transaction.addTransactionListener(new GetTransactionListener(resultGet));
         
         transaction.execute();
-        try {
-            transaction.join();
-        } catch (InterruptedException ex) {
-            throw new SubnetException("catched exception", ex);
-        }
-
         
         LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
         return resultGet;
@@ -289,13 +283,6 @@ public class Service {
         transaction.addTransactionListener(new SetTransactionListener(resultSet));
         
         transaction.execute();
-        try {
-            transaction.join();
-        } catch (InterruptedException ex) {
-            SubnetException exception = new SubnetException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "doSet", exception);
-            throw exception;
-        }
 
         LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
         return resultSet;

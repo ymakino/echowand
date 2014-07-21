@@ -95,6 +95,8 @@ public abstract class ResultBase {
     public synchronized boolean addFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addFrame", frame);
         
+        long time = System.currentTimeMillis();
+        
         if (!hasStandardPayload(frame)) {
             invalidFrames.add(frame);
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
@@ -119,9 +121,9 @@ public abstract class ResultBase {
             Data data = property.getEDT();
             
             if (isValidProperty(property)) {
-                dataList.add(new ResultData(node, eoj, epc, data));
+                dataList.add(new ResultData(node, eoj, epc, data, time));
             } else {
-                errorDataList.add(new ResultData(node, eoj, epc, data));
+                errorDataList.add(new ResultData(node, eoj, epc, data, time));
             }
         }
         

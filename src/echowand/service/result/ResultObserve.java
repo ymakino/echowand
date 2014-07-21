@@ -68,6 +68,8 @@ public class ResultObserve {
     public synchronized boolean addFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addFrame", frame);
         
+        long time = System.currentTimeMillis();
+        
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         
         int count = payload.getFirstOPC();
@@ -79,7 +81,7 @@ public class ResultObserve {
             EPC epc = property.getEPC();
             Data data = property.getEDT();
             
-            dataList.add(new ResultData(node, eoj, epc, data));
+            dataList.add(new ResultData(node, eoj, epc, data, time));
         }
         
         boolean result = frames.add(frame);
