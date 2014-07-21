@@ -177,4 +177,16 @@ public class ClassEOJTest {
             }
         }
     }
+    
+    @Test
+    public void testGetEOJWithInstanceCode() {
+        assertEquals(new EOJ("001101"), new ClassEOJ("0011").getEOJWithInstanceCode((byte)0x01));
+        assertEquals(new EOJ("013003"), new ClassEOJ("0130").getEOJWithInstanceCode((byte)0x03));
+        assertEquals(new EOJ("0EF000"), new ClassEOJ("0EF0").getEOJWithInstanceCode((byte)0x00));
+    }
+    
+    @Test
+    public void testGetAllInstanceEOJ() {
+        assertEquals(new EOJ("0EF000"), new ClassEOJ("0EF0").getAllInstanceEOJ());
+    }
 }
