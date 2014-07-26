@@ -11,9 +11,11 @@ import echowand.net.InetSubnet;
 import echowand.net.Node;
 import echowand.net.NodeInfo;
 import echowand.net.SubnetException;
+import echowand.object.EchonetObjectException;
 import echowand.object.LocalObject;
 import echowand.object.ObjectData;
 import echowand.service.LocalObjectConfig;
+import echowand.service.LocalObjectNotFoundException;
 import echowand.service.PropertyDelegate;
 import echowand.service.PropertyUpdater;
 import echowand.service.ResultObserveProcessor;
@@ -91,7 +93,7 @@ public class ServiceSample0 {
         }
     }
     
-    public static void main(String[] args) throws TooManyObjectsException, SocketException, UnknownHostException, InterruptedException {
+    public static void main(String[] args) throws TooManyObjectsException, SocketException, UnknownHostException, InterruptedException, LocalObjectNotFoundException, EchonetObjectException {
         // LoggerConfig.changeLogLevelAll(ResultBase.class.getName());
         // LoggerConfig.changeLogLevelAll(ResultObserve.class.getName());
         
@@ -141,6 +143,23 @@ public class ServiceSample0 {
             // Update remote node information
             ResultUpdate resultUpdate = service.doUpdate(1000);
             resultUpdate.join();
+            
+            for (int i=0; i<resultUpdate.countNodes(); i++) {
+                Node node = resultUpdate.getNode(i);
+                for (int j=0; j<resultUpdate.countEOJs(node); j++) {
+                    EOJ eoj = resultUpdate.getEOJ(node, j);
+                    System.out.println("ResultUpdate: " + node + " " + eoj);
+                    
+                    if (eoj.isMemberOf(new ClassEOJ("0011"))) {
+                        System.out.println("Begin getRemoteData(" + eoj + ", " + EPC.xE0 + ")");
+                        ObjectData d = service.getRemoteData(node, eoj, EPC.xE0);
+                        double t = (((0xff & d.get(0)) << 8) + (0xff & d.get(1))) / 10.0;
+                        System.out.println("0xE0: " + d);
+                        System.out.println("0xE0(double): " + t);
+                        System.out.println("End getRemoteData");
+                    }
+                }
+            }
             
             
             // Test doGet for all nodes in the network

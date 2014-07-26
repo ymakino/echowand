@@ -120,10 +120,11 @@ public abstract class ResultBase {
             EPC epc = property.getEPC();
             Data data = property.getEDT();
             
+            ResultData resultData = new ResultData(node, eoj, epc, data, time);
             if (isValidProperty(property)) {
-                dataList.add(new ResultData(node, eoj, epc, data, time));
+                dataList.add(resultData);
             } else {
-                errorDataList.add(new ResultData(node, eoj, epc, data, time));
+                errorDataList.add(resultData);
             }
         }
         

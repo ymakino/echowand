@@ -45,6 +45,7 @@ public class ServiceManager {
     
     private Thread mainThread;
     
+    private boolean initialized = false;
     private boolean inService = false;
     
     private Service service = null;
@@ -281,6 +282,10 @@ public class ServiceManager {
         return mainThread;
     }
     
+    public boolean isInitialized() {
+        return initialized;
+    }
+    
     /**
      * EchowandServiceManagerが初期化済みであるか返す。
      * @return 初期化済みであればtrue、初期化済みでなければfalse
@@ -288,80 +293,97 @@ public class ServiceManager {
     public boolean isInService() {
         return inService;
     }
+    
+    private void createLocalObjects() throws TooManyObjectsException {
+        for (LocalObjectConfig config : localObjectConfigs) {
+            LocalObjectCreator creator = new LocalObjectCreator(config);
+            LocalObjectCreatorResult creatorResult = creator.create(this);
+            localObjectUpdaters.add(creatorResult.updater);
+        }
+    }
 
     /**
      * ServiceManagerを初期化する。
      * @return 初期化が成功すればtrue、すでに初期化済みであればfalse
      * @throws HarmonyException 初期化中に例外が発生した場合
      */
-    private void initialize() throws TooManyObjectsException {
+    private boolean initialize() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "initialize");
         
-        transactionManager = createTransactionManager(subnet);
-        remoteManager = createRemoteObjectManager();
-        localManager = createLocalObjectManager();
-        nodeProfileObject = createNodeProfileObject(subnet, localManager, transactionManager);
+        boolean result = false;
 
-        setGetRequestProcessor = createSetGetRequestProcessor(localManager);
-        announceRequestProcessor = createAnnounceRequestProcessor(localManager, remoteManager);
-        observeServiceProcessor = createObserveServiceProcessor();
+        if (!initialized) {
+            transactionManager = createTransactionManager(subnet);
+            remoteManager = createRemoteObjectManager();
+            localManager = createLocalObjectManager();
+            nodeProfileObject = createNodeProfileObject(subnet, localManager, transactionManager);
 
-        requestDispatcher = createRequestDispatcher();
-        requestDispatcher.addRequestProcessor(setGetRequestProcessor);
-        requestDispatcher.addRequestProcessor(announceRequestProcessor);
-        requestDispatcher.addRequestProcessor(observeServiceProcessor);
-        
-        for (LocalObjectConfig config: localObjectConfigs) {
-            LocalObjectCreator creator = new LocalObjectCreator(config);
-            LocalObjectCreatorResult result = creator.create(this);
-            localObjectUpdaters.add(result.updater);
+            setGetRequestProcessor = createSetGetRequestProcessor(localManager);
+            announceRequestProcessor = createAnnounceRequestProcessor(localManager, remoteManager);
+            observeServiceProcessor = createObserveServiceProcessor();
+
+            requestDispatcher = createRequestDispatcher();
+            requestDispatcher.addRequestProcessor(setGetRequestProcessor);
+            requestDispatcher.addRequestProcessor(announceRequestProcessor);
+            requestDispatcher.addRequestProcessor(observeServiceProcessor);
+
+            localManager.add(nodeProfileObject);
+            
+            createLocalObjects();
+            
+            initialized = true;
+            result = true;
         }
 
-        LOGGER.exiting(CLASS_NAME, "initialize");
+        LOGGER.exiting(CLASS_NAME, "initialize", result);
+        return result;
+    }
+    
+    private void startUpdateThreads() {
+        for (LocalObjectUpdater updater : localObjectUpdaters) {
+            if (updater != null) {
+                new Thread(updater).start();
+            }
+        }
+    }
+    
+    private void startMainLoopThread() {
+        mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager);
+        new Thread(mainLoop).start();
     }
     
     private void startThreads() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "startThreads");
         
-        mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager);
-
-        localManager.add(nodeProfileObject);
+        startUpdateThreads();
         
-        for (LocalObjectUpdater updater: localObjectUpdaters) {
-            if (updater != null) {
-                new Thread(updater).start();
-            }
-        }
-        
-        new Thread(mainLoop).start();
+        startMainLoopThread();
         
         LOGGER.exiting(CLASS_NAME, "startThreads");
     }
     
     public boolean startService() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "startService");
-
-        boolean result = true;
         
         if (inService) {
-            result = false;
+            LOGGER.exiting(CLASS_NAME, "startService", false);
+            return false;
         }
-        
-        if (result) {
+
+        if (!isInitialized()) {
             initialize();
-            startThreads();
-            inService = true;
         }
         
-        LOGGER.exiting(CLASS_NAME, "startService", result);
-        return result;
+        startThreads();
+
+        service = new Service(this);
+        inService = true;
+
+        LOGGER.exiting(CLASS_NAME, "startService", true);
+        return true;
     }
     
     public Service getService() {
-        if (service == null) {
-            service = new Service(this);
-        }
-        
         return service;
     }
 }

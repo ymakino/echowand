@@ -20,6 +20,7 @@ import echowand.net.NodeInfo;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.object.EchonetObject;
+import echowand.object.EchonetObjectException;
 import echowand.object.InstanceListRequestExecutor;
 import echowand.object.LocalObject;
 import echowand.object.LocalObjectManager;
@@ -445,11 +446,14 @@ public class Service {
         
         InstanceListRequestExecutor executor = new InstanceListRequestExecutor(
                 getSubnet(), getTransactionManager(), getRemoteObjectManager());
-
-        executor.setTimeout(timeout);
-        executor.execute();
         
         ResultUpdate resultUpdate = new ResultUpdate(executor);
+        UpdateTransactionListener updateTransactionListener = new UpdateTransactionListener(resultUpdate);
+
+        executor.setTimeout(timeout);
+        executor.addTransactionListener(updateTransactionListener);
+        executor.execute();
+        
         LOGGER.exiting(CLASS_NAME, "doUpdate", resultUpdate);
         return resultUpdate;
     }
@@ -655,37 +659,90 @@ public class Service {
         return resultObserve;
     }
     
-    public ObjectData getData(EOJ eoj, EPC epc) throws LocalObjectNotFoundException {
-        LOGGER.entering(CLASS_NAME, "getData", new Object[]{eoj, epc});
+    public ObjectData getLocalData(EOJ eoj, EPC epc) throws LocalObjectNotFoundException {
+        LOGGER.entering(CLASS_NAME, "getLocalData", new Object[]{eoj, epc});
         
-        LocalObject localObject = getLocalObjectManager().get(eoj);
+        LocalObject localObject = getLocalObject(eoj);
         
         if (localObject == null) {
             LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
-            LOGGER.throwing(CLASS_NAME, "getData", exception);
+            LOGGER.throwing(CLASS_NAME, "getLocalData", exception);
             throw exception;
         }
         
         ObjectData objectData = localObject.getData(epc);
         
-        LOGGER.exiting(CLASS_NAME, "getData", objectData);
+        LOGGER.exiting(CLASS_NAME, "getLocalData", objectData);
         return objectData;
     }
     
-    public boolean setData(EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException {
-        LOGGER.entering(CLASS_NAME, "setData", new Object[]{eoj, epc, data});
+    public boolean setLocalData(EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException {
+        LOGGER.entering(CLASS_NAME, "setLocalData", new Object[]{eoj, epc, data});
         
-        LocalObject localObject = getLocalObjectManager().get(eoj);
+        LocalObject localObject = getLocalObject(eoj);
         
         if (localObject == null) {
             LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
-            LOGGER.throwing(CLASS_NAME, "setData", exception);
+            LOGGER.throwing(CLASS_NAME, "setLocalData", exception);
             throw exception;
         }
         
         boolean result = localObject.forceSetData(epc, data);
         
-        LOGGER.exiting(CLASS_NAME, "setData", result);
+        LOGGER.exiting(CLASS_NAME, "setLocalData", result);
+        return result;
+    }
+    
+    public ObjectData getRemoteData(NodeInfo nodeInfo, EOJ eoj, EPC epc) throws LocalObjectNotFoundException, SubnetException, EchonetObjectException {
+        LOGGER.entering(CLASS_NAME, "getRemoteData", new Object[]{nodeInfo, eoj, epc});
+        
+        ObjectData objectData = getRemoteData(getRemoteNode(nodeInfo), eoj, epc);
+        
+        LOGGER.exiting(CLASS_NAME, "getRemoteData", objectData);
+        return objectData;
+    }
+    
+    public ObjectData getRemoteData(Node node, EOJ eoj, EPC epc) throws LocalObjectNotFoundException, EchonetObjectException {
+        LOGGER.entering(CLASS_NAME, "getRemoteData", new Object[]{node, eoj, epc});
+        
+        RemoteObject remoteObject = getRemoteObject(node, eoj);
+        
+        if (remoteObject == null) {
+            LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
+            LOGGER.throwing(CLASS_NAME, "getRemoteData", exception);
+            throw exception;
+        }
+        
+        ObjectData objectData = remoteObject.getData(epc);
+        
+        LOGGER.exiting(CLASS_NAME, "getRemoteData", objectData);
+        return objectData;
+    }
+    
+    
+    public boolean setRemoteData(NodeInfo nodeInfo, EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException, SubnetException, EchonetObjectException {
+        LOGGER.entering(CLASS_NAME, "setRemoteData", new Object[]{nodeInfo, eoj, epc, data});
+        
+        boolean result = setRemoteData(getRemoteNode(nodeInfo), eoj, epc, data);
+        
+        LOGGER.exiting(CLASS_NAME, "setRemoteData", result);
+        return result;
+    }
+    
+    public boolean setRemoteData(Node node, EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException, EchonetObjectException {
+        LOGGER.entering(CLASS_NAME, "setRemoteData", new Object[]{eoj, epc, data});
+        
+        RemoteObject remoteObject = getRemoteObject(node, eoj);
+        
+        if (remoteObject == null) {
+            LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
+            LOGGER.throwing(CLASS_NAME, "setRemoteData", exception);
+            throw exception;
+        }
+        
+        boolean result = remoteObject.setData(epc, data);
+        
+        LOGGER.exiting(CLASS_NAME, "setRemoteData", result);
         return result;
     }
     
@@ -713,15 +770,41 @@ public class Service {
         return eojs;
     }
     
-    public List<EOJ> getEOJs() {
+    public int countLocalEOJs() {
+        return getLocalObjectManager().size();
+    }
+    
+    public EOJ getLocalEOJ(int index) {
+        return getLocalObjectManager().getAtIndex(index).getEOJ();
+    }
+    
+    public List<EOJ> getLocalEOJs() {
         return localObjectsToEOJs(getLocalObjectManager().getAllObjects());
     }
     
-    public List<EOJ> getEOJsAt(Node node) {
+    public int countRemoteEOJs(Node node) {
+        return getRemoteObjectManager().getAtNode(node).size();
+    }
+    
+    public int countRemoteEOJs(NodeInfo nodeInfo) throws SubnetException {
+        Node node = getRemoteNode(nodeInfo);
+        return getRemoteObjectManager().getAtNode(node).size();
+    }
+    
+    public EOJ getRemoteEOJ(Node node, int index) {
+        return getRemoteObjectManager().getAtNode(node).get(index).getEOJ();
+    }
+    
+    public EOJ getRemoteEOJ(NodeInfo nodeInfo, int index) throws SubnetException {
+        Node node = getRemoteNode(nodeInfo);
+        return getRemoteObjectManager().getAtNode(node).get(index).getEOJ();
+    }
+    
+    public List<EOJ> getRemoteEOJs(Node node) {
         return remoteObjectsToEOJs(getRemoteObjectManager().getAtNode(node));
     }
     
-    public List<EOJ> getEOJsAt(NodeInfo nodeInfo) throws SubnetException {
+    public List<EOJ> getRemoteEOJs(NodeInfo nodeInfo) throws SubnetException {
         Node node = getRemoteNode(nodeInfo);
         return remoteObjectsToEOJs(getRemoteObjectManager().getAtNode(node));
     }
@@ -736,5 +819,17 @@ public class Service {
     
     public Node getGroupNode() {
         return getSubnet().getGroupNode();
+    }
+    
+    public LocalObject getLocalObject(EOJ eoj) {
+        return getLocalObjectManager().get(eoj);
+    }
+    
+    public RemoteObject getRemoteObject(NodeInfo nodeInfo, EOJ eoj) throws SubnetException {
+        return getRemoteObject(getRemoteNode(nodeInfo), eoj);
+    }
+    
+    public RemoteObject getRemoteObject(Node node, EOJ eoj) {
+        return getRemoteObjectManager().get(node, eoj);
     }
 }
