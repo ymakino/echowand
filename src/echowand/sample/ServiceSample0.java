@@ -15,7 +15,7 @@ import echowand.object.EchonetObjectException;
 import echowand.object.LocalObject;
 import echowand.object.ObjectData;
 import echowand.service.LocalObjectConfig;
-import echowand.service.LocalObjectNotFoundException;
+import echowand.service.ObjectNotFoundException;
 import echowand.service.PropertyDelegate;
 import echowand.service.PropertyUpdater;
 import echowand.service.ResultObserveProcessor;
@@ -93,7 +93,7 @@ public class ServiceSample0 {
         }
     }
     
-    public static void main(String[] args) throws TooManyObjectsException, SocketException, UnknownHostException, InterruptedException, LocalObjectNotFoundException, EchonetObjectException {
+    public static void main(String[] args) throws TooManyObjectsException, SocketException, UnknownHostException, InterruptedException, ObjectNotFoundException, EchonetObjectException {
         // LoggerConfig.changeLogLevelAll(ResultBase.class.getName());
         // LoggerConfig.changeLogLevelAll(ResultObserve.class.getName());
         

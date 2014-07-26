@@ -659,13 +659,13 @@ public class Service {
         return resultObserve;
     }
     
-    public ObjectData getLocalData(EOJ eoj, EPC epc) throws LocalObjectNotFoundException {
+    public ObjectData getLocalData(EOJ eoj, EPC epc) throws ObjectNotFoundException {
         LOGGER.entering(CLASS_NAME, "getLocalData", new Object[]{eoj, epc});
         
         LocalObject localObject = getLocalObject(eoj);
         
         if (localObject == null) {
-            LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
+            ObjectNotFoundException exception = new ObjectNotFoundException(eoj.toString());
             LOGGER.throwing(CLASS_NAME, "getLocalData", exception);
             throw exception;
         }
@@ -676,13 +676,13 @@ public class Service {
         return objectData;
     }
     
-    public boolean setLocalData(EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException {
+    public boolean setLocalData(EOJ eoj, EPC epc, ObjectData data) throws ObjectNotFoundException {
         LOGGER.entering(CLASS_NAME, "setLocalData", new Object[]{eoj, epc, data});
         
         LocalObject localObject = getLocalObject(eoj);
         
         if (localObject == null) {
-            LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
+            ObjectNotFoundException exception = new ObjectNotFoundException(eoj.toString());
             LOGGER.throwing(CLASS_NAME, "setLocalData", exception);
             throw exception;
         }
@@ -693,7 +693,7 @@ public class Service {
         return result;
     }
     
-    public ObjectData getRemoteData(NodeInfo nodeInfo, EOJ eoj, EPC epc) throws LocalObjectNotFoundException, SubnetException, EchonetObjectException {
+    public ObjectData getRemoteData(NodeInfo nodeInfo, EOJ eoj, EPC epc) throws ObjectNotFoundException, SubnetException, EchonetObjectException {
         LOGGER.entering(CLASS_NAME, "getRemoteData", new Object[]{nodeInfo, eoj, epc});
         
         ObjectData objectData = getRemoteData(getRemoteNode(nodeInfo), eoj, epc);
@@ -702,13 +702,13 @@ public class Service {
         return objectData;
     }
     
-    public ObjectData getRemoteData(Node node, EOJ eoj, EPC epc) throws LocalObjectNotFoundException, EchonetObjectException {
+    public ObjectData getRemoteData(Node node, EOJ eoj, EPC epc) throws ObjectNotFoundException, EchonetObjectException {
         LOGGER.entering(CLASS_NAME, "getRemoteData", new Object[]{node, eoj, epc});
         
         RemoteObject remoteObject = getRemoteObject(node, eoj);
         
         if (remoteObject == null) {
-            LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
+            ObjectNotFoundException exception = new ObjectNotFoundException(eoj.toString());
             LOGGER.throwing(CLASS_NAME, "getRemoteData", exception);
             throw exception;
         }
@@ -720,7 +720,7 @@ public class Service {
     }
     
     
-    public boolean setRemoteData(NodeInfo nodeInfo, EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException, SubnetException, EchonetObjectException {
+    public boolean setRemoteData(NodeInfo nodeInfo, EOJ eoj, EPC epc, ObjectData data) throws ObjectNotFoundException, SubnetException, EchonetObjectException {
         LOGGER.entering(CLASS_NAME, "setRemoteData", new Object[]{nodeInfo, eoj, epc, data});
         
         boolean result = setRemoteData(getRemoteNode(nodeInfo), eoj, epc, data);
@@ -729,13 +729,13 @@ public class Service {
         return result;
     }
     
-    public boolean setRemoteData(Node node, EOJ eoj, EPC epc, ObjectData data) throws LocalObjectNotFoundException, EchonetObjectException {
+    public boolean setRemoteData(Node node, EOJ eoj, EPC epc, ObjectData data) throws ObjectNotFoundException, EchonetObjectException {
         LOGGER.entering(CLASS_NAME, "setRemoteData", new Object[]{eoj, epc, data});
         
         RemoteObject remoteObject = getRemoteObject(node, eoj);
         
         if (remoteObject == null) {
-            LocalObjectNotFoundException exception = new LocalObjectNotFoundException(eoj.toString());
+            ObjectNotFoundException exception = new ObjectNotFoundException(eoj.toString());
             LOGGER.throwing(CLASS_NAME, "setRemoteData", exception);
             throw exception;
         }
