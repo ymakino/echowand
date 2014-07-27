@@ -38,15 +38,15 @@ public class ResultObserve {
         LOGGER.exiting(CLASS_NAME, "ResultObserve");
     }
     
-    public synchronized void done() {
-        LOGGER.entering(CLASS_NAME, "done");
+    public synchronized void stopObserve() {
+        LOGGER.entering(CLASS_NAME, "stopObserve");
         
         if (!done) {
             processor.removeResultObserve(this);
             done = true;
         }
         
-        LOGGER.exiting(CLASS_NAME, "done");
+        LOGGER.exiting(CLASS_NAME, "stopObserve");
     }
     
     public synchronized boolean isDone() {

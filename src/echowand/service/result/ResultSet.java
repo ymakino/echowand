@@ -13,11 +13,20 @@ public class ResultSet extends ResultBase {
     private static final Logger LOGGER = Logger.getLogger(ResultSet.class.getName());
     private static final String CLASS_NAME = ResultSet.class.getName();
     
+    private boolean responseRequired = false;
+    
+    public ResultSet(boolean responseRequired) {
+        this.responseRequired = responseRequired;
+    }
+    
     @Override
     public boolean isSuccessPayload(StandardPayload payload) {
         LOGGER.entering(CLASS_NAME, "isSuccessPayload", payload);
         
-        boolean result = payload.getESV() == ESV.Set_Res;
+        boolean result = false;
+        if (responseRequired) {
+            result = (payload.getESV() == ESV.Set_Res);
+        }
         
         LOGGER.exiting(CLASS_NAME, "isSuccessPayload", result);
         return result;
@@ -28,7 +37,13 @@ public class ResultSet extends ResultBase {
         LOGGER.entering(CLASS_NAME, "isValidPayload", payload);
         
         ESV esv = payload.getESV();
-        boolean result = (esv == ESV.Set_Res || esv == ESV.SetI_SNA || esv == ESV.SetC_SNA);
+        boolean result;
+        
+        if (responseRequired) {
+            result = (esv == ESV.Set_Res ||  esv == ESV.SetC_SNA);
+        } else {
+            result = (esv == ESV.SetI_SNA);
+        }
         
         LOGGER.exiting(CLASS_NAME, "isValidPayload", result);
         return result;
@@ -38,7 +53,10 @@ public class ResultSet extends ResultBase {
     public boolean isValidProperty(Property property) {
         LOGGER.entering(CLASS_NAME, "isValidProperty", property);
         
-        boolean result = (property.getPDC() == 0);
+        boolean result = false;
+        if (responseRequired) {
+            result = (property.getPDC() == 0);
+        }
         
         LOGGER.exiting(CLASS_NAME, "isValidProperty", result);
         return result;
