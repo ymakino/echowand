@@ -195,7 +195,7 @@ public class ServiceSample0 {
             
             Thread.sleep(5000);
             
-            resultObserve.done();
+            resultObserve.stopObserve();
             System.out.println("done");
             
             for (ResultData resultData: resultObserve.getResultDataList()) {
