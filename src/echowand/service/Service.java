@@ -820,11 +820,11 @@ public class Service {
         return getRemoteObjectManager().get(node, eoj);
     }
     
-    public RemoteObject registerRemoteObject(NodeInfo nodeInfo, EOJ eoj) throws SubnetException {
-        return registerRemoteObject(getRemoteNode(nodeInfo), eoj);
+    public RemoteObject registerRemoteEOJ(NodeInfo nodeInfo, EOJ eoj) throws SubnetException {
+        return registerRemoteEOJ(getRemoteNode(nodeInfo), eoj);
     }
     
-    public RemoteObject registerRemoteObject(Node node, EOJ eoj) {
+    public RemoteObject registerRemoteEOJ(Node node, EOJ eoj) {
         RemoteObject object = new RemoteObject(getSubnet(), node, eoj, getTransactionManager());
         getRemoteObjectManager().add(object);
         return object;
