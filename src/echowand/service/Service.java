@@ -27,7 +27,7 @@ import echowand.service.result.ResultBase;
 import echowand.service.result.ResultGet;
 import echowand.service.result.ResultObserve;
 import echowand.service.result.ResultSet;
-import echowand.service.result.ResultUpdate;
+import echowand.service.result.ResultUpdateRemoteInfo;
 import echowand.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,9 +112,9 @@ public class Service {
     }
     
     private class ResultUpdateTransactionListener implements TransactionListener {
-        private ResultUpdate resultUpdate;
+        private ResultUpdateRemoteInfo resultUpdate;
 
-        public ResultUpdateTransactionListener(ResultUpdate resultUpdate) {
+        public ResultUpdateTransactionListener(ResultUpdateRemoteInfo resultUpdate) {
             LOGGER.entering(CLASS_NAME, "ResultUpdateTransactionListener.begin", resultUpdate);
             
             this.resultUpdate = resultUpdate;
@@ -427,22 +427,22 @@ public class Service {
         return resultSet;
     }
     
-    public ResultUpdate doUpdate(int timeout) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doUpdate", timeout);
+    public ResultUpdateRemoteInfo doUpdateRemoteInfo(int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", timeout);
         
         InstanceListRequestExecutor executor = new InstanceListRequestExecutor(
                 getSubnet(), getTransactionManager(), getRemoteObjectManager());
         
-        ResultUpdate resultUpdate = new ResultUpdate(executor);
-        ResultUpdateTransactionListener resultUpdateTransactionListener = new ResultUpdateTransactionListener(resultUpdate);
+        ResultUpdateRemoteInfo resultUpdateRemoteInfo = new ResultUpdateRemoteInfo(executor);
+        ResultUpdateTransactionListener resultUpdateTransactionListener = new ResultUpdateTransactionListener(resultUpdateRemoteInfo);
 
         executor.setTimeout(timeout);
         executor.addTransactionListener(resultUpdateTransactionListener);
         
         executor.execute();
         
-        LOGGER.exiting(CLASS_NAME, "doUpdate", resultUpdate);
-        return resultUpdate;
+        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", resultUpdateRemoteInfo);
+        return resultUpdateRemoteInfo;
     }
     
     public ResultObserve doObserve(Node node, EOJ eoj, EPC epc) throws SubnetException {

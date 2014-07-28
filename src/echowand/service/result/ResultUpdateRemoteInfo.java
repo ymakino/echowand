@@ -7,9 +7,7 @@ import echowand.common.ESV;
 import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.StandardPayload;
-import echowand.net.Subnet;
 import echowand.object.InstanceListRequestExecutor;
-import echowand.object.RemoteObject;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -18,9 +16,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ResultUpdate {
-    private static final Logger LOGGER = Logger.getLogger(ResultUpdate.class.getName());
-    private static final String CLASS_NAME = ResultUpdate.class.getName();
+public class ResultUpdateRemoteInfo {
+    private static final Logger LOGGER = Logger.getLogger(ResultUpdateRemoteInfo.class.getName());
+    private static final String CLASS_NAME = ResultUpdateRemoteInfo.class.getName();
     
     private InstanceListRequestExecutor executor;
     private LinkedList<Frame> frames;
@@ -29,8 +27,8 @@ public class ResultUpdate {
     private LinkedList<Node> nodes;
     private HashMap<Node, LinkedList<EOJ>> nodeEOJMap;
     
-    public ResultUpdate(InstanceListRequestExecutor executor) {
-        LOGGER.entering(CLASS_NAME, "ResultUpdate", executor);
+    public ResultUpdateRemoteInfo(InstanceListRequestExecutor executor) {
+        LOGGER.entering(CLASS_NAME, "ResultUpdateRemoteInfo", executor);
         
         this.executor = executor;
         frames = new LinkedList<Frame>();
@@ -39,7 +37,7 @@ public class ResultUpdate {
         nodes = new LinkedList<Node>();
         nodeEOJMap = new HashMap<Node, LinkedList<EOJ>>();
         
-        LOGGER.exiting(CLASS_NAME, "ResultUpdate");
+        LOGGER.exiting(CLASS_NAME, "ResultUpdateRemoteInfo");
     }
     
     public boolean isDone() {
@@ -187,11 +185,11 @@ public class ResultUpdate {
     }
     
     public synchronized EOJ getEOJ(Node node, int index) {
-        LOGGER.entering(CLASS_NAME, "getNode", index);
+        LOGGER.entering(CLASS_NAME, "getEOJ", index);
         
         LinkedList<EOJ> eojs = nodeEOJMap.get(node);
         EOJ eoj = eojs.get(index);
-        LOGGER.exiting(CLASS_NAME, "getNode", eoj);
+        LOGGER.exiting(CLASS_NAME, "getEOJ", eoj);
         return eoj;
     }
 }
