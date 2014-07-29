@@ -10,20 +10,20 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class LocalObjectInterface {
-    private static final Logger LOGGER = Logger.getLogger(LocalObjectInterface.class.getName());
-    private static final String CLASS_NAME = LocalObjectInterface.class.getName();
+public class LocalObjectAccessInterface {
+    private static final Logger LOGGER = Logger.getLogger(LocalObjectAccessInterface.class.getName());
+    private static final String CLASS_NAME = LocalObjectAccessInterface.class.getName();
     
-    private ServiceManager serviceManager;
-    private LocalObject localObject;
+    private ServiceManager serviceManager = null;
+    private LocalObject localObject = null;
     
     public ServiceManager setServiceManager(ServiceManager serviceManager) {
-        LOGGER.entering(CLASS_NAME, "setLocalObjectManager", serviceManager);
+        LOGGER.entering(CLASS_NAME, "setServiceManager", serviceManager);
         
-        ServiceManager lastManager = serviceManager;
+        ServiceManager lastManager = this.serviceManager;
         this.serviceManager = serviceManager;
         
-        LOGGER.exiting(CLASS_NAME, "setLocalObjectManager", lastManager);
+        LOGGER.exiting(CLASS_NAME, "setServiceManager", lastManager);
         return lastManager;
     }
     

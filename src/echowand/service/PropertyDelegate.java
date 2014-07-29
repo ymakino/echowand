@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class PropertyDelegate extends LocalObjectInterface {
+public class PropertyDelegate extends LocalObjectAccessInterface {
     private static final Logger LOGGER = Logger.getLogger(PropertyDelegate.class.getName());
     private static final String CLASS_NAME = PropertyDelegate.class.getName();
     

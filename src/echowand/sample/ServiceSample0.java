@@ -27,7 +27,7 @@ import echowand.service.result.ResultData;
 import echowand.service.result.ResultDataMatcherRule;
 import echowand.service.result.ResultGet;
 import echowand.service.result.ResultObserve;
-import echowand.service.result.ResultUpdate;
+import echowand.service.result.ResultUpdateRemoteInfo;
 import echowand.util.LoggerConfig;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -141,7 +141,7 @@ public class ServiceSample0 {
             }
             
             // Update remote node information
-            ResultUpdate resultUpdate = service.doUpdate(1000);
+            ResultUpdateRemoteInfo resultUpdate = service.doUpdateRemoteInfo(1000);
             resultUpdate.join();
             
             for (int i=0; i<resultUpdate.countNodes(); i++) {

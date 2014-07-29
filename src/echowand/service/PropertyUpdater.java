@@ -7,7 +7,7 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public abstract class PropertyUpdater extends LocalObjectInterface {
+public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     private static final Logger LOGGER = Logger.getLogger(PropertyUpdater.class.getName());
     private static final String CLASS_NAME = PropertyUpdater.class.getName();
     
