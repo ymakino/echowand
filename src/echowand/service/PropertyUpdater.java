@@ -11,7 +11,6 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     private static final Logger LOGGER = Logger.getLogger(PropertyUpdater.class.getName());
     private static final String CLASS_NAME = PropertyUpdater.class.getName();
     
-    private LocalObject localObject;
     private int intervalPeriod;
     private boolean done;
     
@@ -59,7 +58,7 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     public void doLoopOnce() {
         LOGGER.entering(CLASS_NAME, "doLoopOnce");
         
-        loop(localObject);
+        loop(getLocalObject());
         
         LOGGER.exiting(CLASS_NAME, "doLoopOnce");
     }
