@@ -1,6 +1,5 @@
 package echowand.util;
 
-import echowand.net.NetworkException;
 import java.util.HashSet;
 
 public class UniqueNumberGenerator {
@@ -39,7 +38,7 @@ public class UniqueNumberGenerator {
         return usedNumberSet.remove(id);
     }
     
-    private Long findNextNumber() throws NetworkException {
+    private Long findNextNumber() throws RunOutOfNumbersException {
         long newNumber;
 
         for (newNumber = nextNumber; newNumber <= maxNumber; newNumber++) {
@@ -54,20 +53,30 @@ public class UniqueNumberGenerator {
             }
         }
 
-        throw new NetworkException("Unique numbers have been exhausted");
+        throw new RunOutOfNumbersException("Unique numbers have been exhausted");
     }
     
-    private void updateNextNumber() throws NetworkException {
+    private void updateNextNumber() throws RunOutOfNumbersException {
         nextNumber = findNextNumber();
     }
     
-    public synchronized long allocate() throws NetworkException {
-        long newNumber;
-        boolean found = false;
+    private void incrementNextNumber() {
+        if (nextNumber == maxNumber) {
+            nextNumber = minNumber;
+        } else {
+            nextNumber += 1;
+        }
+    }
+    
+    public synchronized long allocate() throws RunOutOfNumbersException {
+        if (isAllocated(nextNumber)) {
+            updateNextNumber();
+        }
         
-        newNumber = nextNumber;
+        long newNumber = nextNumber;
+        usedNumberSet.add(newNumber);
         
-        updateNextNumber();
+        incrementNextNumber();
         
         return newNumber;
     }
