@@ -154,6 +154,11 @@ public class ReadableConverterMap {
         
         putInternal(new ClassEOJ("0130"), EPC.xC1, new ReadableConverterToggle((byte)0x41, "ON", (byte)0x42, "OFF"));
         
+        putInternal(new ClassEOJ("0ef0"), EPC.xD3, new ReadableConverterUnsignedInteger());
+        putInternal(new ClassEOJ("0ef0"), EPC.xD4, new ReadableConverterUnsignedInteger());
+        putInternal(new ClassEOJ("0ef0"), EPC.xD5, new ReadableConverterInstanceList());
+        putInternal(new ClassEOJ("0ef0"), EPC.xD6, new ReadableConverterInstanceList());
+        putInternal(new ClassEOJ("0ef0"), EPC.xD7, new ReadableConverterClassList());
     }
     
     private String code2str(int c) {

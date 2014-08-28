@@ -1,11 +1,14 @@
 package echowand.app;
 
+import echowand.common.ClassEOJ;
+import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.PropertyMap;
 import echowand.object.ObjectData;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 
@@ -305,5 +308,108 @@ class ReadableConverterPropertyMap extends ReadableConverter {
         }
         
         return builder.toString();
+    }
+}
+
+abstract class ReadableConverterEntityList extends ReadableConverter {
+
+    private class  EntityList {
+
+        private LinkedList<Object> list = new LinkedList<Object>();
+
+        public void addEntity(Object entity) {
+            String entityStr = entity.toString();
+
+            int i;
+            for (i = 0; i < list.size(); i++) {
+                int cmp = entityStr.compareTo(list.get(i).toString());
+                if (cmp == 0) {
+                    return;
+                }
+
+                if (cmp < 0) {
+                    break;
+                }
+            }
+
+            list.add(i, entity);
+        }
+        
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < list.size(); i++) {
+                if (i != 0) {
+                    builder.append(", ");
+                }
+
+                builder.append(list.get(i).toString());
+            }
+
+            return builder.toString();
+        }
+    }
+    
+    public abstract Object newEntity(ObjectData data, int offset);
+    public abstract int getEntitySize();
+    
+    @Override
+    public String dataToString(ObjectData data) {
+        int dataSize = data.size();
+
+        if (dataSize == 0) {
+            return INVALID;
+        }
+        
+        int num = 0xff & data.get(0);
+        if (dataSize != 1 + getEntitySize() * num) {
+            return INVALID;
+        }
+        
+        EntityList entityList = new EntityList();
+        for (int i=0; i<num; i++) {
+            int offset = 1 + getEntitySize() * i;
+            Object entity = newEntity(data, offset);
+            
+            if (entity == null) {
+                return INVALID;
+            }
+            
+            entityList.addEntity(entity);
+        }
+        
+        if (entityList.isEmpty()) {
+            return "NONE";
+        }
+        
+        return entityList.toString();
+    }
+}
+
+class ReadableConverterInstanceList extends ReadableConverterEntityList {
+    @Override
+    public Object newEntity(ObjectData data, int offset) {
+            return new EOJ(data.get(offset), data.get(offset+1), data.get(offset+2));
+    }
+    
+    @Override
+    public int getEntitySize() {
+        return 3;
+    }
+}
+
+class ReadableConverterClassList extends ReadableConverterEntityList {
+    @Override
+    public Object newEntity(ObjectData data, int offset) {
+            return new ClassEOJ(data.get(offset), data.get(offset+1));
+    }
+    
+    @Override
+    public int getEntitySize() {
+        return 2;
     }
 }
