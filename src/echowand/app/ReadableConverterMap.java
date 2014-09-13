@@ -58,9 +58,21 @@ public class ReadableConverterMap {
         }
         putInternal(new ClassEOJ("0001"), EPC.xB0, new ReadableConverterMultipleToggle(LevelMap));
         putInternal(new ClassEOJ("0001"), EPC.xB1, new ReadableConverterToggle((byte)0x41, "LEAKING", (byte)0x42, "NORMAL"));
-        
+        putInternal(new ClassEOJ("0007"), EPC.xB1, new ReadableConverterToggle((byte)0x41, "FOUND", (byte)0x42, "NOT FOUND"));
+        putInternal(new ClassEOJ("000d"), EPC.xE0, new ReadableConverterUnsignedInteger("lux"));
+        putInternal(new ClassEOJ("000d"), EPC.xE1, new ReadableConverterUnsignedInteger("klux"));
         putInternal(new ClassEOJ("0011"), EPC.xE0, new ReadableConverterReal(10, "\u2103"));
         putInternal(new ClassEOJ("0012"), EPC.xE0, new ReadableConverterPercentage());
+        putInternal(new ClassEOJ("0019"), EPC.xB1, new ReadableConverterToggle((byte)0x41, "FOUND", (byte)0x42, "NOT FOUND"));
+        putInternal(new ClassEOJ("001f"), EPC.xE0, new ReadableConverterReal(100, "m/sec"));
+        putInternal(new ClassEOJ("001f"), EPC.xE1, new ReadableConverterUnsignedInteger("\u00B0"));
+        putInternal(new ClassEOJ("0022"), EPC.xE0, new ReadableConverterReal(1000, "kWh"));
+        putInternal(new ClassEOJ("0022"), EPC.xE1, new ReadableConverterInteger("W"));
+        putInternal(new ClassEOJ("0022"), EPC.xE2, new ReadableConverterReal(10, "W"));
+        putInternal(new ClassEOJ("0022"), EPC.xE3, new ReadableConverterReal(10, "kW"));
+        putInternal(new ClassEOJ("0022"), EPC.xE5, new ReadableConverterUnsignedInteger("V"));
+        putInternal(new ClassEOJ("0025"), EPC.xE0, new ReadableConverterUnsignedInteger("cm\u00B3"));
+        putInternal(new ClassEOJ("0025"), EPC.xE2, new ReadableConverterUnsignedInteger("cm\u00B3/min"));
         
         
         
@@ -153,6 +165,8 @@ public class ReadableConverterMap {
         putInternal(new ClassEOJ("0130"), EPC.xC0, new ReadableConverterMultipleToggle(ventilationModeMap));
         
         putInternal(new ClassEOJ("0130"), EPC.xC1, new ReadableConverterToggle((byte)0x41, "ON", (byte)0x42, "OFF"));
+        
+        putInternal(new ClassEOJ("0290"), EPC.xB0, new ReadableConverterUnsignedInteger("%"));
         
         putInternal(new ClassEOJ("0ef0"), EPC.xD3, new ReadableConverterUnsignedInteger());
         putInternal(new ClassEOJ("0ef0"), EPC.xD4, new ReadableConverterUnsignedInteger());
