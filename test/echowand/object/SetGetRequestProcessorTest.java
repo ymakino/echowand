@@ -190,8 +190,17 @@ public class SetGetRequestProcessorTest {
     
     @Test
     public void testProcessINF_REQ() {
+        InternalSubnet subnet2 = new InternalSubnet();
+        
         processor.processINF_REQ(subnet, createFrameINF_REQ1(subnet), false);
         Frame frame = recvWithoutError(subnet);
+        assertEquals(subnet.getLocalNode(), frame.getSender());
+        assertEquals(subnet.getGroupNode(), frame.getReceiver());
+        
+        Frame frame2 = recvWithoutError(subnet2);
+        assertEquals(subnet.getLocalNode(), frame2.getSender());
+        assertEquals(subnet2.getGroupNode(), frame2.getReceiver());
+        
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.INF, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
@@ -202,9 +211,16 @@ public class SetGetRequestProcessorTest {
     }
     
     @Test
-    public void testProcessINF_REQ_Fail() {
+    public void testProcessINF_REQ_Fail() throws SubnetException {
+        InternalSubnet subnet2 = new InternalSubnet();
+        
         processor.processINF_REQ(subnet, createFrameINF_REQ2(subnet), false);
         Frame frame = recvWithoutError(subnet);
+        assertEquals(subnet.getLocalNode(), frame.getSender());
+        assertEquals(subnet.getLocalNode(), frame.getReceiver());
+        
+        assertNull(subnet2.recvNoWait());
+        
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.INF_SNA, payload.getESV());
         assertEquals(2, payload.getFirstOPC());

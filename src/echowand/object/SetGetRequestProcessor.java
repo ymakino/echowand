@@ -276,15 +276,19 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
     private void processObjectINF_REQ(Subnet subnet, Frame frame, LocalObject object, boolean processed) {
         logger.entering(className, "processObjectINF_REQ", new Object[]{subnet, frame, object, processed});
         
+        boolean useGroup;
+        
         StandardPayload res = new StandardPayload();
         if (doGetAllData(frame, object, res, true)) {
             res.setESV(ESV.INF);
+            useGroup = true;
         } else {
             res.setESV(ESV.INF_SNA);
+            useGroup = false;
         }
         
         try {
-            subnet.send(createResponse(subnet.getLocalNode(), frame, object, res, false, subnet));
+            subnet.send(createResponse(subnet.getLocalNode(), frame, object, res, useGroup, subnet));
         } catch (SubnetException e) {
             e.printStackTrace();
         }
