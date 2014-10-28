@@ -16,9 +16,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ResultUpdateRemoteInfo {
-    private static final Logger LOGGER = Logger.getLogger(ResultUpdateRemoteInfo.class.getName());
-    private static final String CLASS_NAME = ResultUpdateRemoteInfo.class.getName();
+public class UpdateRemoteInfoResult {
+    private static final Logger LOGGER = Logger.getLogger(UpdateRemoteInfoResult.class.getName());
+    private static final String CLASS_NAME = UpdateRemoteInfoResult.class.getName();
     
     private InstanceListRequestExecutor executor;
     private LinkedList<Frame> frames;
@@ -27,8 +27,8 @@ public class ResultUpdateRemoteInfo {
     private LinkedList<Node> nodes;
     private HashMap<Node, LinkedList<EOJ>> nodeEOJMap;
     
-    public ResultUpdateRemoteInfo(InstanceListRequestExecutor executor) {
-        LOGGER.entering(CLASS_NAME, "ResultUpdateRemoteInfo", executor);
+    public UpdateRemoteInfoResult(InstanceListRequestExecutor executor) {
+        LOGGER.entering(CLASS_NAME, "UpdateRemoteInfoResult", executor);
         
         this.executor = executor;
         frames = new LinkedList<Frame>();
@@ -37,7 +37,7 @@ public class ResultUpdateRemoteInfo {
         nodes = new LinkedList<Node>();
         nodeEOJMap = new HashMap<Node, LinkedList<EOJ>>();
         
-        LOGGER.exiting(CLASS_NAME, "ResultUpdateRemoteInfo");
+        LOGGER.exiting(CLASS_NAME, "UpdateRemoteInfoResult");
     }
     
     public boolean isDone() {

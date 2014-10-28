@@ -19,14 +19,14 @@ public class PropertyDelegate extends LocalObjectAccessInterface {
     private boolean notifyEnabled;
     
     public PropertyDelegate(EPC epc, boolean getEnabled, boolean setEnabled, boolean notifyEnabled) {
-        LOGGER.entering(CLASS_NAME, "ObserveServiceProcessor", new Object[]{epc, getEnabled, setEnabled, notifyEnabled});
+        LOGGER.entering(CLASS_NAME, "PropertyDelegate", new Object[]{epc, getEnabled, setEnabled, notifyEnabled});
         
         this.epc = epc;
         this.getEnabled = getEnabled;
         this.setEnabled = setEnabled;
         this.notifyEnabled = notifyEnabled;
         
-        LOGGER.exiting(CLASS_NAME, "ObserveServiceProcessor");
+        LOGGER.exiting(CLASS_NAME, "PropertyDelegate");
     }
 
     public EPC getEPC() {

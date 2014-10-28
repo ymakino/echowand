@@ -16,7 +16,7 @@ import org.junit.Test;
  */
 public class LocalObjectUpdaterTest {
     private LocalObject localObject;
-    private ServiceManager serviceManager;
+    private Core core;
     
     private class DummyPropertyUpdater extends PropertyUpdater {
         public int count = 0;
@@ -31,7 +31,7 @@ public class LocalObjectUpdaterTest {
     public void setUp() {
         TemperatureSensorInfo info = new TemperatureSensorInfo();
         localObject = new LocalObject(info);
-        serviceManager = new ServiceManager(new InternalSubnet("LocalObjectUpdaterTest"));
+        core = new Core(new InternalSubnet("LocalObjectUpdaterTest"));
     }
 
     /**
@@ -39,17 +39,17 @@ public class LocalObjectUpdaterTest {
      */
     @Test
     public void testGetLocalObject() {
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         assertEquals(localObject, updater.getLocalObject());
     }
 
     /**
-     * Test of getServiceManager method, of class LocalObjectUpdater.
+     * Test of getCore method, of class LocalObjectUpdater.
      */
     @Test
-    public void testGetServiceManager() {
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
-        assertEquals(serviceManager, updater.getServiceManager());
+    public void testGetCore() {
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
+        assertEquals(core, updater.getCore());
     }
 
     /**
@@ -57,7 +57,7 @@ public class LocalObjectUpdaterTest {
      */
     @Test
     public void testCountPropertyUpdaters() {
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         assertEquals(0, updater.countPropertyUpdaters());
     }
 
@@ -66,7 +66,7 @@ public class LocalObjectUpdaterTest {
      */
     @Test
     public void testAddPropertyUpdater() {
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         assertEquals(0, updater.countPropertyUpdaters());
         
         updater.addPropertyUpdater(new DummyPropertyUpdater());
@@ -84,7 +84,7 @@ public class LocalObjectUpdaterTest {
         DummyPropertyUpdater propertyUpdater1 = new DummyPropertyUpdater();
         DummyPropertyUpdater propertyUpdater2 = new DummyPropertyUpdater();
         
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         
         updater.addPropertyUpdater(propertyUpdater1);
         updater.addPropertyUpdater(propertyUpdater2);
@@ -108,7 +108,7 @@ public class LocalObjectUpdaterTest {
         DummyPropertyUpdater propertyUpdater1 = new DummyPropertyUpdater();
         DummyPropertyUpdater propertyUpdater2 = new DummyPropertyUpdater();
         
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         
         updater.addPropertyUpdater(propertyUpdater1);
         updater.addPropertyUpdater(propertyUpdater2);
@@ -132,7 +132,7 @@ public class LocalObjectUpdaterTest {
         propertyUpdater1.setIntervalPeriod(400);
         propertyUpdater2.setIntervalPeriod(200);
         
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         
         updater.addPropertyUpdater(propertyUpdater1);
         updater.addPropertyUpdater(propertyUpdater2);

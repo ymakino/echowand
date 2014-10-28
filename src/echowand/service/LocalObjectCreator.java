@@ -25,8 +25,8 @@ public class LocalObjectCreator {
         LOGGER.exiting(CLASS_NAME, "LocalObjectCreator");
     }
     
-    private LocalObject createLocalObject(ServiceManager service) throws TooManyObjectsException {
-        LOGGER.entering(CLASS_NAME, "createLocalObject", service);
+    private LocalObject createLocalObject(Core core) throws TooManyObjectsException {
+        LOGGER.entering(CLASS_NAME, "createLocalObject", core);
         
         LocalObject object = new LocalObject(config.getObjectInfo());
 
@@ -34,7 +34,7 @@ public class LocalObjectCreator {
         for (int i=0; i<propertyDelegateSize; i++) {
             PropertyDelegate propertyDelegate = config.getPropertyDelegate(i);
             propertyDelegate.setLocalObject(object);
-            propertyDelegate.setServiceManager(service);
+            propertyDelegate.setCore(core);
             LocalObjectPropertyDelegate delegate = new LocalObjectPropertyDelegate(propertyDelegate);
             object.addDelegate(delegate);
         }
@@ -44,18 +44,18 @@ public class LocalObjectCreator {
             object.addDelegate(config.getDelegate(i));
         }
         
-        Subnet subnet = service.getSubnet();
-        TransactionManager transactionManager = service.getTransactionManager();
+        Subnet subnet = core.getSubnet();
+        TransactionManager transactionManager = core.getTransactionManager();
         object.addDelegate(new LocalObjectNotifyDelegate(subnet, transactionManager));
         
-        service.getLocalObjectManager().add(object);
+        core.getLocalObjectManager().add(object);
         
         LOGGER.exiting(CLASS_NAME, "createLocalObject", object);
         return object;
     }
     
-    private LocalObjectUpdater createUpdater(LocalObject localObject, ServiceManager serviceManager) {
-        LOGGER.entering(CLASS_NAME, "createUpdater", new Object[]{localObject, serviceManager});
+    private LocalObjectUpdater createUpdater(LocalObject localObject, Core core) {
+        LOGGER.entering(CLASS_NAME, "createUpdater", new Object[]{localObject, core});
         
         int propertyUpdaterSize = config.countPropertyUpdaters();
         
@@ -64,7 +64,7 @@ public class LocalObjectCreator {
             return null;
         }
         
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         
         for (int i=0; i<propertyUpdaterSize; i++) {
             updater.addPropertyUpdater(config.getPropertyUpdater(i));
@@ -74,11 +74,11 @@ public class LocalObjectCreator {
         return updater;
     }
     
-    public LocalObjectCreatorResult create(ServiceManager service) throws TooManyObjectsException {
-        LOGGER.entering(CLASS_NAME, "create", service);
+    public LocalObjectCreatorResult create(Core core) throws TooManyObjectsException {
+        LOGGER.entering(CLASS_NAME, "create", core);
         
-        LocalObject object = createLocalObject(service);
-        LocalObjectUpdater updater = createUpdater(object, service);
+        LocalObject object = createLocalObject(core);
+        LocalObjectUpdater updater = createUpdater(object, core);
         
         LocalObjectCreatorResult result = new LocalObjectCreatorResult(object, updater);
         LOGGER.exiting(CLASS_NAME, "create", result);

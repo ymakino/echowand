@@ -9,13 +9,13 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ResultSet extends ResultBase {
-    private static final Logger LOGGER = Logger.getLogger(ResultSet.class.getName());
-    private static final String CLASS_NAME = ResultSet.class.getName();
+public class SetResult extends ResultBase {
+    private static final Logger LOGGER = Logger.getLogger(SetResult.class.getName());
+    private static final String CLASS_NAME = SetResult.class.getName();
     
     private boolean responseRequired = false;
     
-    public ResultSet(boolean responseRequired) {
+    public SetResult(boolean responseRequired) {
         this.responseRequired = responseRequired;
     }
     

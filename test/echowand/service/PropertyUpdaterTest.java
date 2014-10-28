@@ -83,14 +83,15 @@ public class PropertyUpdaterTest {
     @Test
     public void testDoLoopOnce() throws TooManyObjectsException {
         PropertyUpdaterImpl updater = new PropertyUpdaterImpl();
-        ServiceManager serviceManager = new ServiceManager(new InternalSubnet("PropertyUpdaterTest"));
+        Core core = new Core(new InternalSubnet("PropertyUpdaterTest"));
         LocalObjectConfig conf = new LocalObjectConfig(new TemperatureSensorInfo());
-        serviceManager.addLocalObjectConfig(conf);
-        serviceManager.startService();
+        core.addLocalObjectConfig(conf);
+        core.startService();
         
-        LocalObject localObject = serviceManager.getService().getLocalObject(new EOJ("001101"));
+        Service service = new Service(core);
+        LocalObject localObject = service.getLocalObject(new EOJ("001101"));
         
-        updater.setServiceManager(serviceManager);
+        updater.setCore(core);
         updater.setLocalObject(localObject);
         
         assertEquals(0, updater.count);

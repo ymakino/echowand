@@ -14,14 +14,14 @@ public class LocalObjectUpdater implements Runnable {
     private static final String CLASS_NAME = LocalObjectUpdater.class.getName();
     
     private LocalObject localObject;
-    private ServiceManager serviceManager;
+    private Core core;
     private LinkedList<PropertyUpdater> propertyUpdaters;
     
-    public LocalObjectUpdater(LocalObject localObject, ServiceManager serviceManager) {
-        LOGGER.entering(CLASS_NAME, "LocalObjectUpdater", new Object[]{localObject, serviceManager});
+    public LocalObjectUpdater(LocalObject localObject, Core core) {
+        LOGGER.entering(CLASS_NAME, "LocalObjectUpdater", new Object[]{localObject, core});
         
         this.localObject = localObject;
-        this.serviceManager = serviceManager;
+        this.core = core;
         propertyUpdaters = new LinkedList<PropertyUpdater>();
         
         LOGGER.exiting(CLASS_NAME, "LocalObjectUpdater");
@@ -34,11 +34,11 @@ public class LocalObjectUpdater implements Runnable {
         return localObject;
     }
     
-    public ServiceManager getServiceManager() {
-        LOGGER.entering(CLASS_NAME, "getServiceManager");
+    public Core getCore() {
+        LOGGER.entering(CLASS_NAME, "getCore");
         
-        LOGGER.exiting(CLASS_NAME, "getServiceManager", serviceManager);
-        return serviceManager;
+        LOGGER.exiting(CLASS_NAME, "getCore", core);
+        return core;
     }
     
     public int countPropertyUpdaters() {
@@ -58,10 +58,10 @@ public class LocalObjectUpdater implements Runnable {
     }
     
     public boolean removePropertyUpdater(PropertyUpdater delegate) {
-        LOGGER.entering(CLASS_NAME, "addPropertyUpdater", delegate);
+        LOGGER.entering(CLASS_NAME, "removePropertyUpdater", delegate);
         
         boolean result = propertyUpdaters.remove(delegate);
-        LOGGER.exiting(CLASS_NAME, "addPropertyUpdater", result);
+        LOGGER.exiting(CLASS_NAME, "removePropertyUpdater", result);
         return result;
     }
     
@@ -81,7 +81,7 @@ public class LocalObjectUpdater implements Runnable {
         LinkedList<PropertyUpdaterThread> threads = new LinkedList<PropertyUpdaterThread>();
         
         for (PropertyUpdater propertyUpdater : propertyUpdaters) {
-            propertyUpdater.setServiceManager(serviceManager);
+            propertyUpdater.setCore(core);
             propertyUpdater.setLocalObject(localObject);
             threads.add(new PropertyUpdaterThread(propertyUpdater));
         }

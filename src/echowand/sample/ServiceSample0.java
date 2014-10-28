@@ -6,10 +6,8 @@ import echowand.common.EPC;
 import echowand.info.DeviceObjectInfo;
 import echowand.logic.TooManyObjectsException;
 import echowand.net.Inet4Subnet;
-import echowand.net.InetNodeInfo;
 import echowand.net.InetSubnet;
 import echowand.net.Node;
-import echowand.net.NodeInfo;
 import echowand.net.SubnetException;
 import echowand.object.EchonetObjectException;
 import echowand.object.LocalObject;
@@ -18,16 +16,13 @@ import echowand.service.LocalObjectConfig;
 import echowand.service.ObjectNotFoundException;
 import echowand.service.PropertyDelegate;
 import echowand.service.PropertyUpdater;
-import echowand.service.ResultObserveProcessor;
 import echowand.service.Service;
-import echowand.service.ServiceManager;
-import echowand.service.result.FrameMatcherRule;
-import echowand.service.result.ResultBase;
+import echowand.service.Core;
 import echowand.service.result.ResultData;
 import echowand.service.result.ResultDataMatcherRule;
-import echowand.service.result.ResultGet;
-import echowand.service.result.ResultObserve;
-import echowand.service.result.ResultUpdateRemoteInfo;
+import echowand.service.result.GetResult;
+import echowand.service.result.ObserveResult;
+import echowand.service.result.UpdateRemoteInfoResult;
 import echowand.util.LoggerConfig;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -95,14 +90,14 @@ public class ServiceSample0 {
     
     public static void main(String[] args) throws TooManyObjectsException, SocketException, UnknownHostException, InterruptedException, ObjectNotFoundException, EchonetObjectException {
         // LoggerConfig.changeLogLevelAll(ResultBase.class.getName());
-        // LoggerConfig.changeLogLevelAll(ResultObserve.class.getName());
+        // LoggerConfig.changeLogLevelAll(ObserveResult.class.getName());
         
         try {
-            // Construct a ServiceManager
+            // Construct a Core
             // NetworkInterface ni = NetworkInterface.getByName("eth9");
             NetworkInterface ni = NetworkInterface.getByName("en0");
             InetSubnet subnet = Inet4Subnet.startSubnet(ni);
-            ServiceManager serviceManager = new ServiceManager(subnet);
+            Core core = new Core(subnet);
             
             // Create a device object information
             DeviceObjectInfo info = new DeviceObjectInfo();
@@ -117,13 +112,13 @@ public class ServiceSample0 {
             config.addPropertyUpdater(new DummyDataUpdater());
             
             // Register a device object config
-            serviceManager.addLocalObjectConfig(config);
+            core.addLocalObjectConfig(config);
             
-            // Start service
-            serviceManager.startService();
+            // Start the core service
+            core.startService();
             
-            // Get service interface
-            Service service = serviceManager.getService();
+            // Construct a service
+            Service service = new Service(core);
             
             // Test doGet
             LinkedList<EPC> epcs = new LinkedList<EPC>();
@@ -131,23 +126,23 @@ public class ServiceSample0 {
             epcs.add(EPC.x80);
             epcs.add(EPC.x82);
             epcs.add(EPC.x84);
-            // ResultGet resultGet1 = service.doGet(subnet.getGroupNode(), new ClassEOJ("0ef0"), EPC.x80, 1000);
-            ResultGet resultGet1 = service.doGet(subnet.getGroupNode(), new ClassEOJ("0011"), epcs, 1000);
-            resultGet1.join();
+            // GetResult getResult1 = service.doGet(subnet.getGroupNode(), new ClassEOJ("0ef0"), EPC.x80, 1000);
+            GetResult getResult1 = service.doGet(subnet.getGroupNode(), new ClassEOJ("0011"), epcs, 1000);
+            getResult1.join();
             
-            List<ResultData> dataList1 = resultGet1.getResultDataList();
+            List<ResultData> dataList1 = getResult1.getResultDataList();
             for (int i=0; i<dataList1.size(); i++) {
                 System.out.println("Get1 " + i + ": " + dataList1.get(i));
             }
             
             // Update remote node information
-            ResultUpdateRemoteInfo resultUpdate = service.doUpdateRemoteInfo(1000);
-            resultUpdate.join();
+            UpdateRemoteInfoResult updateResult = service.doUpdateRemoteInfo(1000);
+            updateResult.join();
             
-            for (int i=0; i<resultUpdate.countNodes(); i++) {
-                Node node = resultUpdate.getNode(i);
-                for (int j=0; j<resultUpdate.countEOJs(node); j++) {
-                    EOJ eoj = resultUpdate.getEOJ(node, j);
+            for (int i=0; i<updateResult.countNodes(); i++) {
+                Node node = updateResult.getNode(i);
+                for (int j=0; j<updateResult.countEOJs(node); j++) {
+                    EOJ eoj = updateResult.getEOJ(node, j);
                     System.out.println("ResultUpdate: " + node + " " + eoj);
                     
                     if (eoj.isMemberOf(new ClassEOJ("0011"))) {
@@ -163,19 +158,19 @@ public class ServiceSample0 {
             
             
             // Test doGet for all nodes in the network
-            LinkedList<ResultGet> resultGets = new LinkedList<ResultGet>();
+            LinkedList<GetResult> getResults = new LinkedList<GetResult>();
             
             for (Node node : service.getRemoteNodes()) {
                 // NodeInfo nodeInfo = new InetNodeInfo(Inet4Address.getByName("192.168.1.1"));
                 LinkedList<EPC> epcs2 = new LinkedList<EPC>();
                 epcs2.add(EPC.xE0);
                 epcs2.add(EPC.x80);
-                resultGets.add(service.doGet(node, new EOJ("001101"), epcs2, 1000));
+                getResults.add(service.doGet(node, new EOJ("001101"), epcs2, 1000));
             }
             
-            for (ResultGet resultGet: resultGets) {
-                resultGet.join();
-                List<ResultData> dataList2 = resultGet.getResultDataList(new ResultDataMatcherRule());
+            for (GetResult getResult: getResults) {
+                getResult.join();
+                List<ResultData> dataList2 = getResult.getResultDataList(new ResultDataMatcherRule());
                 for (int i = 0; i < dataList2.size(); i++) {
                     System.out.println("Get2 " + ": " + i + " " + dataList2.get(i));
                 }
@@ -190,15 +185,15 @@ public class ServiceSample0 {
             epcs2.add(EPC.xBA);
             epcs2.add(EPC.xBB);
             epcs2.add(EPC.xE1);
-            // ResultObserve resultObserve = service.doObserve(new FrameMatcherRule(null, eojs, epcs2));
-            ResultObserve resultObserve = service.doObserve(new LinkedList<Node>(), eojs, epcs2);
+            // ObserveResult observeResult = service.doObserve(new FrameMatcherRule(null, eojs, epcs2));
+            ObserveResult observeResult = service.doObserve(new LinkedList<Node>(), eojs, epcs2);
             
             Thread.sleep(5000);
             
-            resultObserve.stopObserve();
+            observeResult.stopObserve();
             System.out.println("done");
             
-            for (ResultData resultData: resultObserve.getResultDataList()) {
+            for (ResultData resultData: observeResult.getResultDataList()) {
                 System.out.println("Observe: " + resultData);
             }
             
@@ -206,7 +201,7 @@ public class ServiceSample0 {
             
             System.exit(0);
         } catch (SubnetException ex) {
-            Logger.getLogger(ServiceManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

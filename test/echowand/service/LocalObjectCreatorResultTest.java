@@ -19,8 +19,8 @@ public class LocalObjectCreatorResultTest {
     @Test
     public void testCreation() {
         LocalObject localObject = new LocalObject(new TemperatureSensorInfo());
-        ServiceManager serviceManager = new ServiceManager(new InternalSubnet("LocalObjectCreatorResultTest"));
-        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, serviceManager);
+        Core core = new Core(new InternalSubnet("LocalObjectCreatorResultTest"));
+        LocalObjectUpdater updater = new LocalObjectUpdater(localObject, core);
         LocalObjectCreatorResult result = new LocalObjectCreatorResult(localObject, updater);
         
         assertEquals(localObject, result.object);

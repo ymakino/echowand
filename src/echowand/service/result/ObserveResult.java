@@ -7,7 +7,7 @@ import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.service.ResultObserveProcessor;
+import echowand.service.ObserveResultProcessor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,18 +16,18 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ResultObserve {
-    private static final Logger LOGGER = Logger.getLogger(ResultObserve.class.getName());
-    private static final String CLASS_NAME = ResultObserve.class.getName();
+public class ObserveResult {
+    private static final Logger LOGGER = Logger.getLogger(ObserveResult.class.getName());
+    private static final String CLASS_NAME = ObserveResult.class.getName();
     
     private FrameMatcher matcher;
-    private ResultObserveProcessor processor;
+    private ObserveResultProcessor processor;
     private LinkedList<ResultData> dataList;
     private LinkedList<Frame> frames;
     private boolean done;
     
-    public ResultObserve(FrameMatcher matcher, ResultObserveProcessor processor) {
-        LOGGER.entering(CLASS_NAME, "ResultObserve", new Object[]{matcher, processor});
+    public ObserveResult(FrameMatcher matcher, ObserveResultProcessor processor) {
+        LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{matcher, processor});
         
         this.matcher = matcher;
         this.processor = processor;
@@ -35,7 +35,7 @@ public class ResultObserve {
         this.frames = new LinkedList<Frame>();
         done = false;
         
-        LOGGER.exiting(CLASS_NAME, "ResultObserve");
+        LOGGER.exiting(CLASS_NAME, "ObserveResult");
     }
     
     public synchronized void stopObserve() {

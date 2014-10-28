@@ -25,9 +25,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ServiceManager {
-    private static final Logger LOGGER = Logger.getLogger(ServiceManager.class.getName());
-    private static final String CLASS_NAME = ServiceManager.class.getName();
+public class Core {
+    private static final Logger LOGGER = Logger.getLogger(Core.class.getName());
+    private static final String CLASS_NAME = Core.class.getName();
     
     private Subnet subnet;
     private TransactionManager transactionManager;
@@ -38,7 +38,7 @@ public class ServiceManager {
     private MainLoop mainLoop;
     private SetGetRequestProcessor setGetRequestProcessor;
     private AnnounceRequestProcessor announceRequestProcessor;
-    private ResultObserveProcessor observeServiceProcessor;
+    private ObserveResultProcessor observeResultProcessor;
     
     private LinkedList<LocalObjectConfig> localObjectConfigs;
     private LinkedList<LocalObjectUpdater> localObjectUpdaters;
@@ -48,36 +48,34 @@ public class ServiceManager {
     private boolean initialized = false;
     private boolean inService = false;
     
-    private Service service = null;
-    
     /**
-     * Inet4Subnetを利用するServiceを作成する。
-     * initializeメソッドを呼び出すまでは、特に処理を行なわない。
+     * Inet4Subnetを利用するCoreを作成する。
+     * startServiceメソッドを呼び出すまでは、特に処理を行なわない。
      * @throws SubnetException Inet4Subnetの生成に失敗した場合
      */
-    public ServiceManager() throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "ServiceManager");
+    public Core() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "Core");
         
         this.subnet = Inet4Subnet.startSubnet();
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
         
-        LOGGER.exiting(CLASS_NAME, "ServiceManager");
+        LOGGER.exiting(CLASS_NAME, "Core");
     }
     
     /**
-     * 指定されたSubnetを利用するServiceを作成する。
-     * initializeメソッドを呼び出すまでは、特に処理を行なわない。
-     * @param subnet 構築するServiceが利用するsubnet
+     * 指定されたSubnetを利用するCoreを作成する。
+     * startServiceメソッドを呼び出すまでは、特に処理を行なわない。
+     * @param subnet 構築するCoreが利用するsubnet
      */
-    public ServiceManager(Subnet subnet) {
-        LOGGER.entering(CLASS_NAME, "ServiceManager", subnet);
+    public Core(Subnet subnet) {
+        LOGGER.entering(CLASS_NAME, "Core", subnet);
         
         this.subnet = subnet;
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
         
-        LOGGER.exiting(CLASS_NAME, "ServiceManager");
+        LOGGER.exiting(CLASS_NAME, "Core");
     }
     
     public boolean addLocalObjectConfig(LocalObjectConfig config) {
@@ -171,8 +169,8 @@ public class ServiceManager {
         return announceRequestProcessor;
     }
     
-    public ResultObserveProcessor getObserveServiceProsessor() {
-        return observeServiceProcessor;
+    public ObserveResultProcessor getObserveResultProsessor() {
+        return observeResultProcessor;
     }
 
     private NodeProfileInfo createNodeProfileInfo() {
@@ -252,13 +250,13 @@ public class ServiceManager {
         return announceRequestProcessor;
     }
 
-    private ResultObserveProcessor createObserveServiceProcessor() {
-        LOGGER.entering(CLASS_NAME, "createObserveServiceProcessor");
+    private ObserveResultProcessor createObserveResultProcessor() {
+        LOGGER.entering(CLASS_NAME, "createResultObserveProcessor");
         
-        ResultObserveProcessor observeServiceProcessor = new ResultObserveProcessor();
+        ObserveResultProcessor observeResultProcessor = new ObserveResultProcessor();
         
-        LOGGER.exiting(CLASS_NAME, "createObserveServiceProcessor", observeServiceProcessor);
-        return observeServiceProcessor;
+        LOGGER.exiting(CLASS_NAME, "createResultObserveProcessor", observeResultProcessor);
+        return observeResultProcessor;
     }
     
     private MainLoop createMainLoop(Subnet subnet, RequestDispatcher requestDispatcher, TransactionManager transactionManager) {
@@ -282,13 +280,17 @@ public class ServiceManager {
         return mainThread;
     }
     
+    /**
+     * Coreが初期化済みであるか返す。
+     * @return 初期化済みであればtrue、初期化済みでなければfalse
+     */
     public boolean isInitialized() {
         return initialized;
     }
     
     /**
-     * EchowandServiceManagerが初期化済みであるか返す。
-     * @return 初期化済みであればtrue、初期化済みでなければfalse
+     * Coreが実行中であるか返す。
+     * @return 実行中であればtrue、実行中でなければfalse
      */
     public boolean isInService() {
         return inService;
@@ -303,7 +305,7 @@ public class ServiceManager {
     }
 
     /**
-     * ServiceManagerを初期化する。
+     * Coreを初期化する。
      * @return 初期化が成功すればtrue、すでに初期化済みであればfalse
      * @throws HarmonyException 初期化中に例外が発生した場合
      */
@@ -320,12 +322,12 @@ public class ServiceManager {
 
             setGetRequestProcessor = createSetGetRequestProcessor(localManager);
             announceRequestProcessor = createAnnounceRequestProcessor(localManager, remoteManager);
-            observeServiceProcessor = createObserveServiceProcessor();
+            observeResultProcessor = createObserveResultProcessor();
 
             requestDispatcher = createRequestDispatcher();
             requestDispatcher.addRequestProcessor(setGetRequestProcessor);
             requestDispatcher.addRequestProcessor(announceRequestProcessor);
-            requestDispatcher.addRequestProcessor(observeServiceProcessor);
+            requestDispatcher.addRequestProcessor(observeResultProcessor);
 
             localManager.add(nodeProfileObject);
             
@@ -362,6 +364,11 @@ public class ServiceManager {
         LOGGER.exiting(CLASS_NAME, "startThreads");
     }
     
+    /**
+     * Coreを実行する。
+     * @return 実行が成功すればtrue、すでに実行済みであればfalse
+     * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
+     */
     public boolean startService() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "startService");
         
@@ -376,14 +383,9 @@ public class ServiceManager {
         
         startThreads();
 
-        service = new Service(this);
         inService = true;
 
         LOGGER.exiting(CLASS_NAME, "startService", true);
         return true;
-    }
-    
-    public Service getService() {
-        return service;
     }
 }

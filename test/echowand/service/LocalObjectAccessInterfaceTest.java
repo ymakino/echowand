@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
  */
 public class LocalObjectAccessInterfaceTest {
     private InternalSubnet subnet;
-    private ServiceManager serviceManager1;
-    private ServiceManager serviceManager2;
+    private Core core1;
+    private Core core2;
     private DummyLocalObject localObject1 = new DummyLocalObject();
     private DummyLocalObject localObject2 = new DummyLocalObject();
     
@@ -55,17 +55,17 @@ public class LocalObjectAccessInterfaceTest {
     @Before
     public void setUp() throws SubnetException {
         subnet = new InternalSubnet("LocalObjectAccessInterfaceTest");
-        serviceManager1 =  new ServiceManager(subnet);
-        serviceManager2 =  new ServiceManager(subnet);
+        core1 =  new Core(subnet);
+        core2 =  new Core(subnet);
         localObject1 = new DummyLocalObject();
         localObject2 = new DummyLocalObject();
     }
 
     @Test
-    public void testSetServiceManager() {
+    public void testSetCore() {
         LocalObjectAccessInterface instance = new LocalObjectAccessInterface();
-        assertNull(instance.setServiceManager(serviceManager1));
-        assertEquals(serviceManager1, instance.setServiceManager(serviceManager2));
+        assertNull(instance.setCore(core1));
+        assertEquals(core1, instance.setCore(core2));
     }
 
     @Test
@@ -76,15 +76,15 @@ public class LocalObjectAccessInterfaceTest {
     }
 
     @Test
-    public void testGetServiceManager() {
+    public void testGetCore() {
         LocalObjectAccessInterface instance = new LocalObjectAccessInterface();
-        assertNull(instance.getServiceManager());
+        assertNull(instance.getCore());
         
-        instance.setServiceManager(serviceManager1);
-        assertEquals(serviceManager1, instance.getServiceManager());
+        instance.setCore(core1);
+        assertEquals(core1, instance.getCore());
         
-        instance.setServiceManager(serviceManager2);
-        assertEquals(serviceManager2, instance.getServiceManager());
+        instance.setCore(core2);
+        assertEquals(core2, instance.getCore());
     }
 
     @Test
@@ -114,9 +114,9 @@ public class LocalObjectAccessInterfaceTest {
         
         EOJ eoj1 = new EOJ("001101");
         EOJ eoj2 = new EOJ("001102");
-        instance.setServiceManager(serviceManager1);
-        serviceManager1.startService();
-        serviceManager1.getLocalObjectManager().add(localObject1);
+        instance.setCore(core1);
+        core1.startService();
+        core1.getLocalObjectManager().add(localObject1);
         
         assertEquals(localObject1.getReturnData(EPC.x80), instance.getData(eoj1, EPC.x80));
         assertNull(instance.getData(eoj2, EPC.x80));
@@ -127,9 +127,9 @@ public class LocalObjectAccessInterfaceTest {
         LocalObjectAccessInterface instance = new LocalObjectAccessInterface();
         instance.setLocalObject(localObject1);
         
-        instance.setServiceManager(serviceManager1);
-        serviceManager1.startService();
-        serviceManager1.getLocalObjectManager().add(localObject1);
+        instance.setCore(core1);
+        core1.startService();
+        core1.getLocalObjectManager().add(localObject1);
         
         ObjectData objectData = new ObjectData((byte)0x12);
         assertTrue(instance.setData(EPC.x80, objectData));
@@ -145,9 +145,9 @@ public class LocalObjectAccessInterfaceTest {
         
         EOJ eoj1 = new EOJ("001101");
         EOJ eoj2 = new EOJ("001102");
-        instance.setServiceManager(serviceManager1);
-        serviceManager1.startService();
-        serviceManager1.getLocalObjectManager().add(localObject1);
+        instance.setCore(core1);
+        core1.startService();
+        core1.getLocalObjectManager().add(localObject1);
         
         ObjectData objectData = new ObjectData((byte)0x12);
         

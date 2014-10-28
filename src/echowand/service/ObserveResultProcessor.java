@@ -1,6 +1,6 @@
 package echowand.service;
 
-import echowand.service.result.ResultObserve;
+import echowand.service.result.ObserveResult;
 import echowand.logic.DefaultRequestProcessor;
 import echowand.net.Frame;
 import echowand.net.Subnet;
@@ -13,40 +13,40 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ResultObserveProcessor extends DefaultRequestProcessor {
-    private static final Logger LOGGER = Logger.getLogger(ResultObserveProcessor.class.getName());
-    private static final String CLASS_NAME = ResultObserveProcessor.class.getName();
+public class ObserveResultProcessor extends DefaultRequestProcessor {
+    private static final Logger LOGGER = Logger.getLogger(ObserveResultProcessor.class.getName());
+    private static final String CLASS_NAME = ObserveResultProcessor.class.getName();
     
-    private LinkedList<ResultObserve> resultObserves;
+    private LinkedList<ObserveResult> observeResults;
     
-    public ResultObserveProcessor() {
-        LOGGER.entering(CLASS_NAME, "ResultObserveProcessor");
+    public ObserveResultProcessor() {
+        LOGGER.entering(CLASS_NAME, "ObserveResultProcessor");
         
-        resultObserves = new LinkedList<ResultObserve>();
+        observeResults = new LinkedList<ObserveResult>();
         
-        LOGGER.exiting(CLASS_NAME, "ResultObserveProcessor");
+        LOGGER.exiting(CLASS_NAME, "ObserveResultProcessor");
     }
     
-    public synchronized boolean addResultObserve(ResultObserve resultObserve) {
-        LOGGER.entering(CLASS_NAME, "addResultObserve", resultObserve);
+    public synchronized boolean addResultObserve(ObserveResult observeResult) {
+        LOGGER.entering(CLASS_NAME, "addResultObserve", observeResult);
         
-        boolean result = resultObserves.add(resultObserve);
+        boolean result = observeResults.add(observeResult);
         
         LOGGER.exiting(CLASS_NAME, "addResultObserve", result);
         return result;
     }
     
-    public synchronized boolean removeResultObserve(ResultObserve resultObserve) {
-        LOGGER.entering(CLASS_NAME, "removeResultObserve", resultObserve);
+    public synchronized boolean removeResultObserve(ObserveResult observeResult) {
+        LOGGER.entering(CLASS_NAME, "removeResultObserve", observeResult);
         
-        boolean result = resultObserves.remove(resultObserve);
+        boolean result = observeResults.remove(observeResult);
         
         LOGGER.exiting(CLASS_NAME, "removeResultObserve", result);
         return result;
     }
     
-    private synchronized List<ResultObserve> cloneResultNotifies() {
-        return new ArrayList<ResultObserve>(resultObserves);
+    private synchronized List<ObserveResult> cloneResultNotifies() {
+        return new ArrayList<ObserveResult>(observeResults);
     }
     
     /**
@@ -61,9 +61,9 @@ public class ResultObserveProcessor extends DefaultRequestProcessor {
         LOGGER.entering(CLASS_NAME, "processINF", new Object[]{subnet, frame, processed});
         
         boolean result = false;
-        for (ResultObserve resultObserve: cloneResultNotifies()) {
-            if (resultObserve.shouldReceive(frame)) {
-                result |= resultObserve.addFrame(frame);
+        for (ObserveResult observeResult: cloneResultNotifies()) {
+            if (observeResult.shouldReceive(frame)) {
+                result |= observeResult.addFrame(frame);
             }
         }
         
@@ -83,9 +83,9 @@ public class ResultObserveProcessor extends DefaultRequestProcessor {
         LOGGER.entering(CLASS_NAME, "processINFC", new Object[]{subnet, frame, processed});
         
         boolean result = false;
-        for (ResultObserve resultObserve: cloneResultNotifies()) {
-            if (resultObserve.shouldReceive(frame)) {
-                result |= resultObserve.addFrame(frame);
+        for (ObserveResult observeResult: cloneResultNotifies()) {
+            if (observeResult.shouldReceive(frame)) {
+                result |= observeResult.addFrame(frame);
             }
         }
         

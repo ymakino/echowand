@@ -14,17 +14,17 @@ public class LocalObjectAccessInterface {
     private static final Logger LOGGER = Logger.getLogger(LocalObjectAccessInterface.class.getName());
     private static final String CLASS_NAME = LocalObjectAccessInterface.class.getName();
     
-    private ServiceManager serviceManager = null;
+    private Core core = null;
     private LocalObject localObject = null;
     
-    public ServiceManager setServiceManager(ServiceManager serviceManager) {
-        LOGGER.entering(CLASS_NAME, "setServiceManager", serviceManager);
+    public Core setCore(Core core) {
+        LOGGER.entering(CLASS_NAME, "setCore", core);
         
-        ServiceManager lastManager = this.serviceManager;
-        this.serviceManager = serviceManager;
+        Core lastCore = this.core;
+        this.core = core;
         
-        LOGGER.exiting(CLASS_NAME, "setServiceManager", lastManager);
-        return lastManager;
+        LOGGER.exiting(CLASS_NAME, "setCore", lastCore);
+        return lastCore;
     }
     
     public LocalObject setLocalObject(LocalObject object) {
@@ -37,8 +37,8 @@ public class LocalObjectAccessInterface {
         return lastObject;
     }
     
-    public ServiceManager getServiceManager() {
-        return serviceManager;
+    public Core getCore() {
+        return core;
     }
     
     public LocalObject getLocalObject() {
@@ -57,7 +57,7 @@ public class LocalObjectAccessInterface {
     public ObjectData getData(EOJ eoj, EPC epc) {
         LOGGER.entering(CLASS_NAME, "getData", new Object[]{eoj, epc});
         
-        LocalObject otherObject = serviceManager.getLocalObjectManager().get(eoj);
+        LocalObject otherObject = core.getLocalObjectManager().get(eoj);
         
         ObjectData data = null;
         if (otherObject != null) {
@@ -80,7 +80,7 @@ public class LocalObjectAccessInterface {
     public boolean setData(EOJ eoj, EPC epc, ObjectData data) {
         LOGGER.entering(CLASS_NAME, "setData", new Object[]{eoj, epc, data});
         
-        LocalObject otherObject = serviceManager.getLocalObjectManager().get(eoj);
+        LocalObject otherObject = core.getLocalObjectManager().get(eoj);
         
         boolean result = false;
         if (otherObject != null) {

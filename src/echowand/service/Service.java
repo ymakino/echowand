@@ -24,10 +24,10 @@ import echowand.object.RemoteObjectManager;
 import echowand.service.result.FrameMatcher;
 import echowand.service.result.FrameMatcherRule;
 import echowand.service.result.ResultBase;
-import echowand.service.result.ResultGet;
-import echowand.service.result.ResultObserve;
-import echowand.service.result.ResultSet;
-import echowand.service.result.ResultUpdateRemoteInfo;
+import echowand.service.result.GetResult;
+import echowand.service.result.ObserveResult;
+import echowand.service.result.SetResult;
+import echowand.service.result.UpdateRemoteInfoResult;
 import echowand.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,34 +44,34 @@ public class Service {
     private static final Logger LOGGER = Logger.getLogger(Service.class.getName());
     private static final String CLASS_NAME = Service.class.getName();
     
-    private ServiceManager serviceManager;
+    private Core core;
     
-    public Service(ServiceManager serviceManager) {
-        LOGGER.entering(CLASS_NAME, "Service", serviceManager);
+    public Service(Core core) {
+        LOGGER.entering(CLASS_NAME, "Service", core);
         
-        this.serviceManager = serviceManager;
+        this.core = core;
         
         LOGGER.exiting(CLASS_NAME, "Service");
     }
     
-    public ServiceManager getServiceManager() {
-        return serviceManager;
+    public Core getCore() {
+        return core;
     }
     
     public Subnet getSubnet() {
-        return serviceManager.getSubnet();
+        return core.getSubnet();
     }
     
     public LocalObjectManager getLocalObjectManager() {
-        return serviceManager.getLocalObjectManager();
+        return core.getLocalObjectManager();
     }
     
     public RemoteObjectManager getRemoteObjectManager() {
-        return serviceManager.getRemoteObjectManager();
+        return core.getRemoteObjectManager();
     }
     
     public TransactionManager getTransactionManager() {
-        return serviceManager.getTransactionManager();
+        return core.getTransactionManager();
     }
     
     private class ResultBaseTransactionListener implements TransactionListener {
@@ -112,9 +112,9 @@ public class Service {
     }
     
     private class ResultUpdateTransactionListener implements TransactionListener {
-        private ResultUpdateRemoteInfo resultUpdate;
+        private UpdateRemoteInfoResult resultUpdate;
 
-        public ResultUpdateTransactionListener(ResultUpdateRemoteInfo resultUpdate) {
+        public ResultUpdateTransactionListener(UpdateRemoteInfoResult resultUpdate) {
             LOGGER.entering(CLASS_NAME, "ResultUpdateTransactionListener.begin", resultUpdate);
             
             this.resultUpdate = resultUpdate;
@@ -188,91 +188,91 @@ public class Service {
         return list;
     }
     
-    public ResultGet doGet(Node node, ClassEOJ ceoj, EPC epc, int timeout) throws SubnetException {
+    public GetResult doGet(Node node, ClassEOJ ceoj, EPC epc, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, ceoj, epc, timeout});
         
-        ResultGet resultGet = doGet(node, ceoj.getAllInstanceEOJ(), toList(epc), timeout);
+        GetResult getResult = doGet(node, ceoj.getAllInstanceEOJ(), toList(epc), timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(Node node, EOJ eoj, EPC epc, int timeout) throws SubnetException {
+    public GetResult doGet(Node node, EOJ eoj, EPC epc, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, eoj, epc, timeout});
         
-        ResultGet resultGet = doGet(node, eoj, toList(epc), timeout);
+        GetResult getResult = doGet(node, eoj, toList(epc), timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(Node node, ClassEOJ ceoj, List<EPC> epcs, int timeout) throws SubnetException {
+    public GetResult doGet(Node node, ClassEOJ ceoj, List<EPC> epcs, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, ceoj, epcs, timeout});
         
-        ResultGet resultGet = doGet(node, ceoj.getAllInstanceEOJ(), epcs, timeout);
+        GetResult getResult = doGet(node, ceoj.getAllInstanceEOJ(), epcs, timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(Node node, EOJ eoj, List<EPC> epcs, int timeout) throws SubnetException {
+    public GetResult doGet(Node node, EOJ eoj, List<EPC> epcs, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, eoj, epcs, timeout});
         
-        ResultGet resultGet = new ResultGet();
+        GetResult getResult = new GetResult();
         
         SetGetTransactionConfig transactionConfig = createGetTransactionConfig(node, eoj, epcs);
         
         Transaction transaction = new Transaction(getSubnet(), getTransactionManager(), transactionConfig);
         transaction.setTimeout(timeout);
         
-        transaction.addTransactionListener(new ResultBaseTransactionListener(resultGet));
+        transaction.addTransactionListener(new ResultBaseTransactionListener(getResult));
         
         transaction.execute();
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(NodeInfo nodeInfo, EOJ eoj, EPC epc, int timeout) throws SubnetException {
+    public GetResult doGet(NodeInfo nodeInfo, EOJ eoj, EPC epc, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{nodeInfo, eoj, epc, timeout});
         
-        ResultGet resultGet = doGet(getSubnet().getRemoteNode(nodeInfo), eoj, toList(epc), timeout);
+        GetResult getResult = doGet(getSubnet().getRemoteNode(nodeInfo), eoj, toList(epc), timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc, int timeout) throws SubnetException {
+    public GetResult doGet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{nodeInfo, ceoj, epc, timeout});
         
-        ResultGet resultGet = doGet(getSubnet().getRemoteNode(nodeInfo), ceoj, toList(epc), timeout);
+        GetResult getResult = doGet(getSubnet().getRemoteNode(nodeInfo), ceoj, toList(epc), timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(NodeInfo nodeInfo, EOJ eoj, List<EPC> epcs, int timeout) throws SubnetException {
+    public GetResult doGet(NodeInfo nodeInfo, EOJ eoj, List<EPC> epcs, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{nodeInfo, eoj, epcs, timeout});
         
-        ResultGet resultGet = doGet(getSubnet().getRemoteNode(nodeInfo), eoj, epcs, timeout);
+        GetResult getResult = doGet(getSubnet().getRemoteNode(nodeInfo), eoj, epcs, timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultGet doGet(NodeInfo nodeInfo, ClassEOJ ceoj, List<EPC> epcs, int timeout) throws SubnetException {
+    public GetResult doGet(NodeInfo nodeInfo, ClassEOJ ceoj, List<EPC> epcs, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{nodeInfo, ceoj, epcs, timeout});
         
-        ResultGet resultGet = doGet(getSubnet().getRemoteNode(nodeInfo), ceoj, epcs, timeout);
+        GetResult getResult = doGet(getSubnet().getRemoteNode(nodeInfo), ceoj, epcs, timeout);
         
-        LOGGER.exiting(CLASS_NAME, "doGet", resultGet);
-        return resultGet;
+        LOGGER.exiting(CLASS_NAME, "doGet", getResult);
+        return getResult;
     }
     
-    public ResultSet doSet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, eoj, properties, timeout, responseRequired});
         
-        ResultSet resultSet = new ResultSet(responseRequired);
+        SetResult setResult = new SetResult(responseRequired);
         
         SetGetTransactionConfig transactionConfig = createSetTransactionConfig(node, eoj, properties);
         transactionConfig.setResponseRequired(responseRequired);
@@ -280,322 +280,322 @@ public class Service {
         Transaction transaction = new Transaction(getSubnet(), getTransactionManager(), transactionConfig);
         transaction.setTimeout(timeout);
         
-        transaction.addTransactionListener(new ResultBaseTransactionListener(resultSet));
+        transaction.addTransactionListener(new ResultBaseTransactionListener(setResult));
         
         transaction.execute();
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, EOJ eoj, EPC epc, Data data, int timeout) throws SubnetException {
+    public SetResult doSet(Node node, EOJ eoj, EPC epc, Data data, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, eoj, epc, data, timeout});
         
-        ResultSet resultSet = doSet(node, eoj, epc, data, timeout, true);
+        SetResult setResult = doSet(node, eoj, epc, data, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, ClassEOJ ceoj, EPC epc, Data data, int timeout) throws SubnetException {
+    public SetResult doSet(Node node, ClassEOJ ceoj, EPC epc, Data data, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, ceoj, epc, data, timeout});
         
-        ResultSet resultSet = doSet(node, ceoj, epc, data, timeout, true);
+        SetResult setResult = doSet(node, ceoj, epc, data, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+    public SetResult doSet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, eoj, properties, timeout});
                 
-        ResultSet resultSet = doSet(node, eoj, properties, timeout, true);
+        SetResult setResult = doSet(node, eoj, properties, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+    public SetResult doSet(Node node, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, ceoj, properties, timeout});
                 
-        ResultSet resultSet = doSet(node, ceoj, properties, timeout, true);
+        SetResult setResult = doSet(node, ceoj, properties, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, EOJ eoj, EPC epc, Data data, int timeout) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, EOJ eoj, EPC epc, Data data, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, eoj, epc, data, timeout});
                 
-        ResultSet resultSet = doSet(nodeInfo, eoj, epc, data, timeout, true);
+        SetResult setResult = doSet(nodeInfo, eoj, epc, data, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc, Data data, int timeout) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc, Data data, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, ceoj, epc, data, timeout});
         
-        ResultSet resultSet = doSet(nodeInfo, ceoj, epc, data, timeout, true);
+        SetResult setResult = doSet(nodeInfo, ceoj, epc, data, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, eoj, properties, timeout});
         
-        ResultSet resultSet = doSet(nodeInfo, eoj, properties, timeout, true);
+        SetResult setResult = doSet(nodeInfo, eoj, properties, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, ceoj, properties, timeout});
         
-        ResultSet resultSet = doSet(nodeInfo, ceoj, properties, timeout, true);
+        SetResult setResult = doSet(nodeInfo, ceoj, properties, timeout, true);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, EOJ eoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(Node node, EOJ eoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, eoj, epc, data, timeout, responseRequired});
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        ResultSet resultSet = doSet(node, eoj, properties, timeout, responseRequired);
+        SetResult setResult = doSet(node, eoj, properties, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, ClassEOJ ceoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(Node node, ClassEOJ ceoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, ceoj, epc, data, timeout, responseRequired});
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        ResultSet resultSet = doSet(node, ceoj.getAllInstanceEOJ(), properties, timeout, responseRequired);
+        SetResult setResult = doSet(node, ceoj.getAllInstanceEOJ(), properties, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(Node node, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(Node node, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, ceoj, properties, timeout, responseRequired});
         
-        ResultSet resultSet = doSet(node, ceoj.getAllInstanceEOJ(), properties, timeout, responseRequired);
+        SetResult setResult = doSet(node, ceoj.getAllInstanceEOJ(), properties, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, EOJ eoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, EOJ eoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, eoj, epc, data, timeout, responseRequired});
         
-        ResultSet resultSet = doSet(getSubnet().getRemoteNode(nodeInfo), eoj, epc, data, timeout, responseRequired);
+        SetResult setResult = doSet(getSubnet().getRemoteNode(nodeInfo), eoj, epc, data, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, ceoj, epc, data, timeout, responseRequired});
         
-        ResultSet resultSet = doSet(getSubnet().getRemoteNode(nodeInfo), ceoj, epc, data, timeout, responseRequired);
+        SetResult setResult = doSet(getSubnet().getRemoteNode(nodeInfo), ceoj, epc, data, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, eoj, properties, timeout, responseRequired});
         
-        ResultSet resultSet = doSet(getSubnet().getRemoteNode(nodeInfo), eoj, properties, timeout, responseRequired);
+        SetResult setResult = doSet(getSubnet().getRemoteNode(nodeInfo), eoj, properties, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultSet doSet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+    public SetResult doSet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{nodeInfo, ceoj, properties, timeout, responseRequired});
         
-        ResultSet resultSet = doSet(getSubnet().getRemoteNode(nodeInfo), ceoj, properties, timeout, responseRequired);
+        SetResult setResult = doSet(getSubnet().getRemoteNode(nodeInfo), ceoj, properties, timeout, responseRequired);
 
-        LOGGER.exiting(CLASS_NAME, "doSet", resultSet);
-        return resultSet;
+        LOGGER.exiting(CLASS_NAME, "doSet", setResult);
+        return setResult;
     }
     
-    public ResultUpdateRemoteInfo doUpdateRemoteInfo(int timeout) throws SubnetException {
+    public UpdateRemoteInfoResult doUpdateRemoteInfo(int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", timeout);
         
         InstanceListRequestExecutor executor = new InstanceListRequestExecutor(
                 getSubnet(), getTransactionManager(), getRemoteObjectManager());
         
-        ResultUpdateRemoteInfo resultUpdateRemoteInfo = new ResultUpdateRemoteInfo(executor);
-        ResultUpdateTransactionListener resultUpdateTransactionListener = new ResultUpdateTransactionListener(resultUpdateRemoteInfo);
+        UpdateRemoteInfoResult updateRemoteInfoResult = new UpdateRemoteInfoResult(executor);
+        ResultUpdateTransactionListener resultUpdateTransactionListener = new ResultUpdateTransactionListener(updateRemoteInfoResult);
 
         executor.setTimeout(timeout);
         executor.addTransactionListener(resultUpdateTransactionListener);
         
         executor.execute();
         
-        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", resultUpdateRemoteInfo);
-        return resultUpdateRemoteInfo;
+        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
+        return updateRemoteInfoResult;
     }
     
-    public ResultObserve doObserve(Node node, EOJ eoj, EPC epc) throws SubnetException {
+    public ObserveResult doObserve(Node node, EOJ eoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, eoj, epc});
         
-        ResultObserve resultObserve = doObserve(new FrameMatcherRule(node, eoj, epc));
+        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, eoj, epc));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(Node node, ClassEOJ ceoj, EPC epc) throws SubnetException {
+    public ObserveResult doObserve(Node node, ClassEOJ ceoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, ceoj, epc});
         
-        ResultObserve resultObserve = doObserve(new FrameMatcherRule(node, ceoj, epc));
+        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, ceoj, epc));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(Node node, EOJ eoj, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(Node node, EOJ eoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, eoj, epcs});
         
-        ResultObserve resultObserve = doObserve(new FrameMatcherRule(node, eoj, epcs));
+        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, eoj, epcs));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(Node node, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(Node node, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, ceoj, epcs});
         
-        ResultObserve resultObserve = doObserve(new FrameMatcherRule(node, ceoj, epcs));
+        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, ceoj, epcs));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(NodeInfo nodeInfo, EOJ eoj, EPC epc) throws SubnetException {
+    public ObserveResult doObserve(NodeInfo nodeInfo, EOJ eoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, eoj, epc});
         
-        ResultObserve resultObserve = doObserve(getSubnet().getRemoteNode(nodeInfo), eoj, epc);
+        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), eoj, epc);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc) throws SubnetException {
+    public ObserveResult doObserve(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, ceoj, epc});
         
-        ResultObserve resultObserve = doObserve(getSubnet().getRemoteNode(nodeInfo), ceoj, epc);
+        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), ceoj, epc);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(NodeInfo nodeInfo, EOJ eoj, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(NodeInfo nodeInfo, EOJ eoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, eoj, epcs});
         
-        ResultObserve resultObserve = doObserve(getSubnet().getRemoteNode(nodeInfo), eoj, epcs);
+        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), eoj, epcs);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(NodeInfo nodeInfo, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(NodeInfo nodeInfo, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, ceoj, epcs});
         
-        ResultObserve resultObserve = doObserve(getSubnet().getRemoteNode(nodeInfo), ceoj, epcs);
+        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), ceoj, epcs);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(EOJ eoj, EPC epc) throws SubnetException {
+    public ObserveResult doObserve(EOJ eoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{eoj, epc});
         
-        ResultObserve resultObserve = doObserve(null, toList(eoj), toList(epc));
+        ObserveResult observeResult = doObserve(null, toList(eoj), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(ClassEOJ ceoj, EPC epc) throws SubnetException {
+    public ObserveResult doObserve(ClassEOJ ceoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{ceoj, epc});
         
-        ResultObserve resultObserve = doObserve(null, toList(ceoj.getAllInstanceEOJ()), toList(epc));
+        ObserveResult observeResult = doObserve(null, toList(ceoj.getAllInstanceEOJ()), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(EOJ eoj, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(EOJ eoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{eoj, epcs});
         
-        ResultObserve resultObserve = doObserve(null, toList(eoj), epcs);
+        ObserveResult observeResult = doObserve(null, toList(eoj), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{ceoj, epcs});
         
-        ResultObserve resultObserve = doObserve(null, toList(ceoj.getAllInstanceEOJ()), epcs);
+        ObserveResult observeResult = doObserve(null, toList(ceoj.getAllInstanceEOJ()), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(EOJ eoj) throws SubnetException {
+    public ObserveResult doObserve(EOJ eoj) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", eoj);
         
-        ResultObserve resultObserve = doObserve(null, toList(eoj), null);
+        ObserveResult observeResult = doObserve(null, toList(eoj), null);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(ClassEOJ ceoj) throws SubnetException {
+    public ObserveResult doObserve(ClassEOJ ceoj) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", ceoj);
         
-        ResultObserve resultObserve = doObserve(null, toList(ceoj.getAllInstanceEOJ()), null);
+        ObserveResult observeResult = doObserve(null, toList(ceoj.getAllInstanceEOJ()), null);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(EPC epc) throws SubnetException {
+    public ObserveResult doObserve(EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", epc);
         
-        ResultObserve resultObserve = doObserve(null, new ArrayList<EOJ>(), toList(epc));
+        ObserveResult observeResult = doObserve(null, new ArrayList<EOJ>(), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", epcs);
         
-        ResultObserve resultObserve = doObserve(null, new ArrayList<EOJ>(), epcs);
+        ObserveResult observeResult = doObserve(null, new ArrayList<EOJ>(), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve() {
+    public ObserveResult doObserve() {
         LOGGER.entering(CLASS_NAME, "doObserve");
         
-        ResultObserve resultObserve = doObserve(new FrameMatcherRule());
+        ObserveResult observeResult = doObserve(new FrameMatcherRule());
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
     private Node toNodeFromNodeOrNodeInfo(Object o) throws SubnetException {
@@ -625,25 +625,25 @@ public class Service {
         return newNodes;
     }
     
-    public ResultObserve doObserve(List nodes, List<EOJ> eojs, List<EPC> epcs) throws SubnetException {
+    public ObserveResult doObserve(List nodes, List<EOJ> eojs, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodes, eojs, epcs});
         
-        ResultObserve resultObserve = doObserve(new FrameMatcherRule(toNodesFromNodesAndNodeInfos(nodes), eojs, epcs));
+        ObserveResult observeResult = doObserve(new FrameMatcherRule(toNodesFromNodesAndNodeInfos(nodes), eojs, epcs));
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
-    public ResultObserve doObserve(FrameMatcher matcher) {
+    public ObserveResult doObserve(FrameMatcher matcher) {
         LOGGER.entering(CLASS_NAME, "doObserve", matcher);
         
-        ResultObserveProcessor processor = getServiceManager().getObserveServiceProsessor();
-        ResultObserve resultObserve = new ResultObserve(matcher, processor);
+        ObserveResultProcessor processor = getCore().getObserveResultProsessor();
+        ObserveResult observeResult = new ObserveResult(matcher, processor);
         
-        processor.addResultObserve(resultObserve);
+        processor.addResultObserve(observeResult);
         
-        LOGGER.exiting(CLASS_NAME, "doObserve", resultObserve);
-        return resultObserve;
+        LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
+        return observeResult;
     }
     
     public ObjectData getLocalData(EOJ eoj, EPC epc) throws ObjectNotFoundException {

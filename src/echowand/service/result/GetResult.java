@@ -9,9 +9,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ResultGet extends ResultBase {
-    private static final Logger LOGGER = Logger.getLogger(ResultGet.class.getName());
-    private static final String CLASS_NAME = ResultGet.class.getName();
+public class GetResult extends ResultBase {
+    private static final Logger LOGGER = Logger.getLogger(GetResult.class.getName());
+    private static final String CLASS_NAME = GetResult.class.getName();
     
     @Override
     public boolean isSuccessPayload(StandardPayload payload) {

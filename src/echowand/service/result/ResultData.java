@@ -21,7 +21,7 @@ public class ResultData {
     public final long time;
     
     public ResultData(Node node, EOJ eoj, EPC epc, Data data, long time) {
-        LOGGER.entering(CLASS_NAME, "ResultData", new Object[]{node, eoj, epc, data});
+        LOGGER.entering(CLASS_NAME, "ResultData", new Object[]{node, eoj, epc, data, time});
         
         this.node = node;
         this.eoj = eoj;
