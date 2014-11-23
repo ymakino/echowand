@@ -18,6 +18,7 @@ import echowand.service.PropertyDelegate;
 import echowand.service.PropertyUpdater;
 import echowand.service.Service;
 import echowand.service.Core;
+import echowand.service.result.CaptureResult;
 import echowand.service.result.ResultData;
 import echowand.service.result.ResultDataMatcherRule;
 import echowand.service.result.GetResult;
@@ -120,6 +121,9 @@ public class ServiceSample0 {
             // Construct a service
             Service service = new Service(core);
             
+            // Start capturing all frames;
+            CaptureResult captureResult = service.doCapture();
+            
             // Test doGet
             LinkedList<EPC> epcs = new LinkedList<EPC>();
             epcs.add(EPC.xE0);
@@ -198,6 +202,11 @@ public class ServiceSample0 {
             }
             
             Thread.sleep(5000);
+            
+            captureResult.stopCapture();
+            for (int i=0; i<captureResult.countFrames(); i++) {
+                System.out.println(captureResult.getFrame(i));
+            }
             
             System.exit(0);
         } catch (SubnetException ex) {

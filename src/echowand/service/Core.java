@@ -2,6 +2,7 @@ package echowand.service;
 
 import echowand.common.EPC;
 import echowand.info.NodeProfileInfo;
+import echowand.logic.Listener;
 import echowand.logic.MainLoop;
 import echowand.logic.RequestDispatcher;
 import echowand.logic.TooManyObjectsException;
@@ -39,6 +40,7 @@ public class Core {
     private SetGetRequestProcessor setGetRequestProcessor;
     private AnnounceRequestProcessor announceRequestProcessor;
     private ObserveResultProcessor observeResultProcessor;
+    private CaptureResultListener captureResultListener;
     
     private LinkedList<LocalObjectConfig> localObjectConfigs;
     private LinkedList<LocalObjectUpdater> localObjectUpdaters;
@@ -172,6 +174,10 @@ public class Core {
     public ObserveResultProcessor getObserveResultProsessor() {
         return observeResultProcessor;
     }
+    
+    public CaptureResultListener getCaptureResultListener() {
+        return captureResultListener;
+    }
 
     private NodeProfileInfo createNodeProfileInfo() {
         LOGGER.entering(CLASS_NAME, "createNodeProfileInfo");
@@ -251,21 +257,31 @@ public class Core {
     }
 
     private ObserveResultProcessor createObserveResultProcessor() {
-        LOGGER.entering(CLASS_NAME, "createResultObserveProcessor");
+        LOGGER.entering(CLASS_NAME, "createObserveResultProcessor");
         
         ObserveResultProcessor observeResultProcessor = new ObserveResultProcessor();
         
-        LOGGER.exiting(CLASS_NAME, "createResultObserveProcessor", observeResultProcessor);
+        LOGGER.exiting(CLASS_NAME, "createObserveResultProcessor", observeResultProcessor);
         return observeResultProcessor;
     }
     
-    private MainLoop createMainLoop(Subnet subnet, RequestDispatcher requestDispatcher, TransactionManager transactionManager) {
-        LOGGER.entering(CLASS_NAME, "createMainLoop", new Object[]{subnet, requestDispatcher, transactionManager});
+    private CaptureResultListener createCaptureResultListener() {
+        LOGGER.entering(CLASS_NAME, "createCaptureResultListener");
+        
+        CaptureResultListener captureResultListener = new CaptureResultListener();
+        
+        LOGGER.exiting(CLASS_NAME, "createCaptureResultListener", captureResultListener);
+        return captureResultListener;
+    }
+    
+    private MainLoop createMainLoop(Subnet subnet, Listener... listeners) {
+        LOGGER.entering(CLASS_NAME, "createMainLoop", new Object[]{subnet, listeners});
         
         MainLoop mainLoop = new MainLoop();
         mainLoop.setSubnet(subnet);
-        mainLoop.addListener(requestDispatcher);
-        mainLoop.addListener(transactionManager);
+        for (Listener listener: listeners) {
+            mainLoop.addListener(listener);
+        }
         
         LOGGER.exiting(CLASS_NAME, "createMainLoop", mainLoop);
         return mainLoop;
@@ -328,6 +344,8 @@ public class Core {
             requestDispatcher.addRequestProcessor(setGetRequestProcessor);
             requestDispatcher.addRequestProcessor(announceRequestProcessor);
             requestDispatcher.addRequestProcessor(observeResultProcessor);
+            
+            captureResultListener = createCaptureResultListener();
 
             localManager.add(nodeProfileObject);
             
@@ -350,7 +368,7 @@ public class Core {
     }
     
     private void startMainLoopThread() {
-        mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager);
+        mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager, captureResultListener);
         new Thread(mainLoop).start();
     }
     

@@ -7,7 +7,7 @@ import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.service.ObserveResultProcessor;
+import echowand.service.CaptureResultListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,33 +16,31 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class ObserveResult {
-    private static final Logger LOGGER = Logger.getLogger(ObserveResult.class.getName());
-    private static final String CLASS_NAME = ObserveResult.class.getName();
+public class CaptureResult {
+    private static final Logger LOGGER = Logger.getLogger(CaptureResult.class.getName());
+    private static final String CLASS_NAME = CaptureResult.class.getName();
     
-    private FrameMatcher matcher;
-    private ObserveResultProcessor processor;
+    private CaptureResultListener listener;
     private LinkedList<ResultData> dataList;
     private LinkedList<Frame> frames;
     private boolean done;
     
-    public ObserveResult(FrameMatcher matcher, ObserveResultProcessor processor) {
-        LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{matcher, processor});
+    public CaptureResult(CaptureResultListener listener) {
+        LOGGER.entering(CLASS_NAME, "CaptureResult", new Object[]{listener});
         
-        this.matcher = matcher;
-        this.processor = processor;
+        this.listener = listener;
         this.dataList = new LinkedList<ResultData>();
         this.frames = new LinkedList<Frame>();
         done = false;
         
-        LOGGER.exiting(CLASS_NAME, "ObserveResult");
+        LOGGER.exiting(CLASS_NAME, "CaptureResult");
     }
     
-    public synchronized void stopObserve() {
+    public synchronized void stopCapture() {
         LOGGER.entering(CLASS_NAME, "stopObserve");
         
         if (!done) {
-            processor.removeObserveResult(this);
+            listener.removeCaptureResult(this);
             done = true;
         }
         
@@ -54,15 +52,6 @@ public class ObserveResult {
         
         LOGGER.exiting(CLASS_NAME, "isDone", done);
         return done;
-    }
-    
-    public boolean shouldReceive(Frame frame) {
-        LOGGER.entering(CLASS_NAME, "shouldReceive", frame);
-        
-        boolean result = matcher.match(frame);
-        
-        LOGGER.exiting(CLASS_NAME, "shouldReceive", result);
-        return result;
     }
     
     public synchronized boolean addFrame(Frame frame) {

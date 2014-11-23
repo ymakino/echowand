@@ -27,21 +27,21 @@ public class ObserveResultProcessor extends DefaultRequestProcessor {
         LOGGER.exiting(CLASS_NAME, "ObserveResultProcessor");
     }
     
-    public synchronized boolean addResultObserve(ObserveResult observeResult) {
-        LOGGER.entering(CLASS_NAME, "addResultObserve", observeResult);
+    public synchronized boolean addObserveResult(ObserveResult observeResult) {
+        LOGGER.entering(CLASS_NAME, "addObserveResult", observeResult);
         
         boolean result = observeResults.add(observeResult);
         
-        LOGGER.exiting(CLASS_NAME, "addResultObserve", result);
+        LOGGER.exiting(CLASS_NAME, "addObserveResult", result);
         return result;
     }
     
-    public synchronized boolean removeResultObserve(ObserveResult observeResult) {
-        LOGGER.entering(CLASS_NAME, "removeResultObserve", observeResult);
+    public synchronized boolean removeObserveResult(ObserveResult observeResult) {
+        LOGGER.entering(CLASS_NAME, "removeObserveResult", observeResult);
         
         boolean result = observeResults.remove(observeResult);
         
-        LOGGER.exiting(CLASS_NAME, "removeResultObserve", result);
+        LOGGER.exiting(CLASS_NAME, "removeObserveResult", result);
         return result;
     }
     

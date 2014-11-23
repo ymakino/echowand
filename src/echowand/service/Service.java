@@ -21,6 +21,7 @@ import echowand.object.LocalObjectManager;
 import echowand.object.ObjectData;
 import echowand.object.RemoteObject;
 import echowand.object.RemoteObjectManager;
+import echowand.service.result.CaptureResult;
 import echowand.service.result.FrameMatcher;
 import echowand.service.result.FrameMatcherRule;
 import echowand.service.result.ResultBase;
@@ -640,10 +641,22 @@ public class Service {
         ObserveResultProcessor processor = getCore().getObserveResultProsessor();
         ObserveResult observeResult = new ObserveResult(matcher, processor);
         
-        processor.addResultObserve(observeResult);
+        processor.addObserveResult(observeResult);
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
+    }
+    
+    public CaptureResult doCapture() {
+        LOGGER.entering(CLASS_NAME, "doCapture");
+        
+        CaptureResultListener listener = getCore().getCaptureResultListener();
+        CaptureResult captureResult = new CaptureResult(listener);
+        
+        listener.addCaptureResult(captureResult);
+        
+        LOGGER.exiting(CLASS_NAME, "doCapture", captureResult);
+        return captureResult;
     }
     
     public ObjectData getLocalData(EOJ eoj, EPC epc) throws ObjectNotFoundException {
