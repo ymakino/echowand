@@ -205,7 +205,7 @@ public class ServiceSample0 {
             
             captureResult.stopCapture();
             for (int i=0; i<captureResult.countFrames(); i++) {
-                System.out.println(captureResult.getFrame(i));
+                System.out.println(captureResult.getResultFrame(i));
             }
             
             System.exit(0);

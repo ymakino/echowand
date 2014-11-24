@@ -22,9 +22,9 @@ public abstract class ResultBase {
     
     private boolean done;
     
-    private LinkedList<Frame> frames;
-    private LinkedList<Frame> errorFrames;
-    private LinkedList<Frame> invalidFrames;
+    private LinkedList<ResultFrame> frames;
+    private LinkedList<ResultFrame> errorFrames;
+    private LinkedList<ResultFrame> invalidFrames;
     private LinkedList<ResultData> dataList;
     private LinkedList<ResultData> errorDataList;
     
@@ -32,9 +32,9 @@ public abstract class ResultBase {
         LOGGER.entering(CLASS_NAME, "ResultBase");
         
         done = false;
-        frames = new LinkedList<Frame>();
-        errorFrames = new LinkedList<Frame>();
-        invalidFrames = new LinkedList<Frame>();
+        frames = new LinkedList<ResultFrame>();
+        errorFrames = new LinkedList<ResultFrame>();
+        invalidFrames = new LinkedList<ResultFrame>();
         dataList = new LinkedList<ResultData>();
         errorDataList = new LinkedList<ResultData>();
         
@@ -96,9 +96,10 @@ public abstract class ResultBase {
         LOGGER.entering(CLASS_NAME, "addFrame", frame);
         
         long time = System.currentTimeMillis();
+        ResultFrame resultFrame = new ResultFrame(frame, time);
         
         if (!hasStandardPayload(frame)) {
-            invalidFrames.add(frame);
+            invalidFrames.add(resultFrame);
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
             return false;
         }
@@ -106,7 +107,7 @@ public abstract class ResultBase {
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         
         if (!isValidPayload(payload)) {
-            invalidFrames.add(frame);
+            invalidFrames.add(resultFrame);
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
             return false;
         }
@@ -129,34 +130,63 @@ public abstract class ResultBase {
         }
         
         if (!isSuccessPayload(payload)) {
-            errorFrames.add(frame);
+            errorFrames.add(resultFrame);
         }
         
-        boolean result = frames.add(frame);
+        boolean result = frames.add(resultFrame);
         LOGGER.exiting(CLASS_NAME, "addFrame", result);
         return result;
     }
-
+    
     public synchronized int countFrames() {
         LOGGER.entering(CLASS_NAME, "countFrames");
         
         int count = frames.size();
+        
         LOGGER.exiting(CLASS_NAME, "countFrames", count);
         return count;
     }
-
+    
     public synchronized Frame getFrame(int index) {
         LOGGER.entering(CLASS_NAME, "getFrame", index);
         
-        Frame frame = frames.get(index);
+        Frame frame = frames.get(index).frame;
+        
         LOGGER.exiting(CLASS_NAME, "getFrame", frame);
         return frame;
+    }
+    
+    public synchronized ResultFrame getResultFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getResultFrame", index);
+        
+        ResultFrame frame = frames.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getResultFrame", frame);
+        return frame;
+    }
+    
+    public synchronized int countResultData() {
+        LOGGER.entering(CLASS_NAME, "countResultData");
+        
+        int count = dataList.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countResultData", count);
+        return count;
+    }
+    
+    public synchronized ResultData getResultData(int index) {
+        LOGGER.entering(CLASS_NAME, "getResultData");
+        
+        ResultData resultData = dataList.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getResultData", resultData);
+        return resultData;
     }
     
     public synchronized List<ResultData> getResultDataList() {
         LOGGER.entering(CLASS_NAME, "getResultDataList");
         
-        List<ResultData> resultList = getResultDataList(new ResultDataMatcherRule());
+        List<ResultData> resultList = new LinkedList<ResultData>(dataList);
         
         LOGGER.exiting(CLASS_NAME, "getResultDataList", resultList);
         return resultList;

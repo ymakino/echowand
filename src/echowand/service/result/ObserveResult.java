@@ -23,7 +23,7 @@ public class ObserveResult {
     private FrameMatcher matcher;
     private ObserveResultProcessor processor;
     private LinkedList<ResultData> dataList;
-    private LinkedList<Frame> frames;
+    private LinkedList<ResultFrame> frames;
     private boolean done;
     
     public ObserveResult(FrameMatcher matcher, ObserveResultProcessor processor) {
@@ -32,7 +32,7 @@ public class ObserveResult {
         this.matcher = matcher;
         this.processor = processor;
         this.dataList = new LinkedList<ResultData>();
-        this.frames = new LinkedList<Frame>();
+        this.frames = new LinkedList<ResultFrame>();
         done = false;
         
         LOGGER.exiting(CLASS_NAME, "ObserveResult");
@@ -84,7 +84,7 @@ public class ObserveResult {
             dataList.add(new ResultData(node, eoj, epc, data, time));
         }
         
-        boolean result = frames.add(frame);
+        boolean result = frames.add(new ResultFrame(frame, time));
         LOGGER.exiting(CLASS_NAME, "addFrame", result);
         return result;
     }
@@ -101,16 +101,43 @@ public class ObserveResult {
     public synchronized Frame getFrame(int index) {
         LOGGER.entering(CLASS_NAME, "getFrame", index);
         
-        Frame frame = frames.get(index);
+        Frame frame = frames.get(index).frame;
         
         LOGGER.exiting(CLASS_NAME, "getFrame", frame);
         return frame;
     }
     
+    public synchronized ResultFrame getResultFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getResultFrame", index);
+        
+        ResultFrame resultFrame = frames.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getResultFrame", resultFrame);
+        return resultFrame;
+    }
+    
+    public synchronized int countResultData() {
+        LOGGER.entering(CLASS_NAME, "countResultData");
+        
+        int count = dataList.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countResultData", count);
+        return count;
+    }
+    
+    public synchronized ResultData getResultData(int index) {
+        LOGGER.entering(CLASS_NAME, "getResultData");
+        
+        ResultData resultData = dataList.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getResultData", resultData);
+        return resultData;
+    }
+    
     public synchronized List<ResultData> getResultDataList() {
         LOGGER.entering(CLASS_NAME, "getResultDataList");
         
-        List<ResultData> resultList = getResultDataList(new ResultDataMatcherRule());
+        List<ResultData> resultList = new LinkedList<ResultData>(dataList);
         
         LOGGER.exiting(CLASS_NAME, "getResultDataList", resultList);
         return resultList;
