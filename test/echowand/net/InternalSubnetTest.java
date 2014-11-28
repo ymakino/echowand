@@ -39,40 +39,40 @@ public class InternalSubnetTest {
     }
     
     @Test
-    public void testSendAndRecvSameNode() {
+    public void testSendAndReceiveSameNode() {
         InternalSubnet subnet = new InternalSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
 
         CommonFrame sendFrame = createFrame();
-        Frame recvFrame = null;
+        Frame receivedFrame = null;
         try {
             subnet.send(new Frame(local, group, sendFrame));
-            recvFrame = subnet.receive();
+            receivedFrame = subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
         }
-        assertTrue(Arrays.equals(recvFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
-        assertEquals(subnet.getLocalNode(), recvFrame.getSender());
-        assertEquals(subnet.getGroupNode(), recvFrame.getReceiver());
+        assertTrue(Arrays.equals(receivedFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
+        assertEquals(subnet.getLocalNode(), receivedFrame.getSender());
+        assertEquals(subnet.getGroupNode(), receivedFrame.getReceiver());
 
 
         sendFrame = createFrame();
         try {
             subnet.send(new Frame(local, local, sendFrame));
-            recvFrame = subnet.receive();
+            receivedFrame = subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
         }
-        assertTrue(Arrays.equals(recvFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
-        assertEquals(subnet.getLocalNode(), recvFrame.getSender());
-        assertEquals(subnet.getLocalNode(), recvFrame.getReceiver());
+        assertTrue(Arrays.equals(receivedFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
+        assertEquals(subnet.getLocalNode(), receivedFrame.getSender());
+        assertEquals(subnet.getLocalNode(), receivedFrame.getReceiver());
     }
     
     @Test
-    public void testSendAndRecv() {
+    public void testSendAndReceive() {
         InternalSubnet subnet1 = new InternalSubnet();
         InternalSubnet subnet2 = new InternalSubnet();
         InternalSubnet subnet3 = new InternalSubnet();
@@ -80,7 +80,7 @@ public class InternalSubnetTest {
         Node group1 = subnet1.getGroupNode();
 
         CommonFrame sendFrame = createFrame();
-        Frame recvFrame = null;
+        Frame receivedFrame = null;
         try {
             subnet1.send(new Frame(local1, group1, sendFrame));
             subnet1.receive();
@@ -90,20 +90,20 @@ public class InternalSubnetTest {
         }
         
         try {
-            recvFrame = subnet2.receive();
-            assertTrue(Arrays.equals(recvFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
-            assertEquals(subnet1.getLocalNode(), recvFrame.getSender());
-            assertEquals(subnet2.getGroupNode(), recvFrame.getReceiver());
+            receivedFrame = subnet2.receive();
+            assertTrue(Arrays.equals(receivedFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
+            assertEquals(subnet1.getLocalNode(), receivedFrame.getSender());
+            assertEquals(subnet2.getGroupNode(), receivedFrame.getReceiver());
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
         }
 
         try {
-            recvFrame = subnet3.receive();
-            assertTrue(Arrays.equals(recvFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
-            assertEquals(subnet1.getLocalNode(), recvFrame.getSender());
-            assertEquals(subnet3.getGroupNode(), recvFrame.getReceiver());
+            receivedFrame = subnet3.receive();
+            assertTrue(Arrays.equals(receivedFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
+            assertEquals(subnet1.getLocalNode(), receivedFrame.getSender());
+            assertEquals(subnet3.getGroupNode(), receivedFrame.getReceiver());
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -113,38 +113,38 @@ public class InternalSubnetTest {
         sendFrame = createFrame();
         try {
             subnet1.send(new Frame(local1, local2, sendFrame));
-            recvFrame = subnet2.receive();
-            assertNull(subnet1.recvNoWait());
-            assertNull(subnet3.recvNoWait());
+            receivedFrame = subnet2.receive();
+            assertNull(subnet1.receiveNoWait());
+            assertNull(subnet3.receiveNoWait());
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
         }
-        assertTrue(Arrays.equals(recvFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
-        assertEquals(subnet1.getLocalNode(), recvFrame.getSender());
-        assertEquals(subnet2.getLocalNode(), recvFrame.getReceiver());
+        assertTrue(Arrays.equals(receivedFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
+        assertEquals(subnet1.getLocalNode(), receivedFrame.getSender());
+        assertEquals(subnet2.getLocalNode(), receivedFrame.getReceiver());
 
         Node local3 = subnet3.getLocalNode();
         sendFrame = createFrame();
         try {
             subnet1.send(new Frame(local1, local3, sendFrame));
-            recvFrame = subnet3.receive();
-            assertNull(subnet1.recvNoWait());
-            assertNull(subnet2.recvNoWait());
+            receivedFrame = subnet3.receive();
+            assertNull(subnet1.receiveNoWait());
+            assertNull(subnet2.receiveNoWait());
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
         }
-        assertTrue(Arrays.equals(recvFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
-        assertEquals(subnet1.getLocalNode(), recvFrame.getSender());
-        assertEquals(subnet3.getLocalNode(), recvFrame.getReceiver());
+        assertTrue(Arrays.equals(receivedFrame.getCommonFrame().toBytes(), sendFrame.toBytes()));
+        assertEquals(subnet1.getLocalNode(), receivedFrame.getSender());
+        assertEquals(subnet3.getLocalNode(), receivedFrame.getReceiver());
     }
     
     @Test
-    public void testRecvNoWait() {
+    public void testReceiveNoWait() {
         InternalSubnet subnet = new InternalSubnet();
         try {
-            Frame frame = subnet.recvNoWait();
+            Frame frame = subnet.receiveNoWait();
             assertEquals(null, frame);
         } catch (SubnetException e) {
             e.printStackTrace();

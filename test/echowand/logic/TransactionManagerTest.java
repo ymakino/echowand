@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  */
 public class TransactionManagerTest {
     
-    public Frame recvWithoutError(Subnet subnet) {
+    public Frame receiveWithoutError(Subnet subnet) {
         try {
             return subnet.receive();
         } catch (SubnetException e) {

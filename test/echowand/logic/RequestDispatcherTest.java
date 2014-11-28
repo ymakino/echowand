@@ -30,9 +30,9 @@ import static org.junit.Assert.*;
  */
 public class RequestDispatcherTest {
     
-    public Frame recvWithoutError(InternalSubnet subnet) {
+    public Frame receiveWithoutError(InternalSubnet subnet) {
         try {
-            return subnet.recvNoWait();
+            return subnet.receiveNoWait();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -87,7 +87,7 @@ public class RequestDispatcherTest {
         } else {
             assertFalse(dispatcher.process(subnet, new Frame(local, group, frame), false));
         }
-        Frame res = recvWithoutError(subnet);
+        Frame res = receiveWithoutError(subnet);
         
         if (useValidEOJ) {
             assertTrue(res != null);

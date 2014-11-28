@@ -92,7 +92,7 @@ public class InternalSubnet implements Subnet {
     @Override
     public Frame receive() throws SubnetException {
         for (;;) {
-            Frame frame = port.recv();
+            Frame frame = port.receive();
             
             if (shouldLocalNodeReceive(frame)) {
                 return frame;
@@ -107,9 +107,9 @@ public class InternalSubnet implements Subnet {
      * @return 受信したFrame、もし受信フレームがない場合にはnull
      * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
      */
-    public Frame recvNoWait() throws SubnetException {
+    public Frame receiveNoWait() throws SubnetException {
         for (;;) {
-            Frame frame = port.recvNoWait();
+            Frame frame = port.receiveNoWait();
             
             if (frame == null) {
                 return null;

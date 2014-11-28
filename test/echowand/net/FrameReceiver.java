@@ -6,13 +6,13 @@ package echowand.net;
  */
 class FrameReceiver extends Thread {
     public Subnet subnet;
-    public Frame recvFrame;
+    public Frame receivedFrame;
 
     public FrameReceiver(Subnet subnet) {
         this.subnet = subnet;
     }
     
-    public Frame getRecvFrame() {
+    public Frame getReceivedFrame() {
         try {
             for (int i=0; i<5; i++) {
                 Thread.sleep(100);
@@ -24,13 +24,13 @@ class FrameReceiver extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return recvFrame;
+        return receivedFrame;
     }
 
     @Override
     public void run() {
         try {
-            recvFrame = subnet.receive();
+            receivedFrame = subnet.receive();
         } catch (SubnetException e) {
             e.printStackTrace();
         }

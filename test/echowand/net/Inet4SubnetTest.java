@@ -104,17 +104,17 @@ public class Inet4SubnetTest {
         FrameReceiver receiver = new FrameReceiver(subnet);
         receiver.start();
         
-        Frame recvFrame = receiver.getRecvFrame();
+        Frame receivedFrame = receiver.getReceivedFrame();
         if (success) {
-            assertFalse(recvFrame == null);
-            assertTrue(Arrays.equals(sendFrame.getCommonFrame().toBytes(), recvFrame.getCommonFrame().toBytes()));
+            assertFalse(receivedFrame == null);
+            assertTrue(Arrays.equals(sendFrame.getCommonFrame().toBytes(), receivedFrame.getCommonFrame().toBytes()));
         } else {
-            assertTrue(recvFrame == null);
+            assertTrue(receivedFrame == null);
         }
     }
 
     @Test
-    public void testSendAndRecv() throws SubnetException, UnknownHostException {
+    public void testSendAndReceive() throws SubnetException, UnknownHostException {
         subnet.startService();
 
         sendTest(subnet.getGroupNode(), true);
@@ -236,7 +236,7 @@ public class Inet4SubnetTest {
     }
     
     @Test(expected=SubnetException.class)
-    public void testInvalidRecv() throws SubnetException {  
+    public void testInvalidReceive() throws SubnetException {  
         subnet.stopService();
         subnet.receive();
     }

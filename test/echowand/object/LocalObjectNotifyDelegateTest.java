@@ -36,7 +36,7 @@ public class LocalObjectNotifyDelegateTest {
         assertTrue(result.isDone());
         assertFalse(result.isFail());
         
-        Frame frame = subnet.recvNoWait();
+        Frame frame = subnet.receiveNoWait();
         assertTrue(frame != null);
         CommonFrame cf = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload)cf.getEDATA();
@@ -67,7 +67,7 @@ public class LocalObjectNotifyDelegateTest {
         assertTrue(result.isDone());
         assertFalse(result.isFail());
         
-        Frame frame = subnet.recvNoWait();
+        Frame frame = subnet.receiveNoWait();
         assert(frame == null);
     }
     
@@ -85,7 +85,7 @@ public class LocalObjectNotifyDelegateTest {
         assertTrue(result.isDone());
         assertFalse(result.isFail());
         
-        Frame frame = subnet.recvNoWait();
+        Frame frame = subnet.receiveNoWait();
         assertTrue(frame == null);
     }
 }
