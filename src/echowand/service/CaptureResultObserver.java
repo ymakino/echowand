@@ -1,8 +1,6 @@
 package echowand.service;
 
-import echowand.logic.Listener;
 import echowand.net.Frame;
-import echowand.net.Subnet;
 import echowand.service.result.CaptureResult;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -11,13 +9,13 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class CaptureResultListener implements Listener {
-    private static final Logger LOGGER = Logger.getLogger(CaptureResultListener.class.getName());
-    private static final String CLASS_NAME = CaptureResultListener.class.getName();
+public class CaptureResultObserver implements CaptureSubnetObserver {
+    private static final Logger LOGGER = Logger.getLogger(CaptureResultObserver.class.getName());
+    private static final String CLASS_NAME = CaptureResultObserver.class.getName();
     
     private LinkedList<CaptureResult> captureResults;
     
-    public CaptureResultListener() {
+    public CaptureResultObserver() {
         captureResults = new LinkedList<CaptureResult>();
     }
     
@@ -40,14 +38,26 @@ public class CaptureResultListener implements Listener {
     }
 
     @Override
-    public synchronized boolean process(Subnet subnet, Frame frame, boolean processed) {
-        LOGGER.entering(CLASS_NAME, "process", new Object[]{subnet, frame, processed});
+    public void notifySent(Frame frame, boolean success) {
+        LOGGER.entering(CLASS_NAME, "notifySent", new Object[]{frame, success});
         
-        for (CaptureResult captureResult : captureResults) {
-            captureResult.addFrame(frame);
+        if (success) {
+            for (CaptureResult captureResult : captureResults) {
+                captureResult.addSentFrame(frame);
+            }
         }
         
-        LOGGER.exiting(CLASS_NAME, "process", false);
-        return false;
+        LOGGER.exiting(CLASS_NAME, "notifySent");
+    }
+
+    @Override
+    public void notifyReceived(Frame frame) {
+        LOGGER.entering(CLASS_NAME, "notifyReceived", new Object[]{frame});
+        
+        for (CaptureResult captureResult : captureResults) {
+            captureResult.addReceivedFrame(frame);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "notifyReceived");
     }
 }

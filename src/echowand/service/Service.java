@@ -647,13 +647,16 @@ public class Service {
         return observeResult;
     }
     
+    public boolean isCaptureEnabled() {
+        return getCore().isCaptureEnabled();
+    }
+    
     public CaptureResult doCapture() {
         LOGGER.entering(CLASS_NAME, "doCapture");
         
-        CaptureResultListener listener = getCore().getCaptureResultListener();
-        CaptureResult captureResult = new CaptureResult(listener);
-        
-        listener.addCaptureResult(captureResult);
+        CaptureResultObserver observer = getCore().getCaptureResultObserver();
+        CaptureResult captureResult = new CaptureResult(observer);
+        observer.addCaptureResult(captureResult);
         
         LOGGER.exiting(CLASS_NAME, "doCapture", captureResult);
         return captureResult;

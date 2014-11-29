@@ -7,7 +7,7 @@ import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
-import echowand.service.CaptureResultListener;
+import echowand.service.CaptureResultObserver;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -20,17 +20,22 @@ public class CaptureResult {
     private static final Logger LOGGER = Logger.getLogger(CaptureResult.class.getName());
     private static final String CLASS_NAME = CaptureResult.class.getName();
     
-    private CaptureResultListener listener;
-    private LinkedList<ResultData> dataList;
+    private CaptureResultObserver observer;
+    
     private LinkedList<ResultFrame> frames;
+    private LinkedList<ResultFrame> sentFrames;
+    private LinkedList<ResultFrame> receivedFrames;
     private boolean done;
     
-    public CaptureResult(CaptureResultListener listener) {
-        LOGGER.entering(CLASS_NAME, "CaptureResult", new Object[]{listener});
+    public CaptureResult(CaptureResultObserver observer) {
+        LOGGER.entering(CLASS_NAME, "CaptureResult", new Object[]{observer});
         
-        this.listener = listener;
-        this.dataList = new LinkedList<ResultData>();
-        this.frames = new LinkedList<ResultFrame>();
+        this.observer = observer;
+        
+        frames = new LinkedList<ResultFrame>();
+        sentFrames = new LinkedList<ResultFrame>();
+        receivedFrames = new LinkedList<ResultFrame>();
+        
         done = false;
         
         LOGGER.exiting(CLASS_NAME, "CaptureResult");
@@ -40,7 +45,7 @@ public class CaptureResult {
         LOGGER.entering(CLASS_NAME, "stopCapture");
         
         if (!done) {
-            listener.removeCaptureResult(this);
+            observer.removeCaptureResult(this);
             done = true;
         }
         
@@ -54,28 +59,40 @@ public class CaptureResult {
         return done;
     }
     
-    public synchronized boolean addFrame(Frame frame) {
-        LOGGER.entering(CLASS_NAME, "addFrame", frame);
+    public boolean addSentFrame(Frame frame) {
+        LOGGER.entering(CLASS_NAME, "addSentFrame", frame);
+        
+        boolean result = true;
+        ResultFrame resultFrame = getResultFrame(frame);
+        
+        result &= frames.add(resultFrame);
+        result &= sentFrames.add(resultFrame);
+        
+        LOGGER.exiting(CLASS_NAME, "addSentFrame", result);
+        return result;
+    }
+    
+    public boolean addReceivedFrame(Frame frame) {
+        LOGGER.entering(CLASS_NAME, "addReceivedFrame", frame);
+        
+        boolean result = true;
+        ResultFrame resultFrame = getResultFrame(frame);
+        
+        result &= frames.add(resultFrame);
+        result &= receivedFrames.add(resultFrame);
+        
+        LOGGER.exiting(CLASS_NAME, "addReceivedFrame", result);
+        return result;
+    }
+    
+    private ResultFrame getResultFrame(Frame frame) {
+        LOGGER.entering(CLASS_NAME, "getResultFrame", frame);
         
         long time = System.currentTimeMillis();
+        ResultFrame resultFrame = new ResultFrame(frame, time);
         
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
-        
-        int count = payload.getFirstOPC();
-        for (int i=0; i<count; i++) {
-            Property property = payload.getFirstPropertyAt(i);
-            
-            Node node = frame.getSender();
-            EOJ eoj = payload.getSEOJ();
-            EPC epc = property.getEPC();
-            Data data = property.getEDT();
-            
-            dataList.add(new ResultData(node, eoj, epc, data, time));
-        }
-        
-        boolean result = frames.add(new ResultFrame(frame, time));
-        LOGGER.exiting(CLASS_NAME, "addFrame", result);
-        return result;
+        LOGGER.exiting(CLASS_NAME, "getResultFrame", resultFrame);
+        return resultFrame;
     }
     
     public synchronized int countFrames() {
@@ -84,6 +101,24 @@ public class CaptureResult {
         int count = frames.size();
         
         LOGGER.exiting(CLASS_NAME, "countFrames", count);
+        return count;
+    }
+    
+    public synchronized int countSentFrames() {
+        LOGGER.entering(CLASS_NAME, "countSentFrames");
+        
+        int count = sentFrames.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countSentFrames", count);
+        return count;
+    }
+    
+    public synchronized int countReceivedFrames() {
+        LOGGER.entering(CLASS_NAME, "countReceivedFrames");
+        
+        int count = receivedFrames.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countReceivedFrames", count);
         return count;
     }
     
@@ -96,6 +131,24 @@ public class CaptureResult {
         return frame;
     }
     
+    public synchronized Frame getSentFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getSentFrame", index);
+        
+        Frame frame = sentFrames.get(index).frame;
+        
+        LOGGER.exiting(CLASS_NAME, "getSentFrame", frame);
+        return frame;
+    }
+    
+    public synchronized Frame getReceivedFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getReceivedFrame", index);
+        
+        Frame frame = receivedFrames.get(index).frame;
+        
+        LOGGER.exiting(CLASS_NAME, "getReceivedFrame", frame);
+        return frame;
+    }
+    
     public synchronized ResultFrame getResultFrame(int index) {
         LOGGER.entering(CLASS_NAME, "getResultFrame", index);
         
@@ -105,45 +158,48 @@ public class CaptureResult {
         return resultFrame;
     }
     
-    public synchronized int countResultData() {
-        LOGGER.entering(CLASS_NAME, "countResultData");
+    public synchronized ResultFrame getSentResultFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getSentResultFrame", index);
         
-        int count = dataList.size();
+        ResultFrame resultFrame = sentFrames.get(index);
         
-        LOGGER.exiting(CLASS_NAME, "countResultData", count);
-        return count;
+        LOGGER.exiting(CLASS_NAME, "getSentResultFrame", resultFrame);
+        return resultFrame;
     }
     
-    public synchronized ResultData getResultData(int index) {
-        LOGGER.entering(CLASS_NAME, "getResultData");
+    public synchronized ResultFrame getReceivedResultFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getReceivedResultFrame", index);
         
-        ResultData resultData = dataList.get(index);
+        ResultFrame resultFrame = receivedFrames.get(index);
         
-        LOGGER.exiting(CLASS_NAME, "getResultData", resultData);
-        return resultData;
+        LOGGER.exiting(CLASS_NAME, "getReceivedResultFrame", resultFrame);
+        return resultFrame;
     }
     
-    public synchronized List<ResultData> getResultDataList() {
-        LOGGER.entering(CLASS_NAME, "getResultDataList");
+    public synchronized List<ResultFrame> getResultFrameList() {
+        LOGGER.entering(CLASS_NAME, "getResultFrameList");
         
-        List<ResultData> resultList = new LinkedList<ResultData>(dataList);
+        LinkedList<ResultFrame> list = new LinkedList<ResultFrame>(frames);
         
-        LOGGER.exiting(CLASS_NAME, "getResultDataList", resultList);
-        return resultList;
+        LOGGER.exiting(CLASS_NAME, "getResultFrameList", list);
+        return list;
     }
     
-    public synchronized List<ResultData> getResultDataList(ResultDataMatcher matcher) {
-        LOGGER.entering(CLASS_NAME, "getResultDataList", matcher);
+    public synchronized List<ResultFrame> getSentResultFrameList() {
+        LOGGER.entering(CLASS_NAME, "getSentResultFrameList");
         
-        LinkedList<ResultData> resultList = new LinkedList<ResultData>();
+        LinkedList<ResultFrame> list = new LinkedList<ResultFrame>(sentFrames);
         
-        for (ResultData resultData: dataList) {
-            if (matcher.match(resultData)) {
-                resultList.add(resultData);
-            }
-        }
+        LOGGER.exiting(CLASS_NAME, "getSentResultFrameList", list);
+        return list;
+    }
+    
+    public synchronized List<ResultFrame> getReceivedResultFrameList() {
+        LOGGER.entering(CLASS_NAME, "getReceivedResultFrameList");
         
-        LOGGER.exiting(CLASS_NAME, "getResultDataList", resultList);
-        return resultList;
+        LinkedList<ResultFrame> list = new LinkedList<ResultFrame>(receivedFrames);
+        
+        LOGGER.exiting(CLASS_NAME, "getReceivedResultFrameList", list);
+        return list;
     }
 }

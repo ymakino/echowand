@@ -8,10 +8,12 @@ import echowand.logic.TooManyObjectsException;
 import echowand.net.Inet4Subnet;
 import echowand.net.InetSubnet;
 import echowand.net.Node;
+import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.object.EchonetObjectException;
 import echowand.object.LocalObject;
 import echowand.object.ObjectData;
+import echowand.service.CaptureSubnet;
 import echowand.service.LocalObjectConfig;
 import echowand.service.ObjectNotFoundException;
 import echowand.service.PropertyDelegate;
@@ -23,6 +25,7 @@ import echowand.service.result.ResultData;
 import echowand.service.result.ResultDataMatcherRule;
 import echowand.service.result.GetResult;
 import echowand.service.result.ObserveResult;
+import echowand.service.result.ResultFrame;
 import echowand.service.result.UpdateRemoteInfoResult;
 import echowand.util.LoggerConfig;
 import java.net.Inet4Address;
@@ -97,7 +100,7 @@ public class ServiceSample0 {
             // Construct a Core
             // NetworkInterface ni = NetworkInterface.getByName("eth9");
             NetworkInterface ni = NetworkInterface.getByName("en0");
-            InetSubnet subnet = Inet4Subnet.startSubnet(ni);
+            Subnet subnet = new CaptureSubnet(Inet4Subnet.startSubnet(ni));
             Core core = new Core(subnet);
             
             // Create a device object information
@@ -131,7 +134,7 @@ public class ServiceSample0 {
             epcs.add(EPC.x82);
             epcs.add(EPC.x84);
             // GetResult getResult1 = service.doGet(subnet.getGroupNode(), new ClassEOJ("0ef0"), EPC.x80, 1000);
-            GetResult getResult1 = service.doGet(subnet.getGroupNode(), new ClassEOJ("0011"), epcs, 1000);
+            GetResult getResult1 = service.doGet(service.getGroupNode(), new ClassEOJ("0011"), epcs, 1000);
             getResult1.join();
             
             List<ResultData> dataList1 = getResult1.getResultDataList();
@@ -204,8 +207,8 @@ public class ServiceSample0 {
             Thread.sleep(5000);
             
             captureResult.stopCapture();
-            for (int i=0; i<captureResult.countFrames(); i++) {
-                System.out.println(captureResult.getResultFrame(i));
+            for (ResultFrame resultFrame : captureResult.getResultFrameList()) {
+                System.out.println("Capture: " + resultFrame);
             }
             
             System.exit(0);

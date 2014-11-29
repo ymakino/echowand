@@ -40,7 +40,7 @@ public class Core {
     private SetGetRequestProcessor setGetRequestProcessor;
     private AnnounceRequestProcessor announceRequestProcessor;
     private ObserveResultProcessor observeResultProcessor;
-    private CaptureResultListener captureResultListener;
+    private CaptureResultObserver captureResultObserver;
     
     private LinkedList<LocalObjectConfig> localObjectConfigs;
     private LinkedList<LocalObjectUpdater> localObjectUpdaters;
@@ -49,6 +49,7 @@ public class Core {
     
     private boolean initialized = false;
     private boolean inService = false;
+    private boolean captureEnabled = false;
     
     /**
      * Inet4Subnetを利用するCoreを作成する。
@@ -58,7 +59,7 @@ public class Core {
     public Core() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "Core");
         
-        this.subnet = Inet4Subnet.startSubnet();
+        this.subnet = new CaptureSubnet(Inet4Subnet.startSubnet());
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
         
@@ -175,8 +176,8 @@ public class Core {
         return observeResultProcessor;
     }
     
-    public CaptureResultListener getCaptureResultListener() {
-        return captureResultListener;
+    public CaptureResultObserver getCaptureResultObserver() {
+        return captureResultObserver;
     }
 
     private NodeProfileInfo createNodeProfileInfo() {
@@ -265,13 +266,13 @@ public class Core {
         return observeResultProcessor;
     }
     
-    private CaptureResultListener createCaptureResultListener() {
-        LOGGER.entering(CLASS_NAME, "createCaptureResultListener");
+    private CaptureResultObserver createCaptureResultObserver() {
+        LOGGER.entering(CLASS_NAME, "createCaptureResultObserver");
         
-        CaptureResultListener captureResultListener = new CaptureResultListener();
+        CaptureResultObserver captureResultObserver = new CaptureResultObserver();
         
-        LOGGER.exiting(CLASS_NAME, "createCaptureResultListener", captureResultListener);
-        return captureResultListener;
+        LOGGER.exiting(CLASS_NAME, "createCaptureResultObserver", captureResultObserver);
+        return captureResultObserver;
     }
     
     private MainLoop createMainLoop(Subnet subnet, Listener... listeners) {
@@ -312,6 +313,10 @@ public class Core {
         return inService;
     }
     
+    public boolean isCaptureEnabled() {
+        return captureEnabled;
+    }
+    
     private void createLocalObjects() throws TooManyObjectsException {
         for (LocalObjectConfig config : localObjectConfigs) {
             LocalObjectCreator creator = new LocalObjectCreator(config);
@@ -345,7 +350,12 @@ public class Core {
             requestDispatcher.addRequestProcessor(announceRequestProcessor);
             requestDispatcher.addRequestProcessor(observeResultProcessor);
             
-            captureResultListener = createCaptureResultListener();
+            captureResultObserver = createCaptureResultObserver();
+            
+            if (subnet instanceof CaptureSubnet) {
+                ((CaptureSubnet)subnet).addObserver(captureResultObserver);
+                captureEnabled = true;
+            }
 
             localManager.add(nodeProfileObject);
             
@@ -368,7 +378,7 @@ public class Core {
     }
     
     private void startMainLoopThread() {
-        mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager, captureResultListener);
+        mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager);
         new Thread(mainLoop).start();
     }
     
