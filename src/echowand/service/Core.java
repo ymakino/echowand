@@ -45,8 +45,6 @@ public class Core {
     private LinkedList<LocalObjectConfig> localObjectConfigs;
     private LinkedList<LocalObjectUpdater> localObjectUpdaters;
     
-    private Thread mainThread;
-    
     private boolean initialized = false;
     private boolean inService = false;
     private boolean captureEnabled = false;
@@ -289,15 +287,6 @@ public class Core {
     }
     
     /**
-     * 利用中のMainLoopを実行するためのThreadを返す。initializeメソッドを呼び出すまではnullを返す。
-     * このThreadのstartを呼び出すことで、echowandのサービスを開始する。
-     * @return MainLoopを実行するためのThread
-     */
-    public Thread getMainThread() {
-        return mainThread;
-    }
-    
-    /**
      * Coreが初期化済みであるか返す。
      * @return 初期化済みであればtrue、初期化済みでなければfalse
      */
@@ -330,43 +319,43 @@ public class Core {
      * @return 初期化が成功すればtrue、すでに初期化済みであればfalse
      * @throws HarmonyException 初期化中に例外が発生した場合
      */
-    private boolean initialize() throws TooManyObjectsException {
+    public synchronized boolean initialize() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "initialize");
         
-        boolean result = false;
-
-        if (!initialized) {
-            transactionManager = createTransactionManager(subnet);
-            remoteManager = createRemoteObjectManager();
-            localManager = createLocalObjectManager();
-            nodeProfileObject = createNodeProfileObject(subnet, localManager, transactionManager);
-
-            setGetRequestProcessor = createSetGetRequestProcessor(localManager);
-            announceRequestProcessor = createAnnounceRequestProcessor(localManager, remoteManager);
-            observeResultProcessor = createObserveResultProcessor();
-
-            requestDispatcher = createRequestDispatcher();
-            requestDispatcher.addRequestProcessor(setGetRequestProcessor);
-            requestDispatcher.addRequestProcessor(announceRequestProcessor);
-            requestDispatcher.addRequestProcessor(observeResultProcessor);
-            
-            captureResultObserver = createCaptureResultObserver();
-            
-            if (subnet instanceof CaptureSubnet) {
-                ((CaptureSubnet)subnet).addObserver(captureResultObserver);
-                captureEnabled = true;
-            }
-
-            localManager.add(nodeProfileObject);
-            
-            createLocalObjects();
-            
-            initialized = true;
-            result = true;
+        if (initialized) {
+            LOGGER.exiting(CLASS_NAME, "initialize", false);
+            return false;
         }
 
-        LOGGER.exiting(CLASS_NAME, "initialize", result);
-        return result;
+        transactionManager = createTransactionManager(subnet);
+        remoteManager = createRemoteObjectManager();
+        localManager = createLocalObjectManager();
+        nodeProfileObject = createNodeProfileObject(subnet, localManager, transactionManager);
+
+        setGetRequestProcessor = createSetGetRequestProcessor(localManager);
+        announceRequestProcessor = createAnnounceRequestProcessor(localManager, remoteManager);
+        observeResultProcessor = createObserveResultProcessor();
+
+        requestDispatcher = createRequestDispatcher();
+        requestDispatcher.addRequestProcessor(setGetRequestProcessor);
+        requestDispatcher.addRequestProcessor(announceRequestProcessor);
+        requestDispatcher.addRequestProcessor(observeResultProcessor);
+
+        captureResultObserver = createCaptureResultObserver();
+
+        if (subnet instanceof CaptureSubnet) {
+            ((CaptureSubnet) subnet).addObserver(captureResultObserver);
+            captureEnabled = true;
+        }
+
+        localManager.add(nodeProfileObject);
+
+        createLocalObjects();
+
+        initialized = true;
+
+        LOGGER.exiting(CLASS_NAME, "initialize", true);
+        return true;
     }
     
     private void startUpdateThreads() {
@@ -382,14 +371,27 @@ public class Core {
         new Thread(mainLoop).start();
     }
     
-    private void startThreads() throws TooManyObjectsException {
+    public synchronized boolean startThreads() {
         LOGGER.entering(CLASS_NAME, "startThreads");
+        
+        if (inService) {
+            LOGGER.exiting(CLASS_NAME, "startThreads", false);
+            return false;
+        }
+
+        if (!isInitialized()) {
+            LOGGER.exiting(CLASS_NAME, "startThreads", false);
+            return false;
+        }
         
         startUpdateThreads();
         
         startMainLoopThread();
+
+        inService = true;
         
-        LOGGER.exiting(CLASS_NAME, "startThreads");
+        LOGGER.exiting(CLASS_NAME, "startThreads", true);
+        return true;
     }
     
     /**
@@ -397,7 +399,7 @@ public class Core {
      * @return 実行が成功すればtrue、すでに実行済みであればfalse
      * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
      */
-    public boolean startService() throws TooManyObjectsException {
+    public synchronized boolean startService() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "startService");
         
         if (inService) {
@@ -406,12 +408,13 @@ public class Core {
         }
 
         if (!isInitialized()) {
-            initialize();
+            boolean result = initialize();
+            if (!result) {
+                LOGGER.exiting(CLASS_NAME, "startService", false);
+            }
         }
         
         startThreads();
-
-        inService = true;
 
         LOGGER.exiting(CLASS_NAME, "startService", true);
         return true;
