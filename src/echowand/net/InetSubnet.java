@@ -127,7 +127,7 @@ public class InetSubnet implements Subnet {
      * @throws SubnetException 生成に失敗した場合
      */
     protected void initialize(InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "initialize", new Object[]{multicastAddress, portNumber});
+        LOGGER.entering(CLASS_NAME, "initialize", new Object[]{loopbackAddress, multicastAddress, portNumber});
 
         if (!isValidAddress(loopbackAddress)) {
             throw new SubnetException("invalid loopback address: " + localAddress);
@@ -151,7 +151,7 @@ public class InetSubnet implements Subnet {
     }
 
     private void createUDPNetwork() {
-        LOGGER.entering(CLASS_NAME, "createUDPNetwork", new Object[]{multicastAddress, portNumber});
+        LOGGER.entering(CLASS_NAME, "createUDPNetwork");
 
         if (localAddress != null) {
             udpNetwork = new UDPNetwork(localAddress, multicastAddress, portNumber);
@@ -165,7 +165,7 @@ public class InetSubnet implements Subnet {
     }
 
     private void createTCPReceiver() {
-        LOGGER.entering(CLASS_NAME, "createTCPNetwork", new Object[]{multicastAddress, portNumber});
+        LOGGER.entering(CLASS_NAME, "createTCPNetwork");
 
         tcpReceiver = new TCPReceiver();
 
@@ -173,7 +173,7 @@ public class InetSubnet implements Subnet {
     }
 
     private void createTCPAcceptor() {
-        LOGGER.entering(CLASS_NAME, "createTCPAcceptor", new Object[]{multicastAddress, portNumber});
+        LOGGER.entering(CLASS_NAME, "createTCPAcceptor");
 
         if (localAddress != null) {
             tcpAcceptor = new TCPAcceptor(localAddress, portNumber);
@@ -260,7 +260,7 @@ public class InetSubnet implements Subnet {
     }
 
     private synchronized void startThreads() {
-        LOGGER.entering(CLASS_NAME, "startReceiver");
+        LOGGER.entering(CLASS_NAME, "startThreads");
 
         receiveQueue = new SynchronousQueue<Frame>();
 
@@ -275,11 +275,11 @@ public class InetSubnet implements Subnet {
             tcpAcceptorThread.start();
         }
 
-        LOGGER.exiting(CLASS_NAME, "startReceiver");
+        LOGGER.exiting(CLASS_NAME, "startThreads");
     }
 
     private synchronized void stopThreads() {
-        LOGGER.entering(CLASS_NAME, "stopReceiver");
+        LOGGER.entering(CLASS_NAME, "stopThreads");
 
         if (udpReceiverThread != null) {
             udpReceiverThread.terminate();
@@ -296,7 +296,7 @@ public class InetSubnet implements Subnet {
             tcpAcceptorThread = null;
         }
 
-        LOGGER.exiting(CLASS_NAME, "stopReceiver");
+        LOGGER.exiting(CLASS_NAME, "stopThreads");
     }
 
     /**
@@ -415,26 +415,30 @@ public class InetSubnet implements Subnet {
      * TCPConnectionの登録を行う。 ここで登録されたTCPConnectionからの受信処理は自動的に処理されるようになる。
      *
      * @param connection 登録するTCPConnection
+     * @return 追加に成功した場合にはtrue、そうでなければfalse
      */
-    public void registerTCPConnection(TCPConnection connection) {
+    public boolean registerTCPConnection(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "registerTCPConnection", connection);
 
-        getTCPReceiver().addConnection((TCPConnection) connection);
+        boolean result = getTCPReceiver().addConnection((TCPConnection) connection);
 
-        LOGGER.exiting(CLASS_NAME, "createTCPConnection");
+        LOGGER.exiting(CLASS_NAME, "createTCPConnection", result);
+        return result;
     }
 
     /**
      * TCPConnectionの登録の抹消を行う。
      *
      * @param connection 登録を抹消するTCPConnection
+     * @return 抹消に成功した場合にはtrue、そうでなければfalse
      */
-    public void unregisterTCPConnection(TCPConnection connection) {
+    public boolean unregisterTCPConnection(TCPConnection connection) {
         LOGGER.entering(CLASS_NAME, "unregisterTCPConnection", connection);
 
-        getTCPReceiver().removeConnection((TCPConnection) connection);
+        boolean result = getTCPReceiver().removeConnection((TCPConnection) connection);
 
-        LOGGER.exiting(CLASS_NAME, "unregisterTCPConnection");
+        LOGGER.exiting(CLASS_NAME, "unregisterTCPConnection", result);
+        return result;
     }
 
     /**
@@ -552,10 +556,16 @@ public class InetSubnet implements Subnet {
      * @throws SubnetException 無効なアドレスが指定された場合
      */
     public Node getRemoteNode(InetAddress addr) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "getRemoteNode", addr);
+        
         if (isValidAddress(addr)) {
-            return new InetNode(this, addr);
+            InetNode inetNode = new InetNode(this, addr);
+            LOGGER.exiting(CLASS_NAME, "getRemoteNode", inetNode);
+            return inetNode;
         } else {
-            throw new SubnetException("invalid address: " + addr);
+            SubnetException exception = new SubnetException("invalid address: " + addr);
+            LOGGER.throwing(CLASS_NAME, "getRemoteNode", exception);
+            throw exception;
         }
     }
 
@@ -568,16 +578,24 @@ public class InetSubnet implements Subnet {
      */
     @Override
     public Node getRemoteNode(NodeInfo nodeInfo) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "getRemoteNode", nodeInfo);
+        
         if (nodeInfo instanceof InetNodeInfo) {
             InetNodeInfo inetNodeInfo = (InetNodeInfo) nodeInfo;
 
             if (isValidNodeInfo(inetNodeInfo)) {
-                return new InetNode(this, (InetNodeInfo) nodeInfo);
+                InetNode inetNode = new InetNode(this, (InetNodeInfo) nodeInfo);
+                LOGGER.exiting(CLASS_NAME, "getRemoteNode", inetNode);
+                return inetNode;
             } else {
-                throw new SubnetException("invalid nodeInfo: " + nodeInfo);
+                SubnetException exception = new SubnetException("invalid nodeInfo: " + nodeInfo);
+                LOGGER.throwing(CLASS_NAME, "getRemoteNode", exception);
+                throw exception;
             }
         } else {
-            throw new SubnetException("invalid nodeInfo: " + nodeInfo);
+            SubnetException exception = new SubnetException("invalid nodeInfo: " + nodeInfo);
+            LOGGER.throwing(CLASS_NAME, "getRemoteNode", exception);
+            throw exception;
         }
     }
 
@@ -596,10 +614,13 @@ public class InetSubnet implements Subnet {
      */
     @Override
     public synchronized Node getLocalNode() {
+        LOGGER.entering(CLASS_NAME, "getLocalNode");
+        
         if (localNode == null) {
             localNode = new InetNode(this, getLocalAddress());
         }
 
+        LOGGER.exiting(CLASS_NAME, "getLocalNode", localNode);
         return localNode;
     }
 
@@ -610,10 +631,13 @@ public class InetSubnet implements Subnet {
      */
     @Override
     public synchronized Node getGroupNode() {
+        LOGGER.entering(CLASS_NAME, "getGroupNode");
+        
         if (groupNode == null) {
             groupNode = new InetNode(this, multicastAddress);
         }
 
+        LOGGER.exiting(CLASS_NAME, "getGroupNode", groupNode);
         return groupNode;
     }
 }
