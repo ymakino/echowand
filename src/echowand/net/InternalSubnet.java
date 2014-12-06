@@ -126,6 +126,7 @@ public class InternalSubnet implements Subnet {
      * @param name リモートノードの名前
      * @return リモートノードのNode
      */
+    @Override
     public synchronized Node getRemoteNode(String name) {
         return new InternalNode(this, name);
     }

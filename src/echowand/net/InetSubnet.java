@@ -4,6 +4,7 @@ import echowand.util.Pair;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -546,6 +547,30 @@ public class InetSubnet implements Subnet {
      */
     public boolean isValidNodeInfo(InetNodeInfo nodeInfo) {
         return isValidAddress(nodeInfo.getAddress());
+    }
+    
+    /**
+     * このサブネットに含まれるリモートノードを表すNodeを返す。
+     * @param name リモートノードの名前
+     * @return リモートノードのNode
+     * @throws SubnetException 適切な名前が指定されなかった場合
+     */
+    @Override
+    public Node getRemoteNode(String name) throws SubnetException {
+        try {
+            InetAddress[] addrs = InetAddress.getAllByName(name);
+            
+            for (int i=0; i<addrs.length; i++) {
+                InetAddress addr = addrs[i];
+                if (isValidAddress(addr)) {
+                    return new InetNode(this, addr);
+                }
+            }
+        } catch (UnknownHostException ex) {
+            throw new SubnetException("invalid name: " + name, ex);
+        }
+        
+        throw new SubnetException("invalid name: " + name);
     }
 
     /**
