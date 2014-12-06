@@ -49,6 +49,11 @@ public class CaptureSubnet implements Subnet {
     }
 
     @Override
+    public Node getRemoteNode(String name) throws SubnetException {
+        return internalSubnet.getRemoteNode(name);
+    }
+
+    @Override
     public Node getGroupNode() {
         return internalSubnet.getGroupNode();
     }

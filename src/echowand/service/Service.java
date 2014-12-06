@@ -816,12 +816,20 @@ public class Service {
         return getSubnet().getLocalNode();
     }
     
+    public Node getRemoteNode(String name) throws SubnetException {
+        return getSubnet().getRemoteNode(name);
+    }
+    
     public Node getRemoteNode(NodeInfo nodeInfo) throws SubnetException {
         return getSubnet().getRemoteNode(nodeInfo);
     }
     
     public Node getGroupNode() {
         return getSubnet().getGroupNode();
+    }
+    
+    public List<LocalObject> getLocalObjects() {
+        return getLocalObjectManager().getDeviceObjects();
     }
     
     public LocalObject getLocalObject(EOJ eoj) {
