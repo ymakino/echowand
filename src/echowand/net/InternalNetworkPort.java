@@ -84,7 +84,7 @@ public class InternalNetworkPort {
      * @return 受信キューから取り出されたフレーム
      * @throws SubnetException 取り出しに失敗した場合
      */
-    public Frame recv() throws SubnetException {
+    public Frame receive() throws SubnetException {
         try {
             return loopbackQueue.take();
         } catch (InterruptedException e) {
@@ -98,10 +98,10 @@ public class InternalNetworkPort {
      * @return 受信キューから取り出されたフレーム
      * @throws SubnetException 取り出しに失敗した場合
      */
-    public Frame recvNoWait() throws SubnetException {
+    public Frame receiveNoWait() throws SubnetException {
         if (loopbackQueue.isEmpty()) {
             return null;
         }
-        return recv();
+        return receive();
     }
 }

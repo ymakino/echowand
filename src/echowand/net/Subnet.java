@@ -29,6 +29,14 @@ public interface Subnet {
     
     /**
      * このサブネットに含まれるリモートノードを表すNodeを返す。
+     * @param name リモートノードの名前
+     * @return リモートノードのNode
+     * @throws SubnetException 適切な名前が指定されなかった場合
+     */
+    public Node getRemoteNode(String name) throws SubnetException;
+    
+    /**
+     * このサブネットに含まれるリモートノードを表すNodeを返す。
      * @param nodeInfo リモートノードの情報
      * @return リモートノードのNode
      * @throws SubnetException 適切なNodeInfoが指定されなかった場合

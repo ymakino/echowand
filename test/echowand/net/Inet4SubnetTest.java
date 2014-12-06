@@ -104,17 +104,17 @@ public class Inet4SubnetTest {
         FrameReceiver receiver = new FrameReceiver(subnet);
         receiver.start();
         
-        Frame recvFrame = receiver.getRecvFrame();
+        Frame receivedFrame = receiver.getReceivedFrame();
         if (success) {
-            assertFalse(recvFrame == null);
-            assertTrue(Arrays.equals(sendFrame.getCommonFrame().toBytes(), recvFrame.getCommonFrame().toBytes()));
+            assertFalse(receivedFrame == null);
+            assertTrue(Arrays.equals(sendFrame.getCommonFrame().toBytes(), receivedFrame.getCommonFrame().toBytes()));
         } else {
-            assertTrue(recvFrame == null);
+            assertTrue(receivedFrame == null);
         }
     }
 
     @Test
-    public void testSendAndRecv() throws SubnetException, UnknownHostException {
+    public void testSendAndReceive() throws SubnetException, UnknownHostException {
         subnet.startService();
 
         sendTest(subnet.getGroupNode(), true);
@@ -236,7 +236,7 @@ public class Inet4SubnetTest {
     }
     
     @Test(expected=SubnetException.class)
-    public void testInvalidRecv() throws SubnetException {  
+    public void testInvalidReceive() throws SubnetException {  
         subnet.stopService();
         subnet.receive();
     }
@@ -348,6 +348,50 @@ public class Inet4SubnetTest {
             assertArrayEquals(commonFrame1.toBytes(), commonFrame2.toBytes());
         } finally {
             ss.close();
+        }
+    }
+    
+    @Test
+    public void testGetRemoteNode() throws UnknownHostException, SubnetException {
+        InetNode inetNode = (InetNode)subnet.getRemoteNode("localhost");
+        assertEquals(getLocalAddress(), inetNode.getAddress());
+        
+        inetNode = (InetNode)subnet.getRemoteNode(getLocalAddress());
+        assertEquals(getLocalAddress(), inetNode.getAddress());
+        
+        inetNode = (InetNode)subnet.getRemoteNode(getLocalAddress().getHostAddress());
+        assertEquals(getLocalAddress(), inetNode.getAddress());
+        
+        inetNode = (InetNode)subnet.getRemoteNode(new InetNodeInfo(getLocalAddress()));
+        assertEquals(getLocalAddress(), inetNode.getAddress());
+        
+        inetNode = (InetNode)subnet.getRemoteNode(getRemoteAddress());
+        assertEquals(getRemoteAddress(), inetNode.getAddress());
+        
+        inetNode = (InetNode)subnet.getRemoteNode(getRemoteAddress().getHostAddress());
+        assertEquals(getRemoteAddress(), inetNode.getAddress());
+        
+        inetNode = (InetNode)subnet.getRemoteNode(new InetNodeInfo(getRemoteAddress()));
+        assertEquals(getRemoteAddress(), inetNode.getAddress());
+        
+        String invalidAddress = getInvalidAddress().getHostAddress();
+        
+        try {
+            subnet.getRemoteNode(InetAddress.getByName(invalidAddress));
+            fail();
+        } catch (SubnetException ex) {
+        }
+        
+        try {
+            subnet.getRemoteNode(invalidAddress);
+            fail();
+        } catch (SubnetException ex) {
+        }
+        
+        try {
+            subnet.getRemoteNode(new InetNodeInfo(InetAddress.getByName(invalidAddress)));
+            fail();
+        } catch (SubnetException ex) {
         }
     }
 }

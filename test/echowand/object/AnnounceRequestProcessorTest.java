@@ -40,7 +40,7 @@ public class AnnounceRequestProcessorTest {
             default: fail();
         }
         try {
-            return subnet.recvNoWait();
+            return subnet.receiveNoWait();
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -118,7 +118,7 @@ public class AnnounceRequestProcessorTest {
         frame = processFrame(subnet, listener, new EOJ("001101"), new EOJ("001101"), ESV.INFC);
         assertTrue(frame != null);
         try {
-            frame = subnet.recvNoWait();
+            frame = subnet.receiveNoWait();
             assertTrue(frame == null);
         } catch (SubnetException e) {
             e.printStackTrace();
@@ -128,7 +128,7 @@ public class AnnounceRequestProcessorTest {
         frame = processFrame(subnet, listener, new EOJ("001101"), new EOJ("001100"), ESV.INFC);
         assertTrue(frame != null);
         try {
-            frame = subnet.recvNoWait();
+            frame = subnet.receiveNoWait();
             assertTrue(frame != null);
         } catch (SubnetException e) {
             e.printStackTrace();

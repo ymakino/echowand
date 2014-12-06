@@ -259,23 +259,23 @@ public class Transaction {
      * @param frame 受信したフレーム
      * @return フレームの処理に成功した場合にはtrue、そうでなければfalse
      */
-    public synchronized boolean recvResponse(Frame frame) {
-        logger.entering(className, "recvResponse");
+    public synchronized boolean receiveResponse(Frame frame) {
+        logger.entering(className, "receiveResponse");
         
         if (!this.waiting) {
-            logger.exiting(className, "recvResponse", false);
+            logger.exiting(className, "receiveResponse", false);
             return false;
         }
         
         if (!frame.getCommonFrame().isStandardPayload()) {
-            logger.exiting(className, "recvResponse", false);
+            logger.exiting(className, "receiveResponse", false);
             return false;
         }
         
         CommonFrame cf = frame.getCommonFrame();
         
         if (cf.getTID() != this.getTID()) {
-            logger.exiting(className, "recvResponse", false);
+            logger.exiting(className, "receiveResponse", false);
             return false;
         }
         
@@ -287,17 +287,17 @@ public class Transaction {
         
         if (!responseSEOJ.equals(requestDEOJ)) {
             if (!requestDEOJ.isAllInstance()) {
-                logger.exiting(className, "recvResponse", false);
+                logger.exiting(className, "receiveResponse", false);
                 return false;
             }
 
             if (!responseSEOJ.getClassEOJ().equals(requestDEOJ.getClassEOJ())) {
-                logger.exiting(className, "recvResponse", false);
+                logger.exiting(className, "receiveResponse", false);
                 return false;
             }
         }
         if (!responseDEOJ.equals(requestSEOJ)) {
-            logger.exiting(className, "recvResponse", false);
+            logger.exiting(className, "receiveResponse", false);
             return false;
         }
 
@@ -305,7 +305,7 @@ public class Transaction {
         ESV resESV = payload.getESV();
         
         if (!isValidTransactionESVPair(reqESV, resESV)) {
-            logger.exiting(className, "recvResponse", false);
+            logger.exiting(className, "receiveResponse", false);
             return false;
         }
         
@@ -313,7 +313,7 @@ public class Transaction {
         
         doCallReceiveTransactionListeners(frame);
         
-        logger.exiting(className, "recvResponse", true);
+        logger.exiting(className, "receiveResponse", true);
         return true;
     }
     

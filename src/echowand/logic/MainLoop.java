@@ -56,12 +56,12 @@ public class MainLoop implements Runnable {
      * @return 受信したフレーム
      * @throws SubnetException 受信に失敗した場合
      */
-    public Frame recvFrame() throws SubnetException {
-        logger.entering(className, "recvFrame");
+    public Frame receiveFrame() throws SubnetException {
+        logger.entering(className, "receiveFrame");
         
         Frame frame = subnet.receive();
         
-        logger.exiting(className, "recvFrame");
+        logger.exiting(className, "receiveFrame");
         
         return frame;
     }
@@ -125,7 +125,7 @@ public class MainLoop implements Runnable {
         try {
             for (;;) {
                 try {
-                    Frame frame = recvFrame();
+                    Frame frame = receiveFrame();
                     invokeListeners(frame);
                 } catch (SubnetException e) {
                     e.printStackTrace();

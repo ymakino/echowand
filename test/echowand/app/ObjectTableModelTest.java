@@ -273,7 +273,7 @@ public class ObjectTableModelTest {
 
                     transactionManager.process(subnet, frame, false);
                 } catch (SubnetException e) {
-                    fail("frame = subnet.recv()");
+                    fail("frame = subnet.receive()");
                     e.printStackTrace();
                 }
                 
@@ -293,7 +293,7 @@ public class ObjectTableModelTest {
 
                     transactionManager.process(subnet, frame, false);
                 } catch (SubnetException e) {
-                    fail("frame = subnet.recv()");
+                    fail("frame = subnet.receive()");
                     e.printStackTrace();
                 }
                 

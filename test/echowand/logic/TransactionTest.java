@@ -89,7 +89,7 @@ public class TransactionTest {
 
             t.execute();
             
-            Frame frame = subnet.recvNoWait();
+            Frame frame = subnet.receiveNoWait();
             assertTrue(frame != null);
         } catch (SubnetException e) {
             e.printStackTrace();
@@ -104,9 +104,9 @@ public class TransactionTest {
 
             t.execute();
             
-            Frame frame = subnet.recvNoWait();
+            Frame frame = subnet.receiveNoWait();
             assertTrue(frame != null);
-            frame = subnet.recvNoWait();
+            frame = subnet.receiveNoWait();
             assertTrue(frame != null);
         } catch (SubnetException e) {
             e.printStackTrace();
@@ -161,7 +161,7 @@ public class TransactionTest {
         try {
             Frame reqFrame = subnet.receive();
             assertTrue(reqFrame != null);
-            t.recvResponse(createReplyFrame(reqFrame));
+            t.receiveResponse(createReplyFrame(reqFrame));
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -197,7 +197,7 @@ public class TransactionTest {
             Frame reqFrame = subnet.receive();
             assertTrue(reqFrame != null);
             t.finish();
-            t.recvResponse(createReplyFrame(reqFrame));
+            t.receiveResponse(createReplyFrame(reqFrame));
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -247,7 +247,7 @@ public class TransactionTest {
     }
     
     public boolean testCallbackBegan = false;
-    public int testCallbackRecvCount = 0;
+    public int testCallbackReceiveCount = 0;
     public boolean testCallbackFinished = false;
     
     @Test
@@ -255,13 +255,13 @@ public class TransactionTest {
         Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
         
         testCallbackBegan = false;
-        testCallbackRecvCount = 0;
+        testCallbackReceiveCount = 0;
         testCallbackFinished = false;
         TransactionListener tl = new TransactionListener(){
             @Override
             public void begin(Transaction t){testCallbackBegan = true;}
             @Override
-            public void receive(Transaction t, Subnet subnet, Frame frame){testCallbackRecvCount++;}
+            public void receive(Transaction t, Subnet subnet, Frame frame){testCallbackReceiveCount++;}
             @Override
             public void finish(Transaction t){testCallbackFinished = true;}
         };
@@ -280,9 +280,9 @@ public class TransactionTest {
         try {
             Frame reqFrame = subnet.receive();
             Frame resFrame1 = createReplyFrame(reqFrame);
-            t.recvResponse(resFrame1);
+            t.receiveResponse(resFrame1);
             Frame resFrame2 = createReplyFrame(reqFrame);
-            t.recvResponse(resFrame2);
+            t.receiveResponse(resFrame2);
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();
@@ -295,7 +295,7 @@ public class TransactionTest {
             fail();
         }
         
-        assertEquals(2, testCallbackRecvCount);
+        assertEquals(2, testCallbackReceiveCount);
         assertTrue(testCallbackFinished);
     }
     
@@ -349,11 +349,11 @@ public class TransactionTest {
             CommonFrame cf = repFrame.getCommonFrame();
             StandardPayload payload = (StandardPayload)cf.getEDATA();
             payload.setSEOJ(new EOJ("001101"));
-            t.recvResponse(repFrame);
+            t.receiveResponse(repFrame);
             payload.setSEOJ(new EOJ("001102"));
-            t.recvResponse(repFrame);
+            t.receiveResponse(repFrame);
             payload.setSEOJ(new EOJ("001103"));
-            t.recvResponse(repFrame);
+            t.receiveResponse(repFrame);
             t.finish();
         } catch (SubnetException e) {
             e.printStackTrace();
@@ -376,11 +376,11 @@ public class TransactionTest {
             CommonFrame cf = repFrame.getCommonFrame();
             StandardPayload payload = (StandardPayload)cf.getEDATA();
             payload.setSEOJ(new EOJ("001101"));
-            t.recvResponse(repFrame);
+            t.receiveResponse(repFrame);
             payload.setSEOJ(new EOJ("001102"));
-            t.recvResponse(repFrame);
+            t.receiveResponse(repFrame);
             payload.setSEOJ(new EOJ("001103"));
-            t.recvResponse(repFrame);
+            t.receiveResponse(repFrame);
             t.finish();
         } catch (SubnetException e) {
             e.printStackTrace();

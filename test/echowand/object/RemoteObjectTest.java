@@ -298,7 +298,7 @@ public class RemoteObjectTest {
         
         try {
             object.observeData(EPC.x80);
-            Frame frame = subnet.recvNoWait();
+            Frame frame = subnet.receiveNoWait();
             CommonFrame commonFrame = frame.getCommonFrame();
             StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
             assertEquals(ESV.INF_REQ, payload.getESV());

@@ -103,13 +103,18 @@ public class InstanceListRequestExecutorTest {
     }
     
     @Test
-    public void testTimeout1000() {
+    public void testTimeout500() {
         doTestTimeout(500, false);
     }
     
     @Test
     public void testTimeout2000() {
         doTestTimeout(2000, false);
+    }
+    
+    @Test
+    public void testTimeout3000() {
+        doTestTimeout(3000, false);
     }
     
     private long time() {

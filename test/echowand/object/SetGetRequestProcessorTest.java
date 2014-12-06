@@ -126,9 +126,9 @@ public class SetGetRequestProcessorTest {
         return frame;
     }
     
-    public Frame recvWithoutError(InternalSubnet subnet) {
+    public Frame receiveWithoutError(InternalSubnet subnet) {
         try {
-            Frame frame = subnet.recvNoWait();
+            Frame frame = subnet.receiveNoWait();
             if (frame == null) {
                 fail();
             }
@@ -152,7 +152,7 @@ public class SetGetRequestProcessorTest {
         processor.processSetC(subnet, createFrameSetC(subnet), false);
         assertEquals(1, object.getData(EPC.x80).size());
         assertEquals((byte)0x42, object.getData(EPC.x80).get(0));
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.Set_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
@@ -163,7 +163,7 @@ public class SetGetRequestProcessorTest {
     @Test
     public void testProcessGet() {
         processor.processGet(subnet, createFrameGet(subnet), false);
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.Get_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
@@ -175,7 +175,7 @@ public class SetGetRequestProcessorTest {
     @Test
     public void testProcessSetGet() {
         processor.processSetGet(subnet, createFrameSetGet(subnet), false);
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.SetGet_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
@@ -190,8 +190,17 @@ public class SetGetRequestProcessorTest {
     
     @Test
     public void testProcessINF_REQ() {
+        InternalSubnet subnet2 = new InternalSubnet();
+        
         processor.processINF_REQ(subnet, createFrameINF_REQ1(subnet), false);
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
+        assertEquals(subnet.getLocalNode(), frame.getSender());
+        assertEquals(subnet.getGroupNode(), frame.getReceiver());
+        
+        Frame frame2 = receiveWithoutError(subnet2);
+        assertEquals(subnet.getLocalNode(), frame2.getSender());
+        assertEquals(subnet2.getGroupNode(), frame2.getReceiver());
+        
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.INF, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
@@ -202,9 +211,16 @@ public class SetGetRequestProcessorTest {
     }
     
     @Test
-    public void testProcessINF_REQ_Fail() {
+    public void testProcessINF_REQ_Fail() throws SubnetException {
+        InternalSubnet subnet2 = new InternalSubnet();
+        
         processor.processINF_REQ(subnet, createFrameINF_REQ2(subnet), false);
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
+        assertEquals(subnet.getLocalNode(), frame.getSender());
+        assertEquals(subnet.getLocalNode(), frame.getReceiver());
+        
+        assertNull(subnet2.receiveNoWait());
+        
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.INF_SNA, payload.getESV());
         assertEquals(2, payload.getFirstOPC());
@@ -220,7 +236,7 @@ public class SetGetRequestProcessorTest {
     public void testProcessInvalidEOJSetGet() {
         processor.processSetGet(subnet, createFrameInvalidEOJSetGet(subnet), false);
         processor.processSetGet(subnet, createFrameSetGet(subnet), false);
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.SetGet_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
@@ -247,7 +263,7 @@ public class SetGetRequestProcessorTest {
         EOJ newDEOJ = reqPayload.getDEOJ().getEOJWithInstanceCode((byte)0x00);
         reqPayload.setDEOJ(newDEOJ);
         processor.processGet(subnet, reqFrame, false);
-        Frame frame = recvWithoutError(subnet);
+        Frame frame = receiveWithoutError(subnet);
         StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.Get_Res, payload.getESV());
         assertEquals(new EOJ("001101"), payload.getSEOJ());
@@ -256,7 +272,7 @@ public class SetGetRequestProcessorTest {
         assertEquals((byte)0x01, payload.getFirstPropertyAt(0).getPDC());
         assertEquals((byte)0x41, payload.getFirstPropertyAt(0).getEDT().get(0));
         
-        frame = recvWithoutError(subnet);
+        frame = receiveWithoutError(subnet);
         payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         assertEquals(ESV.Get_Res, payload.getESV());
         assertEquals(new EOJ("001102"), payload.getSEOJ());

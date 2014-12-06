@@ -180,7 +180,6 @@ public class EOJTest {
     @Test
     public void testIsMemberOf() {
         EOJ eoj = new EOJ("0EF001");
-        ClassEOJ ceoj = new ClassEOJ("0EF0");
         
         assertTrue(eoj.isMemberOf(new ClassEOJ("0EF0")));
         assertFalse(eoj.isMemberOf(new ClassEOJ("0EF1")));
@@ -189,11 +188,21 @@ public class EOJTest {
     
     @Test
     public void testIsAllInstance() {
-        EOJ eoj = new EOJ("0EF001");
-        ClassEOJ ceoj = new ClassEOJ("0EF0");
-        
         assertTrue(new EOJ("0EF000").isAllInstance());
         assertFalse(new EOJ("0EF001").isAllInstance());
+    }
+    
+    @Test
+    public void testGetEOJWithInstanceCode() {
+        assertEquals(new EOJ("001101"), new EOJ("001100").getEOJWithInstanceCode((byte)0x01));
+        assertEquals(new EOJ("013003"), new EOJ("013001").getEOJWithInstanceCode((byte)0x03));
+        assertEquals(new EOJ("0EF000"), new EOJ("0EF002").getEOJWithInstanceCode((byte)0x00));
+    }
+    
+    @Test
+    public void testGetAllInstanceEOJ() {
+        assertEquals(new EOJ("0EF000"), new EOJ("0EF001").getAllInstanceEOJ());
+        assertTrue(new EOJ("0EF001").getAllInstanceEOJ().isAllInstance());
     }
     
     @Test

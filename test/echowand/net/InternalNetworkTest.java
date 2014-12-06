@@ -46,16 +46,16 @@ public class InternalNetworkTest {
         Frame sendFrame = new Frame(null, null, new CommonFrame());
         network.broadcast(sendFrame);
         
-        Frame recvFrame1 = port1.recvNoWait();
-        assertEquals(sendFrame.getReceiver(), recvFrame1.getReceiver());
-        assertEquals(sendFrame.getSender(), recvFrame1.getSender());
-        assertTrue(sendFrame.getCommonFrame().toString().equals(recvFrame1.getCommonFrame().toString()));
-        assertTrue(port1.recvNoWait() == null);
+        Frame receivedFrame1 = port1.receiveNoWait();
+        assertEquals(sendFrame.getReceiver(), receivedFrame1.getReceiver());
+        assertEquals(sendFrame.getSender(), receivedFrame1.getSender());
+        assertTrue(sendFrame.getCommonFrame().toString().equals(receivedFrame1.getCommonFrame().toString()));
+        assertTrue(port1.receiveNoWait() == null);
         
-        Frame recvFrame2 = port2.recvNoWait();
-        assertEquals(sendFrame.getReceiver(), recvFrame2.getReceiver());
-        assertEquals(sendFrame.getSender(), recvFrame2.getSender());
-        assertTrue(sendFrame.getCommonFrame().toString().equals(recvFrame2.getCommonFrame().toString()));
-        assertTrue(port2.recvNoWait() == null);
+        Frame receivedFrame2 = port2.receiveNoWait();
+        assertEquals(sendFrame.getReceiver(), receivedFrame2.getReceiver());
+        assertEquals(sendFrame.getSender(), receivedFrame2.getSender());
+        assertTrue(sendFrame.getCommonFrame().toString().equals(receivedFrame2.getCommonFrame().toString()));
+        assertTrue(port2.receiveNoWait() == null);
     }
 }

@@ -67,7 +67,7 @@ public class TransactionManager implements Listener {
     }
     
     /**
-     * 受信したフレームのTIDを確認して適切なTransactionのrecvResponseを呼び出す。
+     * 受信したフレームのTIDを確認して適切なTransactionのreceiveResponseを呼び出す。
      * 既に処理済みのフレームは無視を行なう。
      * @param subnet 受信したフレームの送受信が行なわれたサブネット
      * @param frame 受信したフレーム
@@ -87,7 +87,7 @@ public class TransactionManager implements Listener {
         
         for (Transaction transaction : cloneTransactions()) {
             if (frame.getCommonFrame().getTID() == transaction.getTID()) {
-                ret |= transaction.recvResponse(frame);
+                ret |= transaction.receiveResponse(frame);
             }
         }
         

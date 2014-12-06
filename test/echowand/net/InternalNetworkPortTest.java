@@ -27,23 +27,23 @@ public class InternalNetworkPortTest {
     }
     
     @Test
-    public void enqueueAndRecvTest() throws SubnetException {
+    public void enqueueAndReceiveTest() throws SubnetException {
         InternalNetworkPort port = new InternalNetworkPort();
         
         Frame frame = new Frame(null, null, new CommonFrame());
         port.enqueue(frame);
-        assertEquals(frame.getCommonFrame().toString(), port.recv().getCommonFrame().toString());
-        assertTrue(port.recvNoWait() == null);
+        assertEquals(frame.getCommonFrame().toString(), port.receive().getCommonFrame().toString());
+        assertTrue(port.receiveNoWait() == null);
     }
     
     @Test
-    public void recvNoWaitTest() throws SubnetException {
+    public void receiveNoWaitTest() throws SubnetException {
         InternalNetworkPort port = new InternalNetworkPort();
         
         Frame frame = new Frame(null, null, new CommonFrame());
         port.enqueue(frame);
-        assertEquals(frame.getCommonFrame().toString(), port.recvNoWait().getCommonFrame().toString());
-        assertTrue(port.recvNoWait() == null);
+        assertEquals(frame.getCommonFrame().toString(), port.receiveNoWait().getCommonFrame().toString());
+        assertTrue(port.receiveNoWait() == null);
     }
     
     @Test
@@ -53,16 +53,16 @@ public class InternalNetworkPortTest {
         
         Frame frame = new Frame(null, null, new CommonFrame());
         port1.send(frame);
-        assertTrue(port1.recvNoWait() == null);
+        assertTrue(port1.receiveNoWait() == null);
         
         InternalNetwork network = new InternalNetwork();
         network.addPort(port1);
         network.addPort(port2);
         
         port1.send(frame);
-        assertEquals(frame.getCommonFrame().toString(), port1.recv().getCommonFrame().toString());
-        assertTrue(port1.recvNoWait() == null);
-        assertEquals(frame.getCommonFrame().toString(), port2.recv().getCommonFrame().toString());
-        assertTrue(port2.recvNoWait() == null);
+        assertEquals(frame.getCommonFrame().toString(), port1.receive().getCommonFrame().toString());
+        assertTrue(port1.receiveNoWait() == null);
+        assertEquals(frame.getCommonFrame().toString(), port2.receive().getCommonFrame().toString());
+        assertTrue(port2.receiveNoWait() == null);
     }
 }

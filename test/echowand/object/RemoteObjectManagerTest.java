@@ -42,15 +42,15 @@ public class RemoteObjectManagerTest {
         @Override
         public void run() {
             try {
-                Frame recvFrame = subnet.receive();
-                CommonFrame recvCommonFrame = recvFrame.getCommonFrame();
-                StandardPayload recvPayload = (StandardPayload) recvCommonFrame.getEDATA();
+                Frame receivedFrame = subnet.receive();
+                CommonFrame receivedCommonFrame = receivedFrame.getCommonFrame();
+                StandardPayload receivedPayload = (StandardPayload) receivedCommonFrame.getEDATA();
 
-                CommonFrame sendCommonFrame = new CommonFrame(recvPayload.getDEOJ(), recvPayload.getSEOJ(), ESV.Get_Res);
-                sendCommonFrame.setTID(recvCommonFrame.getTID());
+                CommonFrame sendCommonFrame = new CommonFrame(receivedPayload.getDEOJ(), receivedPayload.getSEOJ(), ESV.Get_Res);
+                sendCommonFrame.setTID(receivedCommonFrame.getTID());
                 StandardPayload sendPayload = (StandardPayload) sendCommonFrame.getEDATA();
                 sendPayload.addFirstProperty(new Property(EPC.xE0, new Data((byte) 0x12, (byte) 0x34)));
-                Frame sendFrame = new Frame(subnet.getLocalNode(), recvFrame.getSender(), sendCommonFrame);
+                Frame sendFrame = new Frame(subnet.getLocalNode(), receivedFrame.getSender(), sendCommonFrame);
                 
                 this.listener.process(subnet, sendFrame, false);
             } catch (SubnetException e) {

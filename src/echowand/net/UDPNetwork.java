@@ -215,7 +215,7 @@ public class UDPNetwork {
         LOGGER.exiting(CLASS_NAME, "send");
     }
     
-    private DatagramPacket recvPacket() throws IOException {
+    private DatagramPacket receivePacket() throws IOException {
         byte[] packetData = new byte[this.bufferSize];
         DatagramPacket packet = new DatagramPacket(packetData, packetData.length);
         multicastSocket.receive(packet);
@@ -247,7 +247,7 @@ public class UDPNetwork {
         }
         
         try {
-            DatagramPacket packet = recvPacket();
+            DatagramPacket packet = receivePacket();
             byte[] data = getData(packet);
 
             CommonFrame commonFrame = new CommonFrame(data);
