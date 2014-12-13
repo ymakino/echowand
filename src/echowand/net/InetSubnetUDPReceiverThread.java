@@ -1,7 +1,6 @@
 package echowand.net;
 
 import echowand.util.Pair;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,7 +14,7 @@ public class InetSubnetUDPReceiverThread extends Thread {
 
     private InetSubnet subnet;
     private UDPNetwork network;
-    private SynchronousQueue<Frame> queue;
+    private SimpleSynchronousQueue<Frame> queue;
     private boolean terminated = false;
 
     /**
@@ -24,7 +23,7 @@ public class InetSubnetUDPReceiverThread extends Thread {
      * @param network フレームの受信を行うUDPNetwork
      * @param queue 受信したフレームの登録先となるキュー
      */
-    public InetSubnetUDPReceiverThread(InetSubnet subnet, UDPNetwork network, SynchronousQueue<Frame> queue) {
+    public InetSubnetUDPReceiverThread(InetSubnet subnet, UDPNetwork network, SimpleSynchronousQueue<Frame> queue) {
         this.subnet = subnet;
         this.network = network;
         this.queue = queue;
@@ -50,6 +49,8 @@ public class InetSubnetUDPReceiverThread extends Thread {
                 queue.put(new Frame(remoteNode, localNode, commonFrame));
             } catch (InterruptedException ex) {
                 LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "interrupted", ex);
+            } catch (InvalidQueueException ex) {
+                LOGGER.logp(Level.INFO, CLASS_NAME, "InetSubnetUDPReceiver.run", "invalid queue", ex);
             } catch (NetworkException ex) {
                 LOGGER.logp(Level.FINE, CLASS_NAME, "InetSubnetUDPReceiver.run", "catched exception", ex);
             } catch (SubnetException ex) {

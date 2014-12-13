@@ -1,7 +1,6 @@
 package echowand.net;
 
 import echowand.util.Pair;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,7 +14,7 @@ public class InetSubnetTCPReceiverThread extends Thread {
 
     private InetSubnet subnet;
     private TCPReceiver receiver;
-    private SynchronousQueue<Frame> queue;
+    private SimpleSynchronousQueue<Frame> queue;
     private boolean terminated = false;
 
     /**
@@ -24,7 +23,7 @@ public class InetSubnetTCPReceiverThread extends Thread {
      * @param receiver フレームの受信を行うTCPReceiver
      * @param queue 受信したフレームの登録先となるキュー
      */
-    public InetSubnetTCPReceiverThread(InetSubnet subnet, TCPReceiver receiver, SynchronousQueue<Frame> queue) {
+    public InetSubnetTCPReceiverThread(InetSubnet subnet, TCPReceiver receiver, SimpleSynchronousQueue<Frame> queue) {
         this.subnet = subnet;
         this.receiver = receiver;
         this.queue = queue;
@@ -60,6 +59,8 @@ public class InetSubnetTCPReceiverThread extends Thread {
             }
         } catch (InterruptedException ex) {
             LOGGER.logp(Level.INFO, CLASS_NAME, "run", "interrupted", ex);
+        } catch (InvalidQueueException ex) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "invalid queue", ex);
         } catch (NetworkException ex) {
             LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
         }

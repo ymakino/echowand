@@ -2,7 +2,7 @@ package echowand.net;
 
 import echowand.util.Pair;
 import java.util.HashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,12 +14,12 @@ public class TCPReceiver implements TCPConnectionObserver {
     private static final Logger LOGGER = Logger.getLogger(TCPReceiver.class.getName());
     private static final String CLASS_NAME = TCPReceiver.class.getName();
     
-    private LinkedBlockingQueue<Pair<TCPConnection, CommonFrame>> receiveQueue;
+    private SimpleBlockingQueue<Pair<TCPConnection, CommonFrame>> receiverQueue;
     private HashMap<TCPConnection, TCPConnectionReceiverThread> receiverThreadMap;
     private boolean inService = false;
 
     public TCPReceiver() {
-        receiveQueue = new LinkedBlockingQueue<Pair<TCPConnection, CommonFrame>>();
+        receiverQueue = new SimpleBlockingQueue<Pair<TCPConnection, CommonFrame>>();
         receiverThreadMap = new HashMap<TCPConnection, TCPConnectionReceiverThread>();
     }
     
@@ -148,10 +148,14 @@ public class TCPReceiver implements TCPConnectionObserver {
         LOGGER.entering(CLASS_NAME, "receive");
         
         try {
-            Pair<TCPConnection, CommonFrame> pair = receiveQueue.take();
+            Pair<TCPConnection, CommonFrame> pair = receiverQueue.take();
             LOGGER.exiting(CLASS_NAME, "receive", pair);
             return pair;
         } catch (InterruptedException ex) {
+            NetworkException exception = new NetworkException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
+            throw exception;
+        } catch (InvalidQueueException ex) {
             NetworkException exception = new NetworkException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
@@ -178,8 +182,12 @@ public class TCPReceiver implements TCPConnectionObserver {
             LOGGER.logp(Level.INFO, CLASS_NAME, "notifyReceived", "not working");
             return;
         }
-
-        receiveQueue.add(new Pair<TCPConnection, CommonFrame>(connection, commonFrame));
+        
+        try {
+            receiverQueue.add(new Pair<TCPConnection, CommonFrame>(connection, commonFrame));
+        } catch (InvalidQueueException ex) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "notifyReceived", "invalid queue");
+        }
 
         LOGGER.exiting(CLASS_NAME, "notifyReceived", connection);
     }

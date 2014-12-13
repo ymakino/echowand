@@ -1,6 +1,8 @@
 package echowand.net;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * InternalNetworkと他のクラスの接続ポイント
@@ -8,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class InternalNetworkPort {
     private InternalNetwork network;
-    private LinkedBlockingQueue<Frame> loopbackQueue = new LinkedBlockingQueue<Frame>();
+    private SimpleBlockingQueue<Frame> loopbackQueue = new SimpleBlockingQueue<Frame>();
 
     private Frame cloneFrame(Frame frame) throws InvalidDataException {
         CommonFrame cf = new CommonFrame(frame.getCommonFrame().toBytes());
@@ -46,17 +48,15 @@ public class InternalNetworkPort {
     /**
      * 受信キューにフレームを追加する
      * @param frame 受信キューに追加するフレーム
-     * @return  キューへの追加が成功した場合にはtrue、それ以外の場合はfalse
      * @throws SubnetException 追加に失敗した場合
      */
-    public boolean enqueue(Frame frame) throws SubnetException {
+    public void enqueue(Frame frame) throws SubnetException {
         try {
-            loopbackQueue.put(cloneFrame(frame));
-            return true;
-        } catch (InterruptedException e) {
-            throw new SubnetException("catched exception", e);
+            loopbackQueue.add(cloneFrame(frame));
         } catch (InvalidDataException e) {
             throw new SubnetException("invalid frame", e);
+        } catch (InvalidQueueException e) {
+            throw new SubnetException("invalid queue", e);
         }
     }
     
@@ -88,6 +88,8 @@ public class InternalNetworkPort {
         try {
             return loopbackQueue.take();
         } catch (InterruptedException e) {
+            throw new SubnetException("catched exception", e);
+        } catch (InvalidQueueException e) {
             throw new SubnetException("catched exception", e);
         }
     }

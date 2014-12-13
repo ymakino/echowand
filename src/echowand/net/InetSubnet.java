@@ -1,11 +1,9 @@
 package echowand.net;
 
-import echowand.util.Pair;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +34,7 @@ public class InetSubnet implements Subnet {
     private InetNode groupNode;
     private InetNode localNode;
 
-    private SynchronousQueue<Frame> receiveQueue = null;
+    private SimpleSynchronousQueue<Frame> receiverQueue = null;
 
     private InetSubnetUDPReceiverThread udpReceiverThread;
     private InetSubnetTCPReceiverThread tcpReceiverThread;
@@ -263,12 +261,12 @@ public class InetSubnet implements Subnet {
     private synchronized void startThreads() {
         LOGGER.entering(CLASS_NAME, "startThreads");
 
-        receiveQueue = new SynchronousQueue<Frame>();
+        receiverQueue = new SimpleSynchronousQueue<Frame>();
 
-        udpReceiverThread = new InetSubnetUDPReceiverThread(this, getUDPNetwork(), receiveQueue);
+        udpReceiverThread = new InetSubnetUDPReceiverThread(this, getUDPNetwork(), receiverQueue);
         udpReceiverThread.start();
 
-        tcpReceiverThread = new InetSubnetTCPReceiverThread(this, getTCPReceiver(), receiveQueue);
+        tcpReceiverThread = new InetSubnetTCPReceiverThread(this, getTCPReceiver(), receiverQueue);
         tcpReceiverThread.start();
 
         if (tcpAcceptorEnabled) {
@@ -519,10 +517,14 @@ public class InetSubnet implements Subnet {
         }
 
         try {
-            Frame frame = receiveQueue.take();
+            Frame frame = receiverQueue.take();
             LOGGER.exiting(CLASS_NAME, "receive", frame);
             return frame;
-        } catch (InterruptedException ex) {
+        } catch (InvalidQueueException ex) {
+            SubnetException exception = new SubnetException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
+            throw exception;
+        }catch (InterruptedException ex) {
             SubnetException exception = new SubnetException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
