@@ -23,7 +23,7 @@ public class ObserveResult {
     private FrameMatcher matcher;
     private ObserveResultProcessor processor;
     private LinkedList<ResultData> dataList;
-    private LinkedList<ResultFrame> frames;
+    private LinkedList<ResultFrame> frameList;
     private boolean done;
     
     public ObserveResult(FrameMatcher matcher, ObserveResultProcessor processor) {
@@ -32,7 +32,7 @@ public class ObserveResult {
         this.matcher = matcher;
         this.processor = processor;
         this.dataList = new LinkedList<ResultData>();
-        this.frames = new LinkedList<ResultFrame>();
+        this.frameList = new LinkedList<ResultFrame>();
         done = false;
         
         LOGGER.exiting(CLASS_NAME, "ObserveResult");
@@ -84,7 +84,7 @@ public class ObserveResult {
             dataList.add(new ResultData(node, eoj, epc, data, time));
         }
         
-        boolean result = frames.add(new ResultFrame(frame, time));
+        boolean result = frameList.add(new ResultFrame(frame, time));
         LOGGER.exiting(CLASS_NAME, "addFrame", result);
         return result;
     }
@@ -92,7 +92,7 @@ public class ObserveResult {
     public synchronized int countFrames() {
         LOGGER.entering(CLASS_NAME, "countFrames");
         
-        int count = frames.size();
+        int count = frameList.size();
         
         LOGGER.exiting(CLASS_NAME, "countFrames", count);
         return count;
@@ -101,7 +101,7 @@ public class ObserveResult {
     public synchronized Frame getFrame(int index) {
         LOGGER.entering(CLASS_NAME, "getFrame", index);
         
-        Frame frame = frames.get(index).frame;
+        Frame frame = frameList.get(index).frame;
         
         LOGGER.exiting(CLASS_NAME, "getFrame", frame);
         return frame;
@@ -110,10 +110,19 @@ public class ObserveResult {
     public synchronized ResultFrame getResultFrame(int index) {
         LOGGER.entering(CLASS_NAME, "getResultFrame", index);
         
-        ResultFrame resultFrame = frames.get(index);
+        ResultFrame resultFrame = frameList.get(index);
         
         LOGGER.exiting(CLASS_NAME, "getResultFrame", resultFrame);
         return resultFrame;
+    }
+    
+    public synchronized List<ResultFrame> getResultFrameList() {
+        LOGGER.entering(CLASS_NAME, "getResultFrameList");
+        
+        List<ResultFrame> resultList = new LinkedList<ResultFrame>(frameList);
+        
+        LOGGER.exiting(CLASS_NAME, "getResultFrameList", resultList);
+        return resultList;
     }
     
     public synchronized int countResultData() {
@@ -156,5 +165,51 @@ public class ObserveResult {
         
         LOGGER.exiting(CLASS_NAME, "getResultDataList", resultList);
         return resultList;
+    }
+    
+    public synchronized int removeResultData(int size) {
+        LOGGER.entering(CLASS_NAME, "removeResultDataList", size);
+        
+        if (dataList.size() < size) {
+            size = dataList.size();
+        }
+        
+        dataList.subList(0, size).clear();
+        
+        LOGGER.exiting(CLASS_NAME, "removeResultDataList", size);
+        return size;
+    }
+    
+    public synchronized int removeAllResultData() {
+        LOGGER.entering(CLASS_NAME, "removeAllResultDataList");
+        
+        int size = dataList.size();
+        dataList.clear();
+        
+        LOGGER.exiting(CLASS_NAME, "removeAllResultDataList", size);
+        return size;
+    }
+    
+    public synchronized int removeFrames(int size) {
+        LOGGER.entering(CLASS_NAME, "removeFrames", size);
+        
+        if (frameList.size() < size) {
+            size = frameList.size();
+        }
+        
+        frameList.subList(0, size).clear();
+        
+        LOGGER.exiting(CLASS_NAME, "removeFrames", size);
+        return size;
+    }
+    
+    public synchronized int removeAllFrames() {
+        LOGGER.entering(CLASS_NAME, "removeAllFrames");
+        
+        int size = frameList.size();
+        frameList.clear();
+        
+        LOGGER.exiting(CLASS_NAME, "removeAllFrames", size);
+        return size;
     }
 }

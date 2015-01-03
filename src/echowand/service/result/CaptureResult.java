@@ -1,13 +1,9 @@
 package echowand.service.result;
 
-import echowand.common.Data;
-import echowand.common.EOJ;
-import echowand.common.EPC;
 import echowand.net.Frame;
-import echowand.net.Node;
-import echowand.net.Property;
-import echowand.net.StandardPayload;
 import echowand.service.CaptureResultObserver;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -201,5 +197,80 @@ public class CaptureResult {
         
         LOGGER.exiting(CLASS_NAME, "getReceivedResultFrameList", list);
         return list;
+    }
+    
+    public synchronized void removeResultFrames(Collection<ResultFrame> removeFrames) {
+        sentFrames.removeAll(removeFrames);
+        receivedFrames.removeAll(removeFrames);
+        frames.removeAll(removeFrames);
+    }
+    
+    public synchronized int removeSentFrames(int size) {
+        LOGGER.entering(CLASS_NAME, "removeSentFrameList", size);
+        
+        if (sentFrames.size() < size) {
+            size = sentFrames.size();
+        }
+        
+        removeResultFrames(new ArrayList<ResultFrame>(sentFrames.subList(0, size)));
+        
+        LOGGER.exiting(CLASS_NAME, "removeSentFrameList", size);
+        return size;
+    }
+    
+    public synchronized int removeAllSentFrames() {
+        LOGGER.entering(CLASS_NAME, "removeAllSentFrameList");
+        
+        int size = sentFrames.size();
+        removeResultFrames(new ArrayList<ResultFrame>(sentFrames));
+        
+        LOGGER.exiting(CLASS_NAME, "removeAllSentFrameList", size);
+        return size;
+    }
+    
+    public synchronized int removeReceivedFrames(int size) {
+        LOGGER.entering(CLASS_NAME, "removeReceivedFrameList", size);
+        
+        if (receivedFrames.size() < size) {
+            size = receivedFrames.size();
+        }
+        
+        removeResultFrames(new ArrayList<ResultFrame>(receivedFrames.subList(0, size)));
+        
+        LOGGER.exiting(CLASS_NAME, "removeReceivedFrameList", size);
+        return size;
+    }
+    
+    public synchronized int removeAllReceivedFrames() {
+        LOGGER.entering(CLASS_NAME, "removeAllReceivedFrameList");
+        
+        int size = receivedFrames.size();
+        removeResultFrames(new ArrayList<ResultFrame>(receivedFrames));
+        
+        LOGGER.exiting(CLASS_NAME, "removeAllReceivedFrameList", size);
+        return size;
+    }
+    
+    public synchronized int removeFrames(int size) {
+        LOGGER.entering(CLASS_NAME, "removeFrameList", size);
+        
+        if (frames.size() < size) {
+            size = frames.size();
+        }
+        
+        removeResultFrames(new ArrayList<ResultFrame>(frames.subList(0, size)));
+        
+        LOGGER.exiting(CLASS_NAME, "removeFrameList", size);
+        return size;
+    }
+    
+    public synchronized int removeAllFrames() {
+        LOGGER.entering(CLASS_NAME, "removeAllFrameList");
+        
+        int size = frames.size();
+        removeResultFrames(new ArrayList<ResultFrame>(frames));
+        
+        LOGGER.exiting(CLASS_NAME, "removeAllFrameList", size);
+        return size;
     }
 }
