@@ -4,6 +4,7 @@ import echowand.common.ClassEOJ;
 import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
+import echowand.logic.AnnounceTransactionConfig;
 import echowand.logic.SetGetTransactionConfig;
 import echowand.logic.Transaction;
 import echowand.logic.TransactionListener;
@@ -852,5 +853,38 @@ public class Service {
         RemoteObject object = new RemoteObject(getSubnet(), node, eoj, getTransactionManager());
         getRemoteObjectManager().add(object);
         return object;
+    }
+    
+    public void broadcastNotification(EOJ eoj, EPC epc, ObjectData data) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "broadcastNotification", new Object[]{eoj, epc, data});
+        
+        AnnounceTransactionConfig transactionConfig = new AnnounceTransactionConfig();
+        
+        transactionConfig.addAnnounce(epc, data.getData());
+        for (int i=0; i<data.getExtraSize(); i++) {
+            transactionConfig.addAnnounce(epc, data.getExtraDataAt(i));
+        }
+        
+        transactionConfig.setReceiverNode(core.getSubnet().getGroupNode());
+        transactionConfig.setSenderNode(core.getSubnet().getLocalNode());
+        transactionConfig.setDestinationEOJ(new EOJ("0ef001"));
+        transactionConfig.setSourceEOJ(eoj);
+        
+        Transaction transaction = core.getTransactionManager().createTransaction(transactionConfig);
+        transaction.execute();
+        
+        LOGGER.exiting(CLASS_NAME, "broadcastNotification");
+    }
+    
+    public void broadcastInstanceList() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "broadcastInstanceList");
+        
+        EOJ eoj = getCore().getNodeProfileObject().getEOJ();
+        EPC epc = EPC.xD5;
+        ObjectData data = getCore().getNodeProfileObject().forceGetData(epc);
+        
+        broadcastNotification(eoj, epc, data);
+        
+        LOGGER.exiting(CLASS_NAME, "broadcastInstanceList");
     }
 }
