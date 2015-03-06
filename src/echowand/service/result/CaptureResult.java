@@ -55,7 +55,7 @@ public class CaptureResult {
         return done;
     }
     
-    public boolean addSentFrame(Frame frame) {
+    public synchronized boolean addSentFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addSentFrame", frame);
         
         boolean result = true;
@@ -68,7 +68,7 @@ public class CaptureResult {
         return result;
     }
     
-    public boolean addReceivedFrame(Frame frame) {
+    public synchronized boolean addReceivedFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addReceivedFrame", frame);
         
         boolean result = true;
@@ -81,7 +81,7 @@ public class CaptureResult {
         return result;
     }
     
-    private ResultFrame getResultFrame(Frame frame) {
+    private synchronized ResultFrame getResultFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "getResultFrame", frame);
         
         long time = System.currentTimeMillis();
