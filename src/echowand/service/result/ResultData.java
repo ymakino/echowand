@@ -73,6 +73,10 @@ public class ResultData {
             return false;
         }
         
+        if (other.data == null) {
+            return data == null;
+        }
+        
         return other.data.equals(data);
     }
 
