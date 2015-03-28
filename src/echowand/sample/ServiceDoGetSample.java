@@ -39,7 +39,7 @@ public class ServiceDoGetSample {
         GetResult getResult = service.doGet(service.getGroupNode(), new ClassEOJ("0011"), epcs, 1000);
         getResult.join();
 
-        List<ResultData> dataList = getResult.getResultDataList();
+        List<ResultData> dataList = getResult.getDataList();
         for (int i = 0; i < dataList.size(); i++) {
             System.out.println("Get " + i + ": " + dataList.get(i));
         }

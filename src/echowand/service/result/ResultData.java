@@ -48,45 +48,4 @@ public class ResultData {
     public String toString() {
         return "ResultData{Node: " + node + ", EOJ: " + eoj + ", EPC: " + epc + ", Data: " + data + ", Time: " + time + "}";
     }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ResultData)) {
-            return false;
-        }
-        
-        ResultData other = (ResultData)o;
-        
-        if (other.epc != epc) {
-            return false;
-        }
-        
-        if (other.time != time) {
-            return false;
-        }
-        
-        if (!other.eoj.equals(eoj)) {
-            return false;
-        }
-        
-        if (!other.node.equals(node)) {
-            return false;
-        }
-        
-        if (other.data == null) {
-            return data == null;
-        }
-        
-        return other.data.equals(data);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 41 * hash + (this.eoj != null ? this.eoj.hashCode() : 0);
-        hash = 41 * hash + (this.epc != null ? this.epc.hashCode() : 0);
-        hash = 41 * hash + (this.data != null ? this.data.hashCode() : 0);
-        hash = 41 * hash + (int) (this.time ^ (this.time >>> 32));
-        return hash;
-    }
 }

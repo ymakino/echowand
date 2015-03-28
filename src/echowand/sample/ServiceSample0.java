@@ -137,7 +137,7 @@ public class ServiceSample0 {
             GetResult getResult1 = service.doGet(service.getGroupNode(), new ClassEOJ("0011"), epcs, 1000);
             getResult1.join();
             
-            List<ResultData> dataList1 = getResult1.getResultDataList();
+            List<ResultData> dataList1 = getResult1.getDataList();
             for (int i=0; i<dataList1.size(); i++) {
                 System.out.println("Get1 " + i + ": " + dataList1.get(i));
             }
@@ -177,7 +177,7 @@ public class ServiceSample0 {
             
             for (GetResult getResult: getResults) {
                 getResult.join();
-                List<ResultData> dataList2 = getResult.getResultDataList(new ResultDataMatcherRule());
+                List<ResultData> dataList2 = getResult.getDataList(new ResultDataMatcherRule());
                 for (int i = 0; i < dataList2.size(); i++) {
                     System.out.println("Get2 " + ": " + i + " " + dataList2.get(i));
                 }
@@ -200,14 +200,14 @@ public class ServiceSample0 {
             observeResult.stopObserve();
             System.out.println("done");
             
-            for (ResultData resultData: observeResult.getResultDataList()) {
+            for (ResultData resultData: observeResult.getDataList()) {
                 System.out.println("Observe: " + resultData);
             }
             
             Thread.sleep(5000);
             
             captureResult.stopCapture();
-            for (ResultFrame resultFrame : captureResult.getResultFrameList()) {
+            for (ResultFrame resultFrame : captureResult.getFrameList()) {
                 System.out.println("Capture: " + resultFrame);
             }
             

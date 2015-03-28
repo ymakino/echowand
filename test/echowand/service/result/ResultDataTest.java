@@ -49,17 +49,17 @@ public class ResultDataTest {
     public void testEquals() {
         ResultData resultData = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
         ResultData resultData1 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
-        ResultData resultData2 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 11);
-        ResultData resultData3 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, null, 10);
+        ResultData resultData2 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, null, 10);
         
-        assertTrue(resultData.equals(resultData1));
-        assertTrue(resultData1.equals(resultData));
+        assertTrue(resultData.equals(resultData));
+        assertTrue(resultData1.equals(resultData1));
+        assertTrue(resultData2.equals(resultData2));
+        
+        assertFalse(resultData.equals(resultData1));
+        assertFalse(resultData1.equals(resultData));
         
         assertFalse(resultData.equals(resultData2));
         assertFalse(resultData2.equals(resultData));
-        
-        assertFalse(resultData.equals(resultData3));
-        assertFalse(resultData3.equals(resultData));
     }
 
     /**
@@ -69,16 +69,15 @@ public class ResultDataTest {
     public void testHashCode() {
         ResultData resultData = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
         ResultData resultData1 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
-        ResultData resultData2 = new ResultData(subnet.getLocalNode(), new EOJ("001101"), EPC.x80, new Data((byte)0x30), 10);
-        ResultData resultData3 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x81, new Data((byte)0x30), 10);
-        ResultData resultData4 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 11);
-        ResultData resultData5 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, null, 10);
+        ResultData resultData2 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, null, 10);
         
-        assertTrue(resultData.hashCode() == resultData1.hashCode());
+        assertTrue(resultData.hashCode() == resultData.hashCode());
+        assertTrue(resultData1.hashCode() == resultData1.hashCode());
+        assertTrue(resultData2.hashCode() == resultData2.hashCode());
+        
+        assertFalse(resultData.hashCode() == resultData1.hashCode());
         assertFalse(resultData.hashCode() == resultData2.hashCode());
-        assertFalse(resultData.hashCode() == resultData3.hashCode());
-        assertFalse(resultData.hashCode() == resultData4.hashCode());
-        assertFalse(resultData.hashCode() == resultData5.hashCode());
+        assertFalse(resultData1.hashCode() == resultData2.hashCode());
     }
     
 }
