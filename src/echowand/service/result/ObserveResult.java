@@ -10,7 +10,6 @@ import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.ObserveResultProcessor;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,30 +33,52 @@ public class ObserveResult {
     private boolean done;
 
     public synchronized void enableDataList() {
+        LOGGER.entering(CLASS_NAME, "enableDataList");
+        
         dataListEnabled = true;
+        
+        LOGGER.exiting(CLASS_NAME, "enableDataList");
     }
 
     public synchronized void disableDataList() {
+        LOGGER.entering(CLASS_NAME, "disableDataList");
+        
         dataList.clear();
         dataFrameMap.clear();
         dataListEnabled = false;
+        
+        LOGGER.exiting(CLASS_NAME, "disableDataList");
     }
 
-    public boolean isDataListEnabled() {
+    public synchronized boolean isDataListEnabled() {
+        LOGGER.entering(CLASS_NAME, "isDataListEnabled");
+        
+        LOGGER.exiting(CLASS_NAME, "isDataListEnabled", dataListEnabled);
         return dataListEnabled;
     }
 
     public synchronized void enableFrameList() {
+        LOGGER.entering(CLASS_NAME, "enableFrameList");
+        
         frameListEnabled = true;
+        
+        LOGGER.exiting(CLASS_NAME, "enableFrameList");
     }
 
     public synchronized void disableFrameList() {
+        LOGGER.entering(CLASS_NAME, "disableFrameList");
+        
         frameList.clear();
         dataFrameMap.clear();
         frameListEnabled = false;
+        
+        LOGGER.exiting(CLASS_NAME, "disableFrameList");
     }
 
-    public boolean isFrameListEnabled() {
+    public synchronized boolean isFrameListEnabled() {
+        LOGGER.entering(CLASS_NAME, "isFrameListEnabled");
+        
+        LOGGER.exiting(CLASS_NAME, "isFrameListEnabled", frameListEnabled);
         return frameListEnabled;
     }
 
