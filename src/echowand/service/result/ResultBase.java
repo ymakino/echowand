@@ -194,12 +194,12 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized int countResultData() {
-        LOGGER.entering(CLASS_NAME, "countResultData");
+    public synchronized int countData() {
+        LOGGER.entering(CLASS_NAME, "countData");
         
         int count = dataList.size();
         
-        LOGGER.exiting(CLASS_NAME, "countResultData", count);
+        LOGGER.exiting(CLASS_NAME, "countData", count);
         return count;
     }
     
