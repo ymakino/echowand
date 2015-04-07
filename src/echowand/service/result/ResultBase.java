@@ -3,6 +3,7 @@ package echowand.service.result;
 import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
+import echowand.common.ESV;
 import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Node;
@@ -23,6 +24,13 @@ public abstract class ResultBase {
     
     private boolean done;
     
+    private LinkedList<ResultFrame> requestFrameList;
+    private LinkedList<ResultFrame> unsentRequestFrameList;
+    private LinkedList<ResultFrame> invalidRequestFrameList;
+    private LinkedList<ResultData> requestDataList;
+    private LinkedList<ResultData> unsentRequestDataList;
+    private HashMap<ResultData, ResultFrame> requestDataFrameMap;
+    
     private LinkedList<ResultFrame> frameList;
     private LinkedList<ResultFrame> errorFrameList;
     private LinkedList<ResultFrame> invalidFrameList;
@@ -34,6 +42,13 @@ public abstract class ResultBase {
         LOGGER.entering(CLASS_NAME, "ResultBase");
         
         done = false;
+        requestFrameList = new LinkedList<ResultFrame>();
+        unsentRequestFrameList = new LinkedList<ResultFrame>();
+        invalidRequestFrameList = new LinkedList<ResultFrame>();
+        requestDataList = new LinkedList<ResultData>();
+        unsentRequestDataList = new LinkedList<ResultData>();
+        requestDataFrameMap = new HashMap<ResultData, ResultFrame>();
+    
         frameList = new LinkedList<ResultFrame>();
         errorFrameList = new LinkedList<ResultFrame>();
         invalidFrameList = new LinkedList<ResultFrame>();
@@ -95,6 +110,65 @@ public abstract class ResultBase {
         return result;
     }
     
+    public synchronized boolean addRequestFrame(Frame frame, boolean success) {
+        LOGGER.entering(CLASS_NAME, "addRequestFrame", new Object[]{frame, success});
+        
+        boolean result = addRequestFrame(createResultFrame(frame), success);
+        
+        LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
+        return result;
+    }
+    
+    public synchronized boolean addRequestFrame(ResultFrame resultFrame, boolean success) {
+        LOGGER.entering(CLASS_NAME, "addRequestFrame", new Object[]{resultFrame, success});
+        
+        if (requestFrameList.contains(resultFrame)) {
+            LOGGER.exiting(CLASS_NAME, "addRequestFrame", false);
+            return false;
+        }
+        
+        Frame frame = resultFrame.frame;
+        
+        if (!hasStandardPayload(frame)) {
+            invalidRequestFrameList.add(resultFrame);
+            LOGGER.exiting(CLASS_NAME, "addRequestFrame", false);
+            return false;
+        }
+        
+        boolean result;
+        
+        if (success) {
+            result = requestFrameList.add(resultFrame);
+        } else {
+            result = unsentRequestFrameList.add(resultFrame);
+        }
+
+        StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
+
+        int count = payload.getFirstOPC();
+        for (int i = 0; i < count; i++) {
+            Property property = payload.getFirstPropertyAt(i);
+
+            Node node = frame.getSender();
+            ESV esv = payload.getESV();
+            EOJ eoj = payload.getSEOJ();
+            EPC epc = property.getEPC();
+            Data data = property.getEDT();
+
+            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
+            if (success) {
+                result &= requestDataList.add(resultData);
+            } else {
+                result &= unsentRequestDataList.add(resultData);
+            }
+
+            requestDataFrameMap.put(resultData, resultFrame);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
+        return result;
+    }
+    
     public synchronized boolean addFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addFrame", frame);
         
@@ -106,6 +180,11 @@ public abstract class ResultBase {
     
     public synchronized boolean addFrame(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "addFrame", resultFrame);
+        
+        if (frameList.contains(resultFrame)) {
+            LOGGER.exiting(CLASS_NAME, "addFrame", false);
+            return false;
+        }
         
         Frame frame = resultFrame.frame;
         
@@ -130,11 +209,12 @@ public abstract class ResultBase {
             Property property = payload.getFirstPropertyAt(i);
             
             Node node = frame.getSender();
+            ESV esv = payload.getESV();
             EOJ eoj = payload.getSEOJ();
             EPC epc = property.getEPC();
             Data data = property.getEDT();
             
-            ResultData resultData = new ResultData(node, eoj, epc, data, resultFrame.time);
+            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
             if (isValidProperty(property)) {
                 result &= dataList.add(resultData);
             } else {
@@ -163,6 +243,15 @@ public abstract class ResultBase {
         return resultFrame;
     }
     
+    public synchronized int countRequestFrames() {
+        LOGGER.entering(CLASS_NAME, "countRequestFrames");
+        
+        int count = requestFrameList.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countRequestFrames", count);
+        return count;
+    }
+    
     public synchronized int countFrames() {
         LOGGER.entering(CLASS_NAME, "countFrames");
         
@@ -170,6 +259,48 @@ public abstract class ResultBase {
         
         LOGGER.exiting(CLASS_NAME, "countFrames", count);
         return count;
+    }
+    
+    public synchronized ResultFrame getRequestFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrame", index);
+        
+        ResultFrame frame = requestFrameList.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrame", frame);
+        return frame;
+    }
+    
+    public synchronized ResultFrame getRequestFrame(ResultData resultData) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrame", resultData);
+        
+        ResultFrame frame = requestDataFrameMap.get(resultData);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrame", frame);
+        return frame;
+    }
+    
+    public synchronized List<ResultFrame> getRequestFrameList() {
+        LOGGER.entering(CLASS_NAME, "getRequestFrameList");
+        
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>(requestFrameList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultFrame> getRequestFrameList(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrameList", matcher);
+        
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
+        
+        for (ResultFrame resultFrame: requestFrameList) {
+            if (matcher.match(resultFrame)) {
+                resultList.add(resultFrame);
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultList);
+        return resultList;
     }
     
     public synchronized ResultFrame getFrame(int index) {
@@ -182,13 +313,33 @@ public abstract class ResultBase {
     }
     
     public synchronized ResultFrame getFrame(ResultData resultData) {
-        return dataFrameMap.get(resultData);
+        LOGGER.entering(CLASS_NAME, "getFrame", resultData);
+        
+        ResultFrame frame = dataFrameMap.get(resultData);
+        
+        LOGGER.exiting(CLASS_NAME, "getFrame", frame);
+        return frame;
     }
     
     public synchronized List<ResultFrame> getFrameList() {
         LOGGER.entering(CLASS_NAME, "getFrameList");
         
         LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>(frameList);
+        
+        LOGGER.exiting(CLASS_NAME, "getFrameList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultFrame> getFrameList(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "getFrameList", matcher);
+        
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
+        
+        for (ResultFrame resultFrame: frameList) {
+            if (matcher.match(resultFrame)) {
+                resultList.add(resultFrame);
+            }
+        }
         
         LOGGER.exiting(CLASS_NAME, "getFrameList", resultList);
         return resultList;
@@ -221,7 +372,7 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultData> getDataList(ResultDataMatcher matcher) {
+    public synchronized List<ResultData> getDataList(Matcher<ResultData> matcher) {
         LOGGER.entering(CLASS_NAME, "getDataList", matcher);
         
         LinkedList<ResultData> resultList = new LinkedList<ResultData>();
@@ -241,7 +392,7 @@ public abstract class ResultBase {
         
         final ResultFrame matcherFrame = resultFrame;
         
-        ResultDataMatcher matcher = new ResultDataMatcher() {
+        Matcher<ResultData> matcher = new Matcher<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
                 return matcherFrame.equals(dataFrameMap.get(resultData));
@@ -251,6 +402,66 @@ public abstract class ResultBase {
         List<ResultData> resultList = getDataList(matcher);
         
         LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized int countRequestData() {
+        LOGGER.entering(CLASS_NAME, "countRequestData");
+        
+        int count = requestDataList.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countRequestData", count);
+        return count;
+    }
+    
+    public synchronized ResultData getRequestData(int index) {
+        LOGGER.entering(CLASS_NAME, "getRequestData");
+        
+        ResultData resultData = requestDataList.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestData", resultData);
+        return resultData;
+    }
+    
+    public synchronized List<ResultData> getRequestDataList() {
+        LOGGER.entering(CLASS_NAME, "getRequestDataList");
+        
+        List<ResultData> resultList = new LinkedList<ResultData>(requestDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultData> getRequestDataList(Matcher<ResultData> matcher) {
+        LOGGER.entering(CLASS_NAME, "getRequestDataList", matcher);
+        
+        LinkedList<ResultData> resultList = new LinkedList<ResultData>();
+        
+        for (ResultData resultData: requestDataList) {
+            if (matcher.match(resultData)) {
+                resultList.add(resultData);
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultData> getRequestDataList(ResultFrame resultFrame) {
+        LOGGER.entering(CLASS_NAME, "getRequestDataList", resultFrame);
+        
+        final ResultFrame matcherFrame = resultFrame;
+        
+        Matcher<ResultData> matcher = new Matcher<ResultData>() {
+            @Override
+            public boolean match(ResultData resultData) {
+                return matcherFrame.equals(requestDataFrameMap.get(resultData));
+            }
+        };
+        
+        List<ResultData> resultList = getDataList(matcher);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
         return resultList;
     }
 }

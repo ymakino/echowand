@@ -47,9 +47,14 @@ class DummyTransactionConfig extends TransactionConfig {
 public class TransactionTest {
     public InternalSubnet subnet;
     public TransactionManager transactionManager;
+    public TransactionManager failSendTransactionManager;
     public DummyTransactionConfig transactionConfig1;
     public DummyTransactionConfig transactionConfig2;
+    public DummyTransactionConfig failSendTransactionConfig;
     public Inet4Subnet inet4Subnet;
+    
+    
+    public InternalSubnet failSendSubnet;
     
     @Before
     public void setUp() throws SubnetException {
@@ -67,6 +72,20 @@ public class TransactionTest {
         transactionConfig2.setSourceEOJ(new EOJ("001101"));
         transactionConfig2.setDestinationEOJ(new EOJ("0ef001"));
         inet4Subnet = new Inet4Subnet();
+        
+        failSendSubnet = new InternalSubnet("failSendSubnet") {
+            @Override
+            public boolean send(Frame frame) throws SubnetException {
+                super.send(frame);
+                return false;
+            }
+        };
+        failSendTransactionManager = new TransactionManager(failSendSubnet);
+        failSendTransactionConfig = new DummyTransactionConfig(ESV.Get, 1);
+        failSendTransactionConfig.setSenderNode(failSendSubnet.getLocalNode());
+        failSendTransactionConfig.setReceiverNode(failSendSubnet.getGroupNode());
+        failSendTransactionConfig.setSourceEOJ(new EOJ("001101"));
+        failSendTransactionConfig.setDestinationEOJ(new EOJ("0ef001"));
     }
     
     @After
@@ -223,6 +242,8 @@ public class TransactionTest {
             @Override
             public void begin(Transaction t){}
             @Override
+            public void send(Transaction t, Subnet subnet, Frame frame, boolean success){}
+            @Override
             public void receive(Transaction t, Subnet subnet, Frame frame){}
             @Override
             public void finish(Transaction t){}
@@ -230,6 +251,8 @@ public class TransactionTest {
         TransactionListener tl2 = new TransactionListener(){
             @Override
             public void begin(Transaction t){}
+            @Override
+            public void send(Transaction t, Subnet subnet, Frame frame, boolean success){}
             @Override
             public void receive(Transaction t, Subnet subnet, Frame frame){}
             @Override
@@ -247,6 +270,8 @@ public class TransactionTest {
     }
     
     public boolean testCallbackBegan = false;
+    public int testCallbackSentSuccess = 0;
+    public int testCallbackSentCount = 0;
     public int testCallbackReceiveCount = 0;
     public boolean testCallbackFinished = false;
     
@@ -255,11 +280,17 @@ public class TransactionTest {
         Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
         
         testCallbackBegan = false;
+        testCallbackSentCount = 0;
         testCallbackReceiveCount = 0;
         testCallbackFinished = false;
         TransactionListener tl = new TransactionListener(){
             @Override
             public void begin(Transaction t){testCallbackBegan = true;}
+            @Override
+            public void send(Transaction t, Subnet subnet, Frame frame, boolean success){
+                if (success) { testCallbackSentSuccess++; }
+                testCallbackSentCount++;
+            }
             @Override
             public void receive(Transaction t, Subnet subnet, Frame frame){testCallbackReceiveCount++;}
             @Override
@@ -295,6 +326,66 @@ public class TransactionTest {
             fail();
         }
         
+        assertEquals(1, testCallbackSentSuccess);
+        assertEquals(1, testCallbackSentCount);
+        assertEquals(2, testCallbackReceiveCount);
+        assertTrue(testCallbackFinished);
+    }
+    
+    @Test
+    public void testFailSendCallback() {
+        Transaction t = new Transaction(failSendSubnet, failSendTransactionManager, failSendTransactionConfig);
+        
+        testCallbackBegan = false;
+        testCallbackSentSuccess = 0;
+        testCallbackSentCount = 0;
+        testCallbackReceiveCount = 0;
+        testCallbackFinished = false;
+        TransactionListener tl = new TransactionListener(){
+            @Override
+            public void begin(Transaction t){testCallbackBegan = true;}
+            @Override
+            public void send(Transaction t, Subnet subnet, Frame frame, boolean success){
+                if (success) { testCallbackSentSuccess++; }
+                testCallbackSentCount++;
+            }
+            @Override
+            public void receive(Transaction t, Subnet subnet, Frame frame){testCallbackReceiveCount++;}
+            @Override
+            public void finish(Transaction t){testCallbackFinished = true;}
+        };
+        t.addTransactionListener(tl);
+
+        try {
+            assertFalse(testCallbackBegan);
+            t.execute();
+            assertTrue(testCallbackBegan);
+            assertFalse(testCallbackFinished);
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            fail();
+        }
+        
+        try {
+            Frame reqFrame = failSendSubnet.receive();
+            Frame resFrame1 = createReplyFrame(reqFrame);
+            t.receiveResponse(resFrame1);
+            Frame resFrame2 = createReplyFrame(reqFrame);
+            t.receiveResponse(resFrame2);
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            fail();
+        }
+        
+        assertEquals(0, testCallbackSentSuccess);
+        assertEquals(1, testCallbackSentCount);
         assertEquals(2, testCallbackReceiveCount);
         assertTrue(testCallbackFinished);
     }

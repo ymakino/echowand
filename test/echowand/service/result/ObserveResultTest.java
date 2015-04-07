@@ -10,7 +10,6 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.ObserveResultProcessor;
-import static echowand.service.result.CaptureResultTest.subnet;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -29,7 +28,7 @@ public class ObserveResultTest {
     public ObserveResult result;
     public short nextTID = 0;
     
-    static class TestFrameMatcher implements FrameMatcher {
+    static class TestFrameMatcher implements Matcher<Frame> {
         public boolean result = true;
         @Override
         public boolean match(Frame frame) {
@@ -423,21 +422,21 @@ public class ObserveResultTest {
      */
     @Test
     public void testGetDataList_ResultDataMatcher() {
-        ResultDataMatcher allMatcher = new ResultDataMatcher() {
+        Matcher<ResultData> allMatcher = new Matcher<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
                 return true;
             }
         };
         
-        ResultDataMatcher noMatcher = new ResultDataMatcher() {
+        Matcher<ResultData> noMatcher = new Matcher<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
                 return false;
             }
         };
         
-        ResultDataMatcher x80Matcher = new ResultDataMatcher() {
+        Matcher<ResultData> x80Matcher = new Matcher<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
                 return resultData.epc == EPC.x80;

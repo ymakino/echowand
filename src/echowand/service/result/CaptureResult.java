@@ -190,6 +190,21 @@ public class CaptureResult {
         return list;
     }
     
+    public synchronized List<ResultFrame> getFrameList(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "getFrameList", matcher);
+        
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
+        
+        for (ResultFrame resultFrame: frameList) {
+            if (matcher.match(resultFrame)) {
+                resultList.add(resultFrame);
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getFrameList", resultList);
+        return resultList;
+    }
+    
     public synchronized List<ResultFrame> getSentFrameList() {
         LOGGER.entering(CLASS_NAME, "getSentFrameList");
         
@@ -197,6 +212,21 @@ public class CaptureResult {
         
         LOGGER.exiting(CLASS_NAME, "getSentFrameList", list);
         return list;
+    }
+    
+    public synchronized List<ResultFrame> getSentFrameList(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "getReceivedFrameList", matcher);
+        
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
+        
+        for (ResultFrame resultFrame: sentFrameList) {
+            if (matcher.match(resultFrame)) {
+                resultList.add(resultFrame);
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getSentFrameList", resultList);
+        return resultList;
     }
     
     public synchronized List<ResultFrame> getReceivedFrameList() {
@@ -208,12 +238,40 @@ public class CaptureResult {
         return list;
     }
     
-    public synchronized void removeFrames(Collection<ResultFrame> removeFrames) {
-        LOGGER.entering(CLASS_NAME, "removeFrames", removeFrames);
+    public synchronized List<ResultFrame> getReceivedFrameList(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "getReceivedFrameList", matcher);
         
-        sentFrameList.removeAll(removeFrames);
-        receivedFrameList.removeAll(removeFrames);
-        frameList.removeAll(removeFrames);
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
+        
+        for (ResultFrame resultFrame: receivedFrameList) {
+            if (matcher.match(resultFrame)) {
+                resultList.add(resultFrame);
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getReceivedFrameList", resultList);
+        return resultList;
+    }
+    
+    private class MatcherResultFrameCollection implements Matcher {
+        private ArrayList<ResultFrame> frameList;
+        
+        public MatcherResultFrameCollection(Collection<ResultFrame> frames) {
+            frameList = new ArrayList<ResultFrame>(frames);
+        }
+
+        @Override
+        public boolean match(Object target) {
+            return frameList.contains(target);
+        }
+    }
+    
+    public synchronized void removeFrames(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "removeFrames", matcher);
+        
+        for (ResultFrame resultFrame : getFrameList(matcher)) {
+            removeFrame(resultFrame);
+        }
         
         LOGGER.exiting(CLASS_NAME, "removeFrames");
     }
@@ -256,6 +314,16 @@ public class CaptureResult {
         LOGGER.exiting(CLASS_NAME, "removeSentFrame");
     }
     
+    public synchronized void removeSentFrames(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "removeSentFrames", matcher);
+        
+        for (ResultFrame resultFrame : getSentFrameList(matcher)) {
+            removeFrame(resultFrame);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "removeSentFrames");
+    }
+    
     public synchronized void removeReceivedFrame(int index) {
         LOGGER.entering(CLASS_NAME, "removeReceivedFrame", index);
         
@@ -267,6 +335,16 @@ public class CaptureResult {
         LOGGER.exiting(CLASS_NAME, "removeReceivedFrame");
     }
     
+    public synchronized void removeReceivedFrame(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "removeReceivedFrame", matcher);
+        
+        for (ResultFrame resultFrame : getReceivedFrameList(matcher)) {
+            removeFrame(resultFrame);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "removeReceivedFrame");
+    }
+    
     public synchronized int truncateSentFrames(int size) {
         LOGGER.entering(CLASS_NAME, "truncateSentFrames", size);
         
@@ -274,7 +352,7 @@ public class CaptureResult {
             size = sentFrameList.size();
         }
         
-        removeFrames(new ArrayList<ResultFrame>(sentFrameList.subList(0, size)));
+        removeFrames(new MatcherResultFrameCollection(sentFrameList.subList(0, size)));
         
         LOGGER.exiting(CLASS_NAME, "truncateSentFrames", size);
         return size;
@@ -284,7 +362,7 @@ public class CaptureResult {
         LOGGER.entering(CLASS_NAME, "removeAllSentFrames");
         
         int size = sentFrameList.size();
-        removeFrames(new ArrayList<ResultFrame>(sentFrameList));
+        removeFrames(new MatcherResultFrameCollection(sentFrameList));
         
         LOGGER.exiting(CLASS_NAME, "removeAllSentFrames", size);
         return size;
@@ -297,7 +375,7 @@ public class CaptureResult {
             size = receivedFrameList.size();
         }
         
-        removeFrames(new ArrayList<ResultFrame>(receivedFrameList.subList(0, size)));
+        removeFrames(new MatcherResultFrameCollection(receivedFrameList.subList(0, size)));
         
         LOGGER.exiting(CLASS_NAME, "truncateReceivedFrames", size);
         return size;
@@ -307,7 +385,7 @@ public class CaptureResult {
         LOGGER.entering(CLASS_NAME, "removeAllReceivedFrames");
         
         int size = receivedFrameList.size();
-        removeFrames(new ArrayList<ResultFrame>(receivedFrameList));
+        removeFrames(new MatcherResultFrameCollection(receivedFrameList));
         
         LOGGER.exiting(CLASS_NAME, "removeAllReceivedFrames", size);
         return size;
@@ -320,7 +398,7 @@ public class CaptureResult {
             size = frameList.size();
         }
         
-        removeFrames(new ArrayList<ResultFrame>(frameList.subList(0, size)));
+        removeFrames(new MatcherResultFrameCollection(frameList.subList(0, size)));
         
         LOGGER.exiting(CLASS_NAME, "truncateFrames", size);
         return size;
@@ -330,7 +408,7 @@ public class CaptureResult {
         LOGGER.entering(CLASS_NAME, "removeAllFrames");
         
         int size = frameList.size();
-        removeFrames(new ArrayList<ResultFrame>(frameList));
+        removeFrames(new MatcherResultFrameCollection(frameList));
         
         LOGGER.exiting(CLASS_NAME, "removeAllFrames", size);
         return size;

@@ -9,7 +9,6 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.CaptureResultObserver;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.After;
@@ -336,23 +335,30 @@ public class CaptureResultTest {
         Frame frame3 = newFrame();
         Frame frame4 = newFrame();
         
-        result.removeFrames(new LinkedList<ResultFrame>());
+        final LinkedList<ResultFrame> matchFrames = new LinkedList<ResultFrame>();
+        
+        Matcher<ResultFrame> matcher = new Matcher<ResultFrame>() {
+            @Override
+            public boolean match(ResultFrame target) {
+                return matchFrames.contains(target);
+            }
+        };
         
         result.addSentFrame(frame1);
         result.addReceivedFrame(frame2);
         result.addSentFrame(frame3);
         result.addReceivedFrame(frame4);
         
-        result.removeFrames(new LinkedList<ResultFrame>());
+        result.removeFrames(matcher);
         
         assertEquals(4, result.countFrames());
         assertEquals(2, result.countSentFrames());
         assertEquals(2, result.countReceivedFrames());
         
-        List<ResultFrame> frameList = result.getFrameList().subList(1, 3);
-        frameList.add(new ResultFrame(newFrame(), 10));
+        matchFrames.addAll(result.getFrameList().subList(1, 3));
+        matchFrames.add(new ResultFrame(newFrame(), 10));
         
-        result.removeFrames(frameList);
+        result.removeFrames(matcher);
         
         assertEquals(2, result.countFrames());
         assertEquals(1, result.countSentFrames());

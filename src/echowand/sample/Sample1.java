@@ -42,6 +42,25 @@ class Sample1Listener implements TransactionListener {
         System.out.println("begin: " + t.getTID());
     }
     @Override
+    public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
+        CommonFrame cf = frame.getCommonFrame();
+        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        System.out.println("Sent: " + success);
+        System.out.println("From: " + frame.getSender());
+        System.out.println("To: " + frame.getReceiver());
+        System.out.println("  TID: " + cf.getTID());
+        System.out.println("  SEOJ: " + payload.getSEOJ());
+        System.out.println("  DEOJ: " + payload.getDEOJ());
+        System.out.print("  ESV: " + payload.getESV());
+        System.out.format("(0x%02x)\n", payload.getESV().toByte());
+        System.out.println("  OPC: " + payload.getFirstOPC());
+        printProperties(payload, 0);
+        if (payload.getSecondOPC() > 0) {
+            System.out.println("  OPC: " + payload.getSecondOPC());
+            printProperties(payload, 1);
+        }
+    }
+    @Override
     public void receive(Transaction t, Subnet subnet, Frame frame) {
         CommonFrame cf = frame.getCommonFrame();
         StandardPayload payload = (StandardPayload)cf.getEDATA();

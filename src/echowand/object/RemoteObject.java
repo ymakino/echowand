@@ -194,6 +194,10 @@ public class RemoteObject implements EchonetObject {
             
             logger.exiting(className, "RemoteObjectGetTransactionListener.begin");
         }
+        
+        @Override
+        public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
+        }
 
         @Override
         public void receive(Transaction t, Subnet subnet, Frame frame) {
@@ -238,6 +242,10 @@ public class RemoteObject implements EchonetObject {
         
         @Override
         public void begin(Transaction t) {
+        }
+
+        @Override
+        public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
         }
 
         @Override

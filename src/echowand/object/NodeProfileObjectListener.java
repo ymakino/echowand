@@ -43,6 +43,17 @@ public class NodeProfileObjectListener implements TransactionListener {
     @Override
     public void begin(Transaction t) {
     }
+
+    /**
+     * フレームが送信された時に呼び出される。
+     * @param t フレームを送信したトランザクション
+     * @param subnet フレームを送信したサブネット
+     * @param frame 送信したフレーム
+     * @param success 送信に成功した場合にはtrue、失敗した場合にはfalse
+     */
+    @Override
+    public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
+    }
     
     /**
      * 指定されたインスタンスリストプロパティを解析し、EOJのリストを返す。

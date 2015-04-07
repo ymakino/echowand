@@ -22,8 +22,8 @@ import echowand.service.Service;
 import echowand.service.Core;
 import echowand.service.result.CaptureResult;
 import echowand.service.result.ResultData;
-import echowand.service.result.ResultDataMatcherRule;
 import echowand.service.result.GetResult;
+import echowand.service.result.MatcherResultData;
 import echowand.service.result.ObserveResult;
 import echowand.service.result.ResultFrame;
 import echowand.service.result.UpdateRemoteInfoResult;
@@ -177,7 +177,7 @@ public class ServiceSample0 {
             
             for (GetResult getResult: getResults) {
                 getResult.join();
-                List<ResultData> dataList2 = getResult.getDataList(new ResultDataMatcherRule());
+                List<ResultData> dataList2 = getResult.getDataList(new MatcherResultData());
                 for (int i = 0; i < dataList2.size(); i++) {
                     System.out.println("Get2 " + ": " + i + " " + dataList2.get(i));
                 }

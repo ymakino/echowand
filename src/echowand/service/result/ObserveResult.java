@@ -23,7 +23,7 @@ public class ObserveResult {
     private static final Logger LOGGER = Logger.getLogger(ObserveResult.class.getName());
     private static final String CLASS_NAME = ObserveResult.class.getName();
     
-    private FrameMatcher matcher;
+    private Matcher<Frame> matcher;
     private ObserveResultProcessor processor;
     private LinkedList<ResultData> dataList;
     private LinkedList<ResultFrame> frameList;
@@ -82,7 +82,7 @@ public class ObserveResult {
         return frameListEnabled;
     }
 
-    public ObserveResult(FrameMatcher matcher, ObserveResultProcessor processor) {
+    public ObserveResult(Matcher<Frame> matcher, ObserveResultProcessor processor) {
         LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{matcher, processor});
 
         this.matcher = matcher;
@@ -179,11 +179,12 @@ public class ObserveResult {
             Property property = payload.getFirstPropertyAt(i);
             
             Node node = frame.getSender();
+            ESV esv = payload.getESV();
             EOJ eoj = payload.getSEOJ();
             EPC epc = property.getEPC();
             Data data = property.getEDT();
             
-            ResultData resultData = new ResultData(node, eoj, epc, data, resultFrame.time);
+            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
             
             if (dataListEnabled) {
                 result &= dataList.add(resultData);
@@ -245,6 +246,21 @@ public class ObserveResult {
         return resultList;
     }
     
+    public synchronized List<ResultFrame> getFrameList(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "getFrameList", matcher);
+        
+        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
+        
+        for (ResultFrame resultFrame: frameList) {
+            if (matcher.match(resultFrame)) {
+                resultList.add(resultFrame);
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getFrameList", resultList);
+        return resultList;
+    }
+    
     public synchronized int countData() {
         LOGGER.entering(CLASS_NAME, "countData");
         
@@ -272,7 +288,7 @@ public class ObserveResult {
         return resultList;
     }
     
-    public synchronized List<ResultData> getDataList(ResultDataMatcher matcher) {
+    public synchronized List<ResultData> getDataList(Matcher<ResultData> matcher) {
         LOGGER.entering(CLASS_NAME, "getDataList", matcher);
         
         LinkedList<ResultData> resultList = new LinkedList<ResultData>();
@@ -292,7 +308,7 @@ public class ObserveResult {
         
         final ResultFrame matcherFrame = resultFrame;
         
-        ResultDataMatcher matcher = new ResultDataMatcher() {
+        Matcher<ResultData> matcher = new  Matcher<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
                 return matcherFrame.equals(dataFrameMap.get(resultData));
@@ -352,6 +368,16 @@ public class ObserveResult {
         ResultData resultData = dataList.get(index);
         dataList.remove(index);
         dataFrameMap.remove(resultData);
+        
+        LOGGER.exiting(CLASS_NAME, "removeData");
+    }
+    
+    public synchronized void removeData(Matcher<ResultData> matcher) {
+        LOGGER.entering(CLASS_NAME, "removeData", matcher);
+        
+        for (ResultData resultData : getDataList(matcher)) {
+            removeData(resultData);
+        }
         
         LOGGER.exiting(CLASS_NAME, "removeData");
     }
@@ -421,6 +447,16 @@ public class ObserveResult {
         updateDataFrameMap();
         
         LOGGER.exiting(CLASS_NAME, "removeFrame");
+    }
+    
+    public synchronized void removeFrames(Matcher<ResultFrame> matcher) {
+        LOGGER.entering(CLASS_NAME, "removeFrames", matcher);
+        
+        for (ResultFrame resultFrame : getFrameList(matcher)) {
+            removeFrame(resultFrame);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "removeFrames");
     }
     
     public synchronized int removeAllFrames() {

@@ -82,9 +82,9 @@ public class ResultFrameTest {
      */
     @Test
     public void testHashCode() {
-        ResultData resultData = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
-        ResultData resultData1 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
-        ResultData resultData2 = new ResultData(subnet.getLocalNode(), new EOJ("0ef001"), EPC.x80, null, 10);
+        ResultData resultData = new ResultData(subnet.getLocalNode(), ESV.Get, new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
+        ResultData resultData1 = new ResultData(subnet.getLocalNode(), ESV.Get, new EOJ("0ef001"), EPC.x80, new Data((byte)0x30), 10);
+        ResultData resultData2 = new ResultData(subnet.getLocalNode(), ESV.Get, new EOJ("0ef001"), EPC.x80, null, 10);
         
         assertTrue(resultData.hashCode() == resultData.hashCode());
         assertTrue(resultData1.hashCode() == resultData1.hashCode());

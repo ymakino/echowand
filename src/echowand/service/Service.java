@@ -23,10 +23,10 @@ import echowand.object.ObjectData;
 import echowand.object.RemoteObject;
 import echowand.object.RemoteObjectManager;
 import echowand.service.result.CaptureResult;
-import echowand.service.result.FrameMatcher;
-import echowand.service.result.FrameMatcherRule;
 import echowand.service.result.ResultBase;
 import echowand.service.result.GetResult;
+import echowand.service.result.Matcher;
+import echowand.service.result.MatcherFrame;
 import echowand.service.result.ObserveResult;
 import echowand.service.result.SetResult;
 import echowand.service.result.UpdateRemoteInfoResult;
@@ -95,6 +95,15 @@ public class Service {
         }
 
         @Override
+        public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
+            LOGGER.entering(CLASS_NAME, "ResultBaseTransactionListener.sent", new Object[]{t, subnet, frame, success});
+            
+            result.addRequestFrame(frame, success);
+            
+            LOGGER.exiting(CLASS_NAME, "ResultBaseTransactionListener.sent");
+        }
+
+        @Override
         public void receive(Transaction t, Subnet subnet, Frame frame) {
             LOGGER.entering(CLASS_NAME, "ResultBaseTransactionListener.receive", new Object[]{t, subnet, frame});
             
@@ -117,11 +126,11 @@ public class Service {
         private UpdateRemoteInfoResult resultUpdate;
 
         public ResultUpdateTransactionListener(UpdateRemoteInfoResult resultUpdate) {
-            LOGGER.entering(CLASS_NAME, "ResultUpdateTransactionListener.begin", resultUpdate);
+            LOGGER.entering(CLASS_NAME, "ResultUpdateTransactionListener", resultUpdate);
             
             this.resultUpdate = resultUpdate;
             
-            LOGGER.exiting(CLASS_NAME, "ResultUpdateTransactionListener.begin");
+            LOGGER.exiting(CLASS_NAME, "ResultUpdateTransactionListener");
         }
 
         @Override
@@ -129,6 +138,13 @@ public class Service {
             LOGGER.entering(CLASS_NAME, "ResultUpdateTransactionListener.begin", t);
             
             LOGGER.exiting(CLASS_NAME, "ResultUpdateTransactionListener.begin");
+        }
+
+        @Override
+        public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
+            LOGGER.entering(CLASS_NAME, "ResultUpdateTransactionListener.send", new Object[]{t, subnet, frame, success});
+            
+            LOGGER.exiting(CLASS_NAME, "ResultUpdateTransactionListener.send");
         }
 
         @Override
@@ -450,7 +466,7 @@ public class Service {
     public ObserveResult doObserve(Node node, EOJ eoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, eoj, epc});
         
-        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, eoj, epc));
+        ObserveResult observeResult = doObserve(new MatcherFrame(node, eoj, epc));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -459,7 +475,7 @@ public class Service {
     public ObserveResult doObserve(Node node, ClassEOJ ceoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, ceoj, epc});
         
-        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, ceoj, epc));
+        ObserveResult observeResult = doObserve(new MatcherFrame(node, ceoj, epc));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -468,7 +484,7 @@ public class Service {
     public ObserveResult doObserve(Node node, EOJ eoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, eoj, epcs});
         
-        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, eoj, epcs));
+        ObserveResult observeResult = doObserve(new MatcherFrame(node, eoj, epcs));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -477,7 +493,7 @@ public class Service {
     public ObserveResult doObserve(Node node, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, ceoj, epcs});
         
-        ObserveResult observeResult = doObserve(new FrameMatcherRule(node, ceoj, epcs));
+        ObserveResult observeResult = doObserve(new MatcherFrame(node, ceoj, epcs));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -594,7 +610,7 @@ public class Service {
     public ObserveResult doObserve() {
         LOGGER.entering(CLASS_NAME, "doObserve");
         
-        ObserveResult observeResult = doObserve(new FrameMatcherRule());
+        ObserveResult observeResult = doObserve(new MatcherFrame());
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -630,13 +646,13 @@ public class Service {
     public ObserveResult doObserve(List nodes, List<EOJ> eojs, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodes, eojs, epcs});
         
-        ObserveResult observeResult = doObserve(new FrameMatcherRule(toNodesFromNodesAndNodeInfos(nodes), eojs, epcs));
+        ObserveResult observeResult = doObserve(new MatcherFrame(toNodesFromNodesAndNodeInfos(nodes), eojs, epcs));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
     }
     
-    public ObserveResult doObserve(FrameMatcher matcher) {
+    public ObserveResult doObserve(Matcher<Frame> matcher) {
         LOGGER.entering(CLASS_NAME, "doObserve", matcher);
         
         ObserveResultProcessor processor = getCore().getObserveResultProsessor();
