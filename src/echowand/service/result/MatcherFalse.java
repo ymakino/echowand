@@ -20,6 +20,6 @@ public class MatcherFalse<T> implements Matcher<T> {
     
     @Override
     public String toString() {
-        return "MatcherTrue";
+        return "MatcherFalse";
     }
 }
