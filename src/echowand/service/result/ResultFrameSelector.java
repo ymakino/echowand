@@ -6,6 +6,7 @@ import echowand.common.EPC;
 import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.StandardPayload;
+import echowand.util.Selector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class MatcherResultFrame implements Matcher<ResultFrame> {
-    private static final Logger LOGGER = Logger.getLogger(MatcherResultFrame.class.getName());
-    private static final String CLASS_NAME = MatcherResultFrame.class.getName();
+public class ResultFrameSelector implements Selector<ResultFrame> {
+    private static final Logger LOGGER = Logger.getLogger(ResultFrameSelector.class.getName());
+    private static final String CLASS_NAME = ResultFrameSelector.class.getName();
     
     private ArrayList<Node> nodes;
     private ArrayList<EOJ> eojs;
@@ -35,82 +36,82 @@ public class MatcherResultFrame implements Matcher<ResultFrame> {
         return list;
     }
     
-    public MatcherResultFrame() {
+    public ResultFrameSelector() {
         this.nodes = new ArrayList<Node>();
         this.eojs = new ArrayList<EOJ>();
         this.epcs = new ArrayList<EPC>();
     }
     
-    public MatcherResultFrame(Node node, EOJ eoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{node, eoj, epc});
+    public ResultFrameSelector(Node node, EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{node, eoj, epc});
         
         init(toList(node), toList(eoj), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(List<Node> nodes, EOJ eoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{nodes, eoj, epc});
+    public ResultFrameSelector(List<Node> nodes, EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, eoj, epc});
         
         init(nodes, toList(eoj), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(Node node, EOJ eoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{node, eoj, epcs});
+    public ResultFrameSelector(Node node, EOJ eoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{node, eoj, epcs});
         
         init(toList(node), toList(eoj), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(List<Node> nodes, EOJ eoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{nodes, eoj, epcs});
+    public ResultFrameSelector(List<Node> nodes, EOJ eoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, eoj, epcs});
         
         init(nodes, toList(eoj), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(Node node, ClassEOJ ceoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{node, ceoj, epc});
+    public ResultFrameSelector(Node node, ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{node, ceoj, epc});
         
         init(toList(node), toList(ceoj.getAllInstanceEOJ()), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(List<Node> nodes, ClassEOJ ceoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{nodes, ceoj, epc});
+    public ResultFrameSelector(List<Node> nodes, ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, ceoj, epc});
         
         init(nodes, toList(ceoj.getAllInstanceEOJ()), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(Node node, ClassEOJ ceoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{node, ceoj, epcs});
+    public ResultFrameSelector(Node node, ClassEOJ ceoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{node, ceoj, epcs});
         
         init(toList(node), toList(ceoj.getAllInstanceEOJ()), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(List<Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{nodes, ceoj, epcs});
+    public ResultFrameSelector(List<Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, ceoj, epcs});
         
         init(nodes, toList(ceoj.getAllInstanceEOJ()), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public MatcherResultFrame(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultFrame", new Object[]{nodes, eojs, epcs});
+    public ResultFrameSelector(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, eojs, epcs});
         
         init(nodes, eojs, epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultFrame");
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
     private void init(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
@@ -219,6 +220,6 @@ public class MatcherResultFrame implements Matcher<ResultFrame> {
     
     @Override
     public String toString() {
-        return "MatcherResultFrame{Nodes: " + nodes + ", EOJs: " + eojs + ", EPCs: " + epcs + "}";
+        return "ResultFrameSelector{Nodes: " + nodes + ", EOJs: " + eojs + ", EPCs: " + epcs + "}";
     }
 }

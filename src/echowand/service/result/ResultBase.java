@@ -9,6 +9,8 @@ import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
+import echowand.util.Collector;
+import echowand.util.Selector;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -288,16 +290,10 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultFrame> getRequestFrameList(Matcher<ResultFrame> matcher) {
-        LOGGER.entering(CLASS_NAME, "getRequestFrameList", matcher);
+    public synchronized List<ResultFrame> getRequestFrameList(Selector<ResultFrame> selector) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrameList", selector);
         
-        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
-        
-        for (ResultFrame resultFrame: requestFrameList) {
-            if (matcher.match(resultFrame)) {
-                resultList.add(resultFrame);
-            }
-        }
+        List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(requestFrameList);
         
         LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultList);
         return resultList;
@@ -330,16 +326,10 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultFrame> getFrameList(Matcher<ResultFrame> matcher) {
-        LOGGER.entering(CLASS_NAME, "getFrameList", matcher);
+    public synchronized List<ResultFrame> getFrameList(Selector<ResultFrame> selector) {
+        LOGGER.entering(CLASS_NAME, "getFrameList", selector);
         
-        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
-        
-        for (ResultFrame resultFrame: frameList) {
-            if (matcher.match(resultFrame)) {
-                resultList.add(resultFrame);
-            }
-        }
+        List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(frameList);
         
         LOGGER.exiting(CLASS_NAME, "getFrameList", resultList);
         return resultList;
@@ -372,16 +362,10 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultData> getDataList(Matcher<ResultData> matcher) {
-        LOGGER.entering(CLASS_NAME, "getDataList", matcher);
+    public synchronized List<ResultData> getDataList(Selector<ResultData> selector) {
+        LOGGER.entering(CLASS_NAME, "getDataList", selector);
         
-        LinkedList<ResultData> resultList = new LinkedList<ResultData>();
-        
-        for (ResultData resultData: dataList) {
-            if (matcher.match(resultData)) {
-                resultList.add(resultData);
-            }
-        }
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
         
         LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
         return resultList;
@@ -390,16 +374,16 @@ public abstract class ResultBase {
     public synchronized List<ResultData> getDataList(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "getDataList", resultFrame);
         
-        final ResultFrame matcherFrame = resultFrame;
+        final ResultFrame selectedFrame = resultFrame;
         
-        Matcher<ResultData> matcher = new Matcher<ResultData>() {
+        Selector<ResultData> selector = new Selector<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
-                return matcherFrame.equals(dataFrameMap.get(resultData));
+                return selectedFrame.equals(dataFrameMap.get(resultData));
             }
         };
         
-        List<ResultData> resultList = getDataList(matcher);
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
         
         LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
         return resultList;
@@ -432,16 +416,10 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultData> getRequestDataList(Matcher<ResultData> matcher) {
-        LOGGER.entering(CLASS_NAME, "getRequestDataList", matcher);
+    public synchronized List<ResultData> getRequestDataList(Selector<ResultData> selector) {
+        LOGGER.entering(CLASS_NAME, "getRequestDataList", selector);
         
-        LinkedList<ResultData> resultList = new LinkedList<ResultData>();
-        
-        for (ResultData resultData: requestDataList) {
-            if (matcher.match(resultData)) {
-                resultList.add(resultData);
-            }
-        }
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(requestDataList);
         
         LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
         return resultList;
@@ -450,16 +428,16 @@ public abstract class ResultBase {
     public synchronized List<ResultData> getRequestDataList(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "getRequestDataList", resultFrame);
         
-        final ResultFrame matcherFrame = resultFrame;
+        final ResultFrame selectedFrame = resultFrame;
         
-        Matcher<ResultData> matcher = new Matcher<ResultData>() {
+        Selector<ResultData> selector = new Selector<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
-                return matcherFrame.equals(requestDataFrameMap.get(resultData));
+                return selectedFrame.equals(requestDataFrameMap.get(resultData));
             }
         };
         
-        List<ResultData> resultList = getDataList(matcher);
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(requestDataList);
         
         LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
         return resultList;

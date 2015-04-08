@@ -8,6 +8,7 @@ import echowand.util.Selector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -109,11 +110,11 @@ public class LocalObjectManager {
      * @param selector ローカルオブジェクトの選択
      * @return 選択したローカルオブジェクトのリスト
      */
-    public synchronized LinkedList<LocalObject> get(Selector<LocalObject> selector) {
+    public synchronized List<LocalObject> get(Selector<LocalObject> selector) {
         logger.entering(className, "get", selector);
         
         Collector<LocalObject> collector = new Collector<LocalObject>(selector);
-        LinkedList<LocalObject> objectList = collector.collect(new ArrayList<LocalObject>(objects));
+        List<LocalObject> objectList = collector.collect(new ArrayList<LocalObject>(objects));
         
         logger.exiting(className, "get", objectList);
         return objectList;
@@ -138,12 +139,12 @@ public class LocalObjectManager {
      * @param ceoj ClassEOJの指定
      * @return 指定されたClassEOJに属するローカルオブジェクトリスト
      */
-    public synchronized LinkedList<LocalObject> getWithClassEOJ(final ClassEOJ ceoj) {
+    public synchronized List<LocalObject> getWithClassEOJ(final ClassEOJ ceoj) {
         logger.entering(className, "getWithClassEOJ", ceoj);
         
-        LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {
+        List<LocalObject> objectList = get(new Selector<LocalObject>() {
             @Override
-            public boolean select(LocalObject object) {
+            public boolean match(LocalObject object) {
                 return object.getEOJ().isMemberOf(ceoj);
             }
         });
@@ -157,12 +158,12 @@ public class LocalObjectManager {
      * 機器オブジェクトを含む、ローカルオブジェクトのリストを返す。
      * @return オブジェクトのリスト
      */
-    public synchronized LinkedList<LocalObject> getAllObjects() {
+    public synchronized List<LocalObject> getAllObjects() {
         logger.entering(className, "getObjects");
         
-        LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {
+        List<LocalObject> objectList = get(new Selector<LocalObject>() {
             @Override
-            public boolean select(LocalObject object) {
+            public boolean match(LocalObject object) {
                 return true;
             }
         });
@@ -175,12 +176,12 @@ public class LocalObjectManager {
      * 機器オブジェクトに属するローカルオブジェクトのリストを返す。
      * @return 機器オブジェクトのリスト
      */
-    public synchronized LinkedList<LocalObject> getDeviceObjects() {
+    public synchronized List<LocalObject> getDeviceObjects() {
         logger.entering(className, "getDeviceObjects");
         
-        LinkedList<LocalObject> objectList = get(new Selector<LocalObject>() {
+        List<LocalObject> objectList = get(new Selector<LocalObject>() {
             @Override
-            public boolean select(LocalObject object) {
+            public boolean match(LocalObject object) {
                 return object.getEOJ().isDeviceObject();
             }
         });

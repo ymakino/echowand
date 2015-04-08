@@ -1,4 +1,4 @@
-package echowand.service.result;
+package echowand.util;
 
 import java.util.logging.Logger;
 
@@ -6,9 +6,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class MatcherTrue<T> implements Matcher<T> {
-    private static final Logger LOGGER = Logger.getLogger(MatcherTrue.class.getName());
-    private static final String CLASS_NAME = MatcherTrue.class.getName();
+public class SelectorAny<T> implements Selector<T> {
+    private static final Logger LOGGER = Logger.getLogger(SelectorAny.class.getName());
+    private static final String CLASS_NAME = SelectorAny.class.getName();
     
     @Override
     public boolean match(T target) {
@@ -20,6 +20,6 @@ public class MatcherTrue<T> implements Matcher<T> {
     
     @Override
     public String toString() {
-        return "MatcherTrue";
+        return "SelectorAny";
     }
 }

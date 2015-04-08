@@ -1,5 +1,7 @@
 package echowand.service.result;
 
+import echowand.util.SelectorNone;
+import echowand.util.SelectorAny;
 import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
@@ -10,6 +12,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.ObserveResultProcessor;
+import echowand.util.Selector;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,11 +27,11 @@ import static org.junit.Assert.*;
  */
 public class ObserveResultTest {
     public static InternalSubnet subnet;
-    public TestFrameMatcher matcher;
+    public TestFrameSelector selector;
     public ObserveResult result;
     public short nextTID = 0;
     
-    static class TestFrameMatcher implements Matcher<Frame> {
+    static class TestFrameSelector implements Selector<Frame> {
         public boolean result = true;
         @Override
         public boolean match(Frame frame) {
@@ -50,9 +53,9 @@ public class ObserveResultTest {
     
     @Before
     public void setUp() {
-        matcher = new TestFrameMatcher();
+        selector = new TestFrameSelector();
         ObserveResultProcessor processor = new ObserveResultProcessor();
-        result = new ObserveResult(matcher, processor);
+        result = new ObserveResult(selector, processor);
     }
     
     @After
@@ -225,14 +228,14 @@ public class ObserveResultTest {
      */
     @Test
     public void testShouldReceive() {
-        matcher.result = true;
+        selector.result = true;
         for (int i=0; i<ESV.values().length; i++) {
             ESV esv = ESV.values()[i];
             assertTrue(result.shouldReceive(newFrame(esv)));
         }
         assertTrue(result.shouldReceive(newSimpleFrame()));
         
-        matcher.result = false;
+        selector.result = false;
         for (int i=0; i<ESV.values().length; i++) {
             ESV esv = ESV.values()[i];
             assertFalse(result.shouldReceive(newFrame(esv)));
@@ -421,22 +424,12 @@ public class ObserveResultTest {
      * Test of getDataList method, of class ObserveResult.
      */
     @Test
-    public void testGetDataList_ResultDataMatcher() {
-        Matcher<ResultData> allMatcher = new Matcher<ResultData>() {
-            @Override
-            public boolean match(ResultData resultData) {
-                return true;
-            }
-        };
+    public void testGetDataList_ResultDataSelector() {
+        Selector<ResultData> selectorAny = new SelectorAny<ResultData>();
         
-        Matcher<ResultData> noMatcher = new Matcher<ResultData>() {
-            @Override
-            public boolean match(ResultData resultData) {
-                return false;
-            }
-        };
+        Selector<ResultData> selectorNone = new SelectorNone<ResultData>();
         
-        Matcher<ResultData> x80Matcher = new Matcher<ResultData>() {
+        Selector<ResultData> selectorEPCx80 = new Selector<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
                 return resultData.epc == EPC.x80;
@@ -449,14 +442,14 @@ public class ObserveResultTest {
         Frame frame2 = newFrame2(ESV.INFC);
         
         result.addFrame(frame1);
-        assertEquals(1, result.getDataList(allMatcher).size());
-        assertEquals(0, result.getDataList(noMatcher).size());
-        assertEquals(1, result.getDataList(x80Matcher).size());
+        assertEquals(1, result.getDataList(selectorAny).size());
+        assertEquals(0, result.getDataList(selectorNone).size());
+        assertEquals(1, result.getDataList(selectorEPCx80).size());
         
         result.addFrame(frame2);
-        assertEquals(3, result.getDataList(allMatcher).size());
-        assertEquals(0, result.getDataList(noMatcher).size());
-        assertEquals(2, result.getDataList(x80Matcher).size());
+        assertEquals(3, result.getDataList(selectorAny).size());
+        assertEquals(0, result.getDataList(selectorNone).size());
+        assertEquals(2, result.getDataList(selectorEPCx80).size());
     }
 
     /**

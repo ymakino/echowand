@@ -25,12 +25,12 @@ import echowand.object.RemoteObjectManager;
 import echowand.service.result.CaptureResult;
 import echowand.service.result.ResultBase;
 import echowand.service.result.GetResult;
-import echowand.service.result.Matcher;
-import echowand.service.result.MatcherFrame;
+import echowand.service.result.FrameSelector;
 import echowand.service.result.ObserveResult;
 import echowand.service.result.SetResult;
 import echowand.service.result.UpdateRemoteInfoResult;
 import echowand.util.Pair;
+import echowand.util.Selector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -466,7 +466,7 @@ public class Service {
     public ObserveResult doObserve(Node node, EOJ eoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, eoj, epc});
         
-        ObserveResult observeResult = doObserve(new MatcherFrame(node, eoj, epc));
+        ObserveResult observeResult = doObserve(new FrameSelector(node, eoj, epc));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -475,7 +475,7 @@ public class Service {
     public ObserveResult doObserve(Node node, ClassEOJ ceoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, ceoj, epc});
         
-        ObserveResult observeResult = doObserve(new MatcherFrame(node, ceoj, epc));
+        ObserveResult observeResult = doObserve(new FrameSelector(node, ceoj, epc));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -484,7 +484,7 @@ public class Service {
     public ObserveResult doObserve(Node node, EOJ eoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, eoj, epcs});
         
-        ObserveResult observeResult = doObserve(new MatcherFrame(node, eoj, epcs));
+        ObserveResult observeResult = doObserve(new FrameSelector(node, eoj, epcs));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -493,7 +493,7 @@ public class Service {
     public ObserveResult doObserve(Node node, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{node, ceoj, epcs});
         
-        ObserveResult observeResult = doObserve(new MatcherFrame(node, ceoj, epcs));
+        ObserveResult observeResult = doObserve(new FrameSelector(node, ceoj, epcs));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -610,7 +610,7 @@ public class Service {
     public ObserveResult doObserve() {
         LOGGER.entering(CLASS_NAME, "doObserve");
         
-        ObserveResult observeResult = doObserve(new MatcherFrame());
+        ObserveResult observeResult = doObserve(new FrameSelector());
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -646,17 +646,17 @@ public class Service {
     public ObserveResult doObserve(List nodes, List<EOJ> eojs, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodes, eojs, epcs});
         
-        ObserveResult observeResult = doObserve(new MatcherFrame(toNodesFromNodesAndNodeInfos(nodes), eojs, epcs));
+        ObserveResult observeResult = doObserve(new FrameSelector(toNodesFromNodesAndNodeInfos(nodes), eojs, epcs));
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
     }
     
-    public ObserveResult doObserve(Matcher<Frame> matcher) {
-        LOGGER.entering(CLASS_NAME, "doObserve", matcher);
+    public ObserveResult doObserve(Selector<Frame> selector) {
+        LOGGER.entering(CLASS_NAME, "doObserve", selector);
         
         ObserveResultProcessor processor = getCore().getObserveResultProsessor();
-        ObserveResult observeResult = new ObserveResult(matcher, processor);
+        ObserveResult observeResult = new ObserveResult(selector, processor);
         
         processor.addObserveResult(observeResult);
         

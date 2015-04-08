@@ -105,18 +105,18 @@ public class LocalObjectManagerTest {
             manager.add(object3);
             LocalObject object2 = new LocalObject(new TemperatureSensorInfo());
             manager.add(object2);
-            LinkedList<LocalObject> list1 = manager.get(new Selector<LocalObject>() {
+            List<LocalObject> list1 = manager.get(new Selector<LocalObject>() {
                 @Override
-                public boolean select(LocalObject object) {
+                public boolean match(LocalObject object) {
                     return object.getEOJ().getClassEOJ().equals(new ClassEOJ("0011"));
                 }
             });
             assertEquals(2, list1.size());
             assertEquals(object1, list1.get(0));
             assertEquals(object2, list1.get(1));
-            LinkedList<LocalObject> list2 = manager.get(new Selector<LocalObject>() {
+            List<LocalObject> list2 = manager.get(new Selector<LocalObject>() {
                 @Override
-                public boolean select(LocalObject object) {
+                public boolean match(LocalObject object) {
                     return object.getEOJ().getClassEOJ().equals(new ClassEOJ("0012"));
                 }
             });

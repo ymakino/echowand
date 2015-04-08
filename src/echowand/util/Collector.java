@@ -2,6 +2,7 @@ package echowand.util;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * コレクションから指定された要素のみを抽出したリストを作成
@@ -25,10 +26,10 @@ public class Collector<T> {
      * @param objects 指定されたオブジェクト集合
      * @return 選択されたオブジェクトのリスト
      */
-    public LinkedList<T> collect(Collection<T> objects) {
+    public List<T> collect(Collection<T> objects) {
         LinkedList<T> newList = new LinkedList<T>();
         for (T object : objects) {
-            if (selector.select(object)) {
+            if (selector.match(object)) {
                 newList.add(object);
             }
         }

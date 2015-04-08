@@ -9,6 +9,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.CaptureResultObserver;
+import echowand.util.Selector;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.After;
@@ -337,7 +338,7 @@ public class CaptureResultTest {
         
         final LinkedList<ResultFrame> matchFrames = new LinkedList<ResultFrame>();
         
-        Matcher<ResultFrame> matcher = new Matcher<ResultFrame>() {
+        Selector<ResultFrame> matcher = new Selector<ResultFrame>() {
             @Override
             public boolean match(ResultFrame target) {
                 return matchFrames.contains(target);

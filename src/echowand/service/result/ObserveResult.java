@@ -10,6 +10,8 @@ import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.ObserveResultProcessor;
+import echowand.util.Collector;
+import echowand.util.Selector;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +25,7 @@ public class ObserveResult {
     private static final Logger LOGGER = Logger.getLogger(ObserveResult.class.getName());
     private static final String CLASS_NAME = ObserveResult.class.getName();
     
-    private Matcher<Frame> matcher;
+    private Selector<Frame> frameSelector;
     private ObserveResultProcessor processor;
     private LinkedList<ResultData> dataList;
     private LinkedList<ResultFrame> frameList;
@@ -82,10 +84,10 @@ public class ObserveResult {
         return frameListEnabled;
     }
 
-    public ObserveResult(Matcher<Frame> matcher, ObserveResultProcessor processor) {
-        LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{matcher, processor});
+    public ObserveResult(Selector<Frame> selector, ObserveResultProcessor processor) {
+        LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{selector, processor});
 
-        this.matcher = matcher;
+        frameSelector = selector;
         this.processor = processor;
         dataList = new LinkedList<ResultData>();
         frameList = new LinkedList<ResultFrame>();
@@ -116,7 +118,7 @@ public class ObserveResult {
     public boolean shouldReceive(Frame frame) {
         LOGGER.entering(CLASS_NAME, "shouldReceive", frame);
         
-        boolean result = matcher.match(frame);
+        boolean result = frameSelector.match(frame);
         
         LOGGER.exiting(CLASS_NAME, "shouldReceive", result);
         return result;
@@ -246,16 +248,10 @@ public class ObserveResult {
         return resultList;
     }
     
-    public synchronized List<ResultFrame> getFrameList(Matcher<ResultFrame> matcher) {
-        LOGGER.entering(CLASS_NAME, "getFrameList", matcher);
+    public synchronized List<ResultFrame> getFrameList(Selector<ResultFrame> selector) {
+        LOGGER.entering(CLASS_NAME, "getFrameList", selector);
         
-        LinkedList<ResultFrame> resultList = new LinkedList<ResultFrame>();
-        
-        for (ResultFrame resultFrame: frameList) {
-            if (matcher.match(resultFrame)) {
-                resultList.add(resultFrame);
-            }
-        }
+        List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(frameList);
         
         LOGGER.exiting(CLASS_NAME, "getFrameList", resultList);
         return resultList;
@@ -288,16 +284,10 @@ public class ObserveResult {
         return resultList;
     }
     
-    public synchronized List<ResultData> getDataList(Matcher<ResultData> matcher) {
-        LOGGER.entering(CLASS_NAME, "getDataList", matcher);
+    public synchronized List<ResultData> getDataList(Selector<ResultData> selector) {
+        LOGGER.entering(CLASS_NAME, "getDataList", selector);
         
-        LinkedList<ResultData> resultList = new LinkedList<ResultData>();
-        
-        for (ResultData resultData: dataList) {
-            if (matcher.match(resultData)) {
-                resultList.add(resultData);
-            }
-        }
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
         
         LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
         return resultList;
@@ -306,16 +296,16 @@ public class ObserveResult {
     public synchronized List<ResultData> getDataList(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "getDataList", resultFrame);
         
-        final ResultFrame matcherFrame = resultFrame;
+        final ResultFrame selectedFrame = resultFrame;
         
-        Matcher<ResultData> matcher = new  Matcher<ResultData>() {
+        Selector<ResultData> selector = new  Selector<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
-                return matcherFrame.equals(dataFrameMap.get(resultData));
+                return selectedFrame.equals(dataFrameMap.get(resultData));
             }
         };
         
-        List<ResultData> resultList = getDataList(matcher);
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
         
         LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
         return resultList;
@@ -372,10 +362,10 @@ public class ObserveResult {
         LOGGER.exiting(CLASS_NAME, "removeData");
     }
     
-    public synchronized void removeData(Matcher<ResultData> matcher) {
-        LOGGER.entering(CLASS_NAME, "removeData", matcher);
+    public synchronized void removeData(Selector<ResultData> selector) {
+        LOGGER.entering(CLASS_NAME, "removeData", selector);
         
-        for (ResultData resultData : getDataList(matcher)) {
+        for (ResultData resultData : getDataList(selector)) {
             removeData(resultData);
         }
         
@@ -449,10 +439,10 @@ public class ObserveResult {
         LOGGER.exiting(CLASS_NAME, "removeFrame");
     }
     
-    public synchronized void removeFrames(Matcher<ResultFrame> matcher) {
-        LOGGER.entering(CLASS_NAME, "removeFrames", matcher);
+    public synchronized void removeFrames(Selector<ResultFrame> selector) {
+        LOGGER.entering(CLASS_NAME, "removeFrames", selector);
         
-        for (ResultFrame resultFrame : getFrameList(matcher)) {
+        for (ResultFrame resultFrame : getFrameList(selector)) {
             removeFrame(resultFrame);
         }
         

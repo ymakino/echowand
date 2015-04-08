@@ -21,9 +21,10 @@ import echowand.service.PropertyUpdater;
 import echowand.service.Service;
 import echowand.service.Core;
 import echowand.service.result.CaptureResult;
+import echowand.service.result.FrameSelector;
 import echowand.service.result.ResultData;
 import echowand.service.result.GetResult;
-import echowand.service.result.MatcherResultData;
+import echowand.service.result.ResultDataSelector;
 import echowand.service.result.ObserveResult;
 import echowand.service.result.ResultFrame;
 import echowand.service.result.UpdateRemoteInfoResult;
@@ -177,7 +178,7 @@ public class ServiceSample0 {
             
             for (GetResult getResult: getResults) {
                 getResult.join();
-                List<ResultData> dataList2 = getResult.getDataList(new MatcherResultData());
+                List<ResultData> dataList2 = getResult.getDataList(new ResultDataSelector());
                 for (int i = 0; i < dataList2.size(); i++) {
                     System.out.println("Get2 " + ": " + i + " " + dataList2.get(i));
                 }
@@ -192,7 +193,7 @@ public class ServiceSample0 {
             epcs2.add(EPC.xBA);
             epcs2.add(EPC.xBB);
             epcs2.add(EPC.xE1);
-            // ObserveResult observeResult = service.doObserve(new FrameMatcherRule(null, eojs, epcs2));
+            // ObserveResult observeResult = service.doObserve(new FrameSelector(null, eojs, epcs2));
             ObserveResult observeResult = service.doObserve(new LinkedList<Node>(), eojs, epcs2);
             
             Thread.sleep(5000);

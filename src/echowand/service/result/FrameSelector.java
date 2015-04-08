@@ -6,6 +6,7 @@ import echowand.common.EPC;
 import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.StandardPayload;
+import echowand.util.Selector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class MatcherFrame implements Matcher<Frame> {
-    private static final Logger LOGGER = Logger.getLogger(MatcherFrame.class.getName());
-    private static final String CLASS_NAME = MatcherFrame.class.getName();
+public class FrameSelector implements Selector<Frame> {
+    private static final Logger LOGGER = Logger.getLogger(FrameSelector.class.getName());
+    private static final String CLASS_NAME = FrameSelector.class.getName();
     
     private ArrayList<Node> nodes;
     private ArrayList<EOJ> eojs;
@@ -35,82 +36,86 @@ public class MatcherFrame implements Matcher<Frame> {
         return list;
     }
     
-    public MatcherFrame() {
+    public FrameSelector() {
+        LOGGER.entering(CLASS_NAME, "FrameSelector");
+        
         this.nodes = new ArrayList<Node>();
         this.eojs = new ArrayList<EOJ>();
         this.epcs = new ArrayList<EPC>();
+        
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(Node node, EOJ eoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{node, eoj, epc});
+    public FrameSelector(Node node, EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{node, eoj, epc});
         
         init(toList(node), toList(eoj), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(List<Node> nodes, EOJ eoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{nodes, eoj, epc});
+    public FrameSelector(List<Node> nodes, EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{nodes, eoj, epc});
         
         init(nodes, toList(eoj), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(Node node, EOJ eoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{node, eoj, epcs});
+    public FrameSelector(Node node, EOJ eoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{node, eoj, epcs});
         
         init(toList(node), toList(eoj), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(List<Node> nodes, EOJ eoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{nodes, eoj, epcs});
+    public FrameSelector(List<Node> nodes, EOJ eoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{nodes, eoj, epcs});
         
         init(nodes, toList(eoj), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(Node node, ClassEOJ ceoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{node, ceoj, epc});
+    public FrameSelector(Node node, ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{node, ceoj, epc});
         
         init(toList(node), toList(ceoj.getAllInstanceEOJ()), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(List<Node> nodes, ClassEOJ ceoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{nodes, ceoj, epc});
+    public FrameSelector(List<Node> nodes, ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{nodes, ceoj, epc});
         
         init(nodes, toList(ceoj.getAllInstanceEOJ()), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(Node node, ClassEOJ ceoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{node, ceoj, epcs});
+    public FrameSelector(Node node, ClassEOJ ceoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{node, ceoj, epcs});
         
         init(toList(node), toList(ceoj.getAllInstanceEOJ()), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(List<Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{nodes, ceoj, epcs});
+    public FrameSelector(List<Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{nodes, ceoj, epcs});
         
         init(nodes, toList(ceoj.getAllInstanceEOJ()), epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
-    public MatcherFrame(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherFrame", new Object[]{nodes, eojs, epcs});
+    public FrameSelector(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "FrameSelector", new Object[]{nodes, eojs, epcs});
         
         init(nodes, eojs, epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherFrame");
+        LOGGER.exiting(CLASS_NAME, "FrameSelector");
     }
     
     private void init(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
@@ -213,6 +218,6 @@ public class MatcherFrame implements Matcher<Frame> {
     
     @Override
     public String toString() {
-        return "MatcherFrame{Nodes: " + nodes + ", EOJs: " + eojs + ", EPCs: " + epcs + "}";
+        return "FrameSelector{Nodes: " + nodes + ", EOJs: " + eojs + ", EPCs: " + epcs + "}";
     }
 }

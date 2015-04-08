@@ -3,6 +3,7 @@ package echowand.service.result;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.net.Node;
+import echowand.util.Selector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,9 +13,9 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class MatcherResultData implements Matcher<ResultData> {
-    private static final Logger LOGGER = Logger.getLogger(MatcherResultData.class.getName());
-    private static final String CLASS_NAME = MatcherResultData.class.getName();
+public class ResultDataSelector implements Selector<ResultData> {
+    private static final Logger LOGGER = Logger.getLogger(ResultDataSelector.class.getName());
+    private static final String CLASS_NAME = ResultDataSelector.class.getName();
     
     private List<Node> nodes;
     private List<EOJ> eojs;
@@ -32,28 +33,28 @@ public class MatcherResultData implements Matcher<ResultData> {
         return list;
     }
     
-    public MatcherResultData() {
-        LOGGER.entering(CLASS_NAME, "MatcherResultData");
+    public ResultDataSelector() {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector");
         
         init(null, null, null);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultData");
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
     }
     
-    public MatcherResultData(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultData", new Object[]{nodes, eojs, epcs});
+    public ResultDataSelector(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, eojs, epcs});
         
         init(nodes, eojs, epcs);
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultData");
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
     }
     
-    public MatcherResultData(Node node, EOJ eoj, EPC epc) {
-        LOGGER.entering(CLASS_NAME, "MatcherResultData", new Object[]{node, eoj, epc});
+    public ResultDataSelector(Node node, EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{node, eoj, epc});
         
         init(toList(node), toList(eoj), toList(epc));
         
-        LOGGER.exiting(CLASS_NAME, "MatcherResultData");
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
     }
     
     private void init(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
@@ -148,6 +149,6 @@ public class MatcherResultData implements Matcher<ResultData> {
     
     @Override
     public String toString() {
-        return "MatcherResultData{Nodes: " + nodes + ", EOJs: " + eojs + ", EPCs: " + epcs + "}";
+        return "ResultDataSelector{Nodes: " + nodes + ", EOJs: " + eojs + ", EPCs: " + epcs + "}";
     }
 }

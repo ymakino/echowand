@@ -6,6 +6,7 @@ import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -104,12 +105,12 @@ public class RemoteObjectManager {
      * @param node Nodeの指定
      * @return 指定したNodeとEOJで検索されたRemoteObject
      */
-    public synchronized LinkedList<RemoteObject> getAtNode(final Node node) {
+    public synchronized List<RemoteObject> getAtNode(final Node node) {
         logger.entering(className, "getAtNode", node);
         
-        LinkedList<RemoteObject> objectList = get(new Selector<RemoteObject>() {
+        List<RemoteObject> objectList = get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getNode().equals(node);
             }
         });
@@ -123,11 +124,11 @@ public class RemoteObjectManager {
      * @param selector リモートオブジェクトの選択
      * @return 選択したリモートオブジェクトのリスト
      */
-    public LinkedList<RemoteObject> get(Selector<RemoteObject> selector) {
+    public List<RemoteObject> get(Selector<RemoteObject> selector) {
         logger.entering(className, "get", selector);
         
         Collector<RemoteObject> collector = new Collector<RemoteObject>(selector);
-        LinkedList<RemoteObject> objectList = collector.collect(getAllObjects());
+        List<RemoteObject> objectList = collector.collect(getAllObjects());
         
         logger.exiting(className, "get", objectList);
         return objectList;

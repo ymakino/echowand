@@ -20,6 +20,7 @@ import echowand.object.RemoteObject;
 import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.LinkedList;
+import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.*;
 
@@ -132,25 +133,25 @@ public class RemoteObjectManagerTest {
         RemoteObject object5 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001202"), transactionManager);
         manager.add(object5);
 
-        LinkedList<RemoteObject> list1 = manager.get(new Selector<RemoteObject>() {
+        List<RemoteObject> list1 = manager.get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getEOJ().getClassEOJ().equals(new ClassEOJ("0011"));
             }
         });
         assertEquals(3, list1.size());
         
-        LinkedList<RemoteObject> list2 = manager.get(new Selector<RemoteObject>() {
+        List<RemoteObject> list2 = manager.get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getEOJ().getClassEOJ().equals(new ClassEOJ("0012"));
             }
         });
         assertEquals(2, list2.size());
         
-        LinkedList<RemoteObject> list3 = manager.get(new Selector<RemoteObject>() {
+        List<RemoteObject> list3 = manager.get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getNode().equals(subnet.getLocalNode());
             }
         });

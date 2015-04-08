@@ -14,6 +14,7 @@ import echowand.object.*;
 import echowand.util.Selector;
 import java.net.BindException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,9 +40,9 @@ public class Sample5 {
     
     
     public static LinkedList<Node> getRemoteNodes(RemoteObjectManager remoteManager) {
-        LinkedList<RemoteObject> objects = remoteManager.get(new Selector<RemoteObject>(){
+        List<RemoteObject> objects = remoteManager.get(new Selector<RemoteObject>(){
             @Override
-            public boolean select(RemoteObject obj){ return true; }
+            public boolean match(RemoteObject obj){ return true; }
         });
         
         LinkedList<Node> nodes = new LinkedList<Node>();
@@ -54,10 +55,10 @@ public class Sample5 {
         return nodes;
     }
     
-    public static LinkedList<RemoteObject> getRemoteObjectsAt(final Node node, RemoteObjectManager remoteManager) {
+    public static List<RemoteObject> getRemoteObjectsAt(final Node node, RemoteObjectManager remoteManager) {
         return remoteManager.get(new Selector<RemoteObject>(){
             @Override
-            public boolean select(RemoteObject obj){ return obj.getNode().equals(node); }
+            public boolean match(RemoteObject obj){ return obj.getNode().equals(node); }
         });
     }
     
