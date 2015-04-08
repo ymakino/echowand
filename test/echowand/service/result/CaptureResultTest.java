@@ -338,7 +338,7 @@ public class CaptureResultTest {
         
         final LinkedList<ResultFrame> matchFrames = new LinkedList<ResultFrame>();
         
-        Selector<ResultFrame> matcher = new Selector<ResultFrame>() {
+        Selector<ResultFrame> selector = new Selector<ResultFrame>() {
             @Override
             public boolean match(ResultFrame target) {
                 return matchFrames.contains(target);
@@ -350,7 +350,7 @@ public class CaptureResultTest {
         result.addSentFrame(frame3);
         result.addReceivedFrame(frame4);
         
-        result.removeFrames(matcher);
+        result.removeFrames(selector);
         
         assertEquals(4, result.countFrames());
         assertEquals(2, result.countSentFrames());
@@ -359,7 +359,7 @@ public class CaptureResultTest {
         matchFrames.addAll(result.getFrameList().subList(1, 3));
         matchFrames.add(new ResultFrame(newFrame(), 10));
         
-        result.removeFrames(matcher);
+        result.removeFrames(selector);
         
         assertEquals(2, result.countFrames());
         assertEquals(1, result.countSentFrames());
