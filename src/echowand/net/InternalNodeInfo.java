@@ -36,4 +36,11 @@ public class InternalNodeInfo implements NodeInfo {
             return false;
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
 }

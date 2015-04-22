@@ -868,7 +868,7 @@ public class Service {
     public RemoteObject registerRemoteEOJ(Node node, EOJ eoj) {
         RemoteObject object = new RemoteObject(getSubnet(), node, eoj, getTransactionManager());
         getRemoteObjectManager().add(object);
-        return object;
+        return getRemoteObjectManager().get(node, eoj);
     }
     
     public void broadcastNotification(EOJ eoj, EPC epc, ObjectData data) throws SubnetException {

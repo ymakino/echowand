@@ -45,28 +45,42 @@ public class RemoteObjectManager {
     
     /**
      * 指定されたRemoteObjectを登録する。
+     * 既にオブジェクトのEOJが登録済の場合には何も行わない。
      * @param object 登録するRemoteObject
+     * @return 登録に成功した場合はtrue、失敗した場合はfalse
      */
-    public synchronized void add(RemoteObject object) {
+    public synchronized boolean add(RemoteObject object) {
         logger.entering(className, "add", object);
         
-        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
-        map.put(object.getEOJ(), object);
+        boolean result = false;
         
-        logger.exiting(className, "add");
+        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
+        if (!map.containsKey(object.getEOJ())) {
+            map.put(object.getEOJ(), object);
+            result = true;
+        }
+        
+        logger.exiting(className, "add", result);
+        return result;
     }
     
     /**
      * 指定されたRemoteObjectの登録を抹消する。
      * @param object 登録を抹消するRemoteObject
+     * @return 登録の抹消に成功した場合はtrue、失敗した場合はfalse
      */
-    public synchronized void remove(RemoteObject object) {
+    public synchronized boolean remove(RemoteObject object) {
         logger.entering(className, "remove", object);
         
-        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
-        map.remove(object.getEOJ());
+        boolean result = false;
         
-        logger.exiting(className, "remove");
+        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
+        if (map.remove(object.getEOJ()) != null) {
+            result = true;
+        }
+        
+        logger.exiting(className, "remove", result);
+        return result;
     }
     
     /**
