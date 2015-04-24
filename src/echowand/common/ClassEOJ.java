@@ -30,13 +30,13 @@ public class ClassEOJ {
      */
     public ClassEOJ(String ceoj) throws IllegalArgumentException {
         if (ceoj.length() != 4) {
-            throw new IllegalArgumentException("Invalid EOJ: " + ceoj);
+            throw new IllegalArgumentException("Invalid ClassEOJ: " + ceoj);
         }
         try {
             this.classGroupCode = (byte) Integer.parseInt(ceoj.substring(0, 2), 16);
             this.classCode = (byte) Integer.parseInt(ceoj.substring(2, 4), 16);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid EOJ: " + ceoj);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Invalid ClassEOJ: " + ceoj, ex);
         }
     }
     

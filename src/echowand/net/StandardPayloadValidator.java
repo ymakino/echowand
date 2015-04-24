@@ -107,10 +107,12 @@ public class StandardPayloadValidator {
         int len = getOPC(useFirst, payload);
         for (int i=0; i<len; i++) {
             Property property = getPropertyAt(i, useFirst, payload);
+            
             if (property.getEPC().isInvalid()) {
                 return PropType.Invalid;
             }
-            if (property.getPDC() == 0 && (property.getEDT() != null)) {
+            
+            if (property.getPDC() == 0 && !property.getEDT().isEmpty()) {
                 return PropType.Invalid;
             }
             
@@ -120,6 +122,7 @@ public class StandardPayloadValidator {
                     return PropType.Invalid;
                 }
             }
+            
             ret = nextPropType(ret, property);
         }
         return ret;

@@ -24,7 +24,7 @@ public class Property {
      * @param epc プロパティのEPC
      */
     public Property(EPC epc) {
-        this.epc = epc;
+        this(epc, new Data());
     }
     
     /**
@@ -53,9 +53,7 @@ public class Property {
     public Property(byte[] bytes, int offset) {
         this.epc = EPC.fromByte(bytes[offset]);
         int pdc = 0xff & (int)bytes[offset+1];
-        if (pdc > 0) {
-            this.edt = new Data(bytes, offset+2, pdc);
-        }
+        this.edt = new Data(bytes, offset+2, pdc);
     }
     
     /**
