@@ -861,14 +861,13 @@ public class Service {
         return getRemoteObjectManager().get(node, eoj);
     }
     
-    public RemoteObject registerRemoteEOJ(NodeInfo nodeInfo, EOJ eoj) throws SubnetException {
+    public boolean registerRemoteEOJ(NodeInfo nodeInfo, EOJ eoj) throws SubnetException {
         return registerRemoteEOJ(getRemoteNode(nodeInfo), eoj);
     }
     
-    public RemoteObject registerRemoteEOJ(Node node, EOJ eoj) {
+    public boolean registerRemoteEOJ(Node node, EOJ eoj) {
         RemoteObject object = new RemoteObject(getSubnet(), node, eoj, getTransactionManager());
-        getRemoteObjectManager().add(object);
-        return getRemoteObjectManager().get(node, eoj);
+        return getRemoteObjectManager().add(object);
     }
     
     public void broadcastNotification(EOJ eoj, EPC epc, ObjectData data) throws SubnetException {

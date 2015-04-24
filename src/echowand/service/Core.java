@@ -317,7 +317,7 @@ public class Core {
     /**
      * Coreを初期化する。
      * @return 初期化が成功すればtrue、すでに初期化済みであればfalse
-     * @throws HarmonyException 初期化中に例外が発生した場合
+     * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
      */
     public synchronized boolean initialize() throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "initialize");
@@ -350,10 +350,8 @@ public class Core {
 
         localManager.add(nodeProfileObject);
 
-        createLocalObjects();
-
         initialized = true;
-
+        
         LOGGER.exiting(CLASS_NAME, "initialize", true);
         return true;
     }
@@ -371,7 +369,7 @@ public class Core {
         new Thread(mainLoop).start();
     }
     
-    public synchronized boolean startThreads() {
+    private boolean startThreads() {
         LOGGER.entering(CLASS_NAME, "startThreads");
         
         if (inService) {
@@ -396,6 +394,8 @@ public class Core {
     
     /**
      * Coreを実行する。
+     * 初期化されていない場合には初期化を先に行う。
+     * addLocalObjectConfigで登録されたローカルオブジェクトの生成と登録を行い、実行に必要なスレッドを開始する。
      * @return 実行が成功すればtrue、すでに実行済みであればfalse
      * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
      */
@@ -413,6 +413,8 @@ public class Core {
                 LOGGER.exiting(CLASS_NAME, "startService", false);
             }
         }
+
+        createLocalObjects();
         
         startThreads();
 

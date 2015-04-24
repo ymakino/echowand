@@ -277,24 +277,21 @@ public class CoreTest {
      * Test of startService method, of class Core.
      */
     @Test
-    public void testStartThreads() throws Exception {
-        Core core = newCore();
-        assertFalse(core.startThreads());
-        assertTrue(core.initialize());
-        
-        assertFalse(core.isInService());
-        assertTrue(core.startThreads());
-        assertTrue(core.isInService());
-    }
-
-    /**
-     * Test of startService method, of class Core.
-     */
-    @Test
     public void testStartService() throws Exception {
         Core core = newCore();
         assertFalse(core.isInService());
         assertFalse(core.isInitialized());
+        assertTrue(core.startService());
+        assertTrue(core.isInService());
+        assertTrue(core.isInitialized());
+        assertFalse(core.startService());
+        
+        core = newCore();
+        assertFalse(core.isInService());
+        assertFalse(core.isInitialized());
+        assertTrue(core.initialize());
+        assertFalse(core.isInService());
+        assertTrue(core.isInitialized());
         assertTrue(core.startService());
         assertTrue(core.isInService());
         assertTrue(core.isInitialized());
