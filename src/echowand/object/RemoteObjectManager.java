@@ -138,7 +138,7 @@ public class RemoteObjectManager {
      * @param selector リモートオブジェクトの選択
      * @return 選択したリモートオブジェクトのリスト
      */
-    public List<RemoteObject> get(Selector<RemoteObject> selector) {
+    public List<RemoteObject> get(Selector<? super RemoteObject> selector) {
         logger.entering(className, "get", selector);
         
         Collector<RemoteObject> collector = new Collector<RemoteObject>(selector);

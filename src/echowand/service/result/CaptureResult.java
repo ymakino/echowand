@@ -191,7 +191,7 @@ public class CaptureResult {
         return list;
     }
     
-    public synchronized List<ResultFrame> getFrameList(Selector<ResultFrame> selector) {
+    public synchronized List<ResultFrame> getFrameList(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "getFrameList", selector);
         
         List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(frameList);
@@ -209,7 +209,7 @@ public class CaptureResult {
         return list;
     }
     
-    public synchronized List<ResultFrame> getSentFrameList(Selector<ResultFrame> selector) {
+    public synchronized List<ResultFrame> getSentFrameList(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "getSentFrameList", selector);
         
         List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(sentFrameList);
@@ -227,7 +227,7 @@ public class CaptureResult {
         return list;
     }
     
-    public synchronized List<ResultFrame> getReceivedFrameList(Selector<ResultFrame> selector) {
+    public synchronized List<ResultFrame> getReceivedFrameList(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "getReceivedFrameList", selector);
         
         List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(receivedFrameList);
@@ -236,7 +236,7 @@ public class CaptureResult {
         return resultList;
     }
     
-    public synchronized void removeFrames(Selector<ResultFrame> selector) {
+    public synchronized void removeFrames(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "removeFrames", selector);
         
         for (ResultFrame resultFrame : getFrameList(selector)) {
@@ -284,7 +284,7 @@ public class CaptureResult {
         LOGGER.exiting(CLASS_NAME, "removeSentFrame");
     }
     
-    public synchronized void removeSentFrames(Selector<ResultFrame> selector) {
+    public synchronized void removeSentFrames(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "removeSentFrames", selector);
         
         for (ResultFrame resultFrame : getSentFrameList(selector)) {
@@ -305,7 +305,7 @@ public class CaptureResult {
         LOGGER.exiting(CLASS_NAME, "removeReceivedFrame");
     }
     
-    public synchronized void removeReceivedFrame(Selector<ResultFrame> selector) {
+    public synchronized void removeReceivedFrame(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "removeReceivedFrame", selector);
         
         for (ResultFrame resultFrame : getReceivedFrameList(selector)) {

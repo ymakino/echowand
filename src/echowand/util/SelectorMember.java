@@ -11,7 +11,7 @@ public class SelectorMember<T> implements Selector<T> {
 
     private ArrayList<T> targetList;
 
-    public SelectorMember(Collection<T> targets) {
+    public SelectorMember(Collection<? extends T> targets) {
         LOGGER.entering(CLASS_NAME, "SelectorMember", targets);
         
         targetList = new ArrayList<T>(targets);
@@ -22,8 +22,7 @@ public class SelectorMember<T> implements Selector<T> {
     public SelectorMember(T... targets) {
         LOGGER.entering(CLASS_NAME, "SelectorMember", targets);
         
-        targetList = new ArrayList<T>();
-        targetList.addAll(Arrays.asList(targets));
+        targetList = new ArrayList<T>(Arrays.asList(targets));
         
         LOGGER.exiting(CLASS_NAME, "SelectorMember");
     }

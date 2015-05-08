@@ -25,7 +25,7 @@ public class ObserveResult {
     private static final Logger LOGGER = Logger.getLogger(ObserveResult.class.getName());
     private static final String CLASS_NAME = ObserveResult.class.getName();
     
-    private Selector<Frame> frameSelector;
+    private Selector<? super Frame> frameSelector;
     private ObserveResultProcessor processor;
     private LinkedList<ResultData> dataList;
     private LinkedList<ResultFrame> frameList;
@@ -84,7 +84,7 @@ public class ObserveResult {
         return frameListEnabled;
     }
 
-    public ObserveResult(Selector<Frame> selector, ObserveResultProcessor processor) {
+    public ObserveResult(Selector<? super Frame> selector, ObserveResultProcessor processor) {
         LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{selector, processor});
 
         frameSelector = selector;
@@ -248,7 +248,7 @@ public class ObserveResult {
         return resultList;
     }
     
-    public synchronized List<ResultFrame> getFrameList(Selector<ResultFrame> selector) {
+    public synchronized List<ResultFrame> getFrameList(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "getFrameList", selector);
         
         List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(frameList);
@@ -284,7 +284,7 @@ public class ObserveResult {
         return resultList;
     }
     
-    public synchronized List<ResultData> getDataList(Selector<ResultData> selector) {
+    public synchronized List<ResultData> getDataList(Selector<? super ResultData> selector) {
         LOGGER.entering(CLASS_NAME, "getDataList", selector);
         
         List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
@@ -362,7 +362,7 @@ public class ObserveResult {
         LOGGER.exiting(CLASS_NAME, "removeData");
     }
     
-    public synchronized void removeData(Selector<ResultData> selector) {
+    public synchronized void removeData(Selector<? super ResultData> selector) {
         LOGGER.entering(CLASS_NAME, "removeData", selector);
         
         for (ResultData resultData : getDataList(selector)) {
@@ -439,7 +439,7 @@ public class ObserveResult {
         LOGGER.exiting(CLASS_NAME, "removeFrame");
     }
     
-    public synchronized void removeFrames(Selector<ResultFrame> selector) {
+    public synchronized void removeFrames(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "removeFrames", selector);
         
         for (ResultFrame resultFrame : getFrameList(selector)) {

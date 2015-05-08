@@ -33,6 +33,7 @@ import echowand.util.Pair;
 import echowand.util.Selector;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -652,7 +653,7 @@ public class Service {
         return observeResult;
     }
     
-    public ObserveResult doObserve(Selector<Frame> selector) {
+    public ObserveResult doObserve(Selector<? super Frame> selector) {
         LOGGER.entering(CLASS_NAME, "doObserve", selector);
         
         ObserveResultProcessor processor = getCore().getObserveResultProsessor();
@@ -770,17 +771,7 @@ public class Service {
         return new ArrayList<Node>(getRemoteObjectManager().getNodes());
     }
     
-    private List<EOJ> localObjectsToEOJs(List<LocalObject> objects) {
-        ArrayList<EOJ> eojs = new ArrayList<EOJ>(objects.size());
-        
-        for (EchonetObject object: objects) {
-            eojs.add(object.getEOJ());
-        }
-        
-        return eojs;
-    }
-    
-    private List<EOJ> remoteObjectsToEOJs(List<RemoteObject> objects) {
+    private List<EOJ> echonetObjectsToEOJs(Collection<? extends EchonetObject> objects) {
         ArrayList<EOJ> eojs = new ArrayList<EOJ>(objects.size());
         
         for (EchonetObject object: objects) {
@@ -799,7 +790,7 @@ public class Service {
     }
     
     public List<EOJ> getLocalEOJs() {
-        return localObjectsToEOJs(getLocalObjectManager().getAllObjects());
+        return echonetObjectsToEOJs(getLocalObjectManager().getAllObjects());
     }
     
     public int countRemoteEOJs(Node node) {
@@ -821,12 +812,12 @@ public class Service {
     }
     
     public List<EOJ> getRemoteEOJs(Node node) {
-        return remoteObjectsToEOJs(getRemoteObjectManager().getAtNode(node));
+        return echonetObjectsToEOJs(getRemoteObjectManager().getAtNode(node));
     }
     
     public List<EOJ> getRemoteEOJs(NodeInfo nodeInfo) throws SubnetException {
         Node node = getRemoteNode(nodeInfo);
-        return remoteObjectsToEOJs(getRemoteObjectManager().getAtNode(node));
+        return echonetObjectsToEOJs(getRemoteObjectManager().getAtNode(node));
     }
     
     public Node getLocalNode() {

@@ -10,9 +10,9 @@ public class SelectorNot<T> implements Selector<T> {
     private static final Logger LOGGER = Logger.getLogger(SelectorNot.class.getName());
     private static final String CLASS_NAME = SelectorNot.class.getName();
     
-    private Selector<T> selector;
+    private Selector<? super T> selector;
     
-    public SelectorNot(Selector<T> selector) {
+    public SelectorNot(Selector<? super T> selector) {
         LOGGER.entering(CLASS_NAME, "SelectorNot", selector);
         
         this.selector = selector;

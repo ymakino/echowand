@@ -110,7 +110,7 @@ public class LocalObjectManager {
      * @param selector ローカルオブジェクトの選択
      * @return 選択したローカルオブジェクトのリスト
      */
-    public synchronized List<LocalObject> get(Selector<LocalObject> selector) {
+    public synchronized List<LocalObject> get(Selector<? super LocalObject> selector) {
         logger.entering(className, "get", selector);
         
         Collector<LocalObject> collector = new Collector<LocalObject>(selector);

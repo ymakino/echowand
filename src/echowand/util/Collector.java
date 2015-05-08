@@ -10,13 +10,13 @@ import java.util.List;
  * @author Yoshiki Makino
  */
 public class Collector<T> {
-    private Selector<T> selector;
+    private Selector<? super T> selector;
     
     /**
      * 指定されたSelectorを利用するCollectorを生成する。
      * @param selector Selectorの指定
      */
-    public Collector(Selector<T> selector) {
+    public Collector(Selector<? super T> selector) {
         this.selector = selector;
     }
     
@@ -26,13 +26,15 @@ public class Collector<T> {
      * @param objects 指定されたオブジェクト集合
      * @return 選択されたオブジェクトのリスト
      */
-    public List<T> collect(Collection<T> objects) {
+    public List<T> collect(Collection<? extends T> objects) {
         LinkedList<T> newList = new LinkedList<T>();
+        
         for (T object : objects) {
             if (selector.match(object)) {
                 newList.add(object);
             }
         }
+        
         return newList;
     }
 }

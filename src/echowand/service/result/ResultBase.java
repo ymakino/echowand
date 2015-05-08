@@ -290,7 +290,7 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultFrame> getRequestFrameList(Selector<ResultFrame> selector) {
+    public synchronized List<ResultFrame> getRequestFrameList(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "getRequestFrameList", selector);
         
         List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(requestFrameList);
@@ -326,7 +326,7 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultFrame> getFrameList(Selector<ResultFrame> selector) {
+    public synchronized List<ResultFrame> getFrameList(Selector<? super ResultFrame> selector) {
         LOGGER.entering(CLASS_NAME, "getFrameList", selector);
         
         List<ResultFrame> resultList = new Collector<ResultFrame>(selector).collect(frameList);
@@ -362,7 +362,7 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultData> getDataList(Selector<ResultData> selector) {
+    public synchronized List<ResultData> getDataList(Selector<? super ResultData> selector) {
         LOGGER.entering(CLASS_NAME, "getDataList", selector);
         
         List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
@@ -416,7 +416,7 @@ public abstract class ResultBase {
         return resultList;
     }
     
-    public synchronized List<ResultData> getRequestDataList(Selector<ResultData> selector) {
+    public synchronized List<ResultData> getRequestDataList(Selector<? super ResultData> selector) {
         LOGGER.entering(CLASS_NAME, "getRequestDataList", selector);
         
         List<ResultData> resultList = new Collector<ResultData>(selector).collect(requestDataList);

@@ -13,20 +13,20 @@ public class SelectorAnd<T> implements Selector<T> {
     private static final Logger LOGGER = Logger.getLogger(SelectorAnd.class.getName());
     private static final String CLASS_NAME = SelectorAnd.class.getName();
     
-    private LinkedList<Selector<T>> selectors;
+    private LinkedList<Selector<? super T>> selectors;
     
-    public SelectorAnd(Selector<T>... selectors) {
+    public SelectorAnd(Selector<? super T>... selectors) {
         LOGGER.entering(CLASS_NAME, "SelectorAnd", selectors);
         
-        this.selectors = new LinkedList<Selector<T>>(Arrays.asList(selectors));
+        this.selectors = new LinkedList<Selector<? super T>>(Arrays.asList(selectors));
         
         LOGGER.exiting(CLASS_NAME, "SelectorAnd");
     }
     
-    public SelectorAnd(List<Selector<T>> selectors) {
+    public SelectorAnd(List<Selector<? super T>> selectors) {
         LOGGER.entering(CLASS_NAME, "SelectorAnd", selectors);
         
-        this.selectors = new LinkedList<Selector<T>>(selectors);
+        this.selectors = new LinkedList<Selector<? super T>>(selectors);
         
         LOGGER.exiting(CLASS_NAME, "SelectorAnd");
     }
@@ -37,7 +37,7 @@ public class SelectorAnd<T> implements Selector<T> {
         
         boolean result = true;
         
-        for (Selector<T> selector: selectors) {
+        for (Selector<? super T> selector: selectors) {
             result &= selector.match(target);
         }
         

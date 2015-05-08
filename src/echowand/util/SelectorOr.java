@@ -13,20 +13,20 @@ public class SelectorOr<T> implements Selector<T> {
     private static final Logger LOGGER = Logger.getLogger(SelectorOr.class.getName());
     private static final String CLASS_NAME = SelectorOr.class.getName();
     
-    private LinkedList<Selector<T>> selectors;
+    private LinkedList<Selector<? super T>> selectors;
     
-    public SelectorOr(Selector<T>... selectors) {
+    public SelectorOr(Selector<? super T>... selectors) {
         LOGGER.entering(CLASS_NAME, "SelectorOr", selectors);
         
-        this.selectors = new LinkedList<Selector<T>>(Arrays.asList(selectors));
+        this.selectors = new LinkedList<Selector<? super T>>(Arrays.asList(selectors));
         
         LOGGER.exiting(CLASS_NAME, "SelectorOr");
     }
     
-    public SelectorOr(List<Selector<T>> selectors) {
+    public SelectorOr(List<Selector<? super T>> selectors) {
         LOGGER.entering(CLASS_NAME, "SelectorOr", selectors);
         
-        this.selectors = new LinkedList<Selector<T>>(selectors);
+        this.selectors = new LinkedList<Selector<? super T>>(selectors);
         
         LOGGER.exiting(CLASS_NAME, "SelectorOr");
     }
@@ -37,7 +37,7 @@ public class SelectorOr<T> implements Selector<T> {
         
         boolean result = true;
         
-        for (Selector<T> selector: selectors) {
+        for (Selector<? super T> selector: selectors) {
             result |= selector.match(target);
         }
         
