@@ -99,7 +99,7 @@ public class RemoteObjectManager {
         return object;
     }
     
-    private synchronized LinkedList<RemoteObject> getAllObjects() {
+    private synchronized List<RemoteObject> getAllObjects() {
         logger.entering(className, "getAllObjects");
         
         LinkedList<RemoteObject> newList = new LinkedList<RemoteObject>();
@@ -152,7 +152,7 @@ public class RemoteObjectManager {
      * ノードのリストを返す。
      * @return ノードのリスト
      */
-    public LinkedList<Node> getNodes() {
+    public List<Node> getNodes() {
         logger.entering(className, "getNodes");
         
         LinkedList<Node> nodeList = new LinkedList<Node>(objects.keySet());
