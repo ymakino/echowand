@@ -45,11 +45,11 @@ public class RemoteObjectManagerTest {
             try {
                 Frame receivedFrame = subnet.receive();
                 CommonFrame receivedCommonFrame = receivedFrame.getCommonFrame();
-                StandardPayload receivedPayload = (StandardPayload) receivedCommonFrame.getEDATA();
+                StandardPayload receivedPayload = receivedCommonFrame.getEDATA(StandardPayload.class);
 
                 CommonFrame sendCommonFrame = new CommonFrame(receivedPayload.getDEOJ(), receivedPayload.getSEOJ(), ESV.Get_Res);
                 sendCommonFrame.setTID(receivedCommonFrame.getTID());
-                StandardPayload sendPayload = (StandardPayload) sendCommonFrame.getEDATA();
+                StandardPayload sendPayload = sendCommonFrame.getEDATA(StandardPayload.class);
                 sendPayload.addFirstProperty(new Property(EPC.xE0, new Data((byte) 0x12, (byte) 0x34)));
                 Frame sendFrame = new Frame(subnet.getLocalNode(), receivedFrame.getSender(), sendCommonFrame);
                 

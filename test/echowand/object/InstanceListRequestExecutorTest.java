@@ -89,7 +89,7 @@ public class InstanceListRequestExecutorTest {
         Frame frame = subnet.receive();
         assertEquals(frame.getReceiver(), subnet.getGroupNode());
         CommonFrame commonFrame = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
         assertEquals(ESV.Get, payload.getESV());
         assertEquals(new EOJ("0ef001"), payload.getDEOJ());
         assertEquals((byte) 0x01, payload.getFirstOPC());

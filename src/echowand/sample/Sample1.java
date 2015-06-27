@@ -44,7 +44,7 @@ class Sample1Listener implements TransactionListener {
     @Override
     public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         System.out.println("Sent: " + success);
         System.out.println("From: " + frame.getSender());
         System.out.println("To: " + frame.getReceiver());
@@ -63,7 +63,7 @@ class Sample1Listener implements TransactionListener {
     @Override
     public void receive(Transaction t, Subnet subnet, Frame frame) {
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         System.out.println("From: " + frame.getSender());
         System.out.println("To: " + frame.getReceiver());
         System.out.println("  TID: " + cf.getTID());

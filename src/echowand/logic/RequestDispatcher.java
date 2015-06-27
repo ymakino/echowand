@@ -81,7 +81,13 @@ public class RequestDispatcher implements Listener {
         
         boolean success = false;
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload) cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            logger.exiting(className, "process", false);
+            return false;
+        }
+        
         switch (payload.getESV()) {
             case SetI:
                 success = this.processSetI(subnet, frame);

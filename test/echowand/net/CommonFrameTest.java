@@ -108,7 +108,7 @@ public class CommonFrameTest {
         EOJ seoj = new EOJ("001101");
         EOJ deoj = new EOJ("002201");
         CommonFrame frame = new CommonFrame(seoj, deoj, ESV.SetC);
-        StandardPayload payload = (StandardPayload)frame.getEDATA();
+        StandardPayload payload = frame.getEDATA(StandardPayload.class);
         assertEquals(new EOJ("001101"), payload.getSEOJ());
         assertEquals(new EOJ("002201"), payload.getDEOJ());
         assertEquals(ESV.SetC, payload.getESV());

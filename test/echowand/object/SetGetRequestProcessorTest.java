@@ -69,7 +69,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameSetI(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("001101"), ESV.SetI);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x11)));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         return frame;
@@ -77,7 +77,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameSetC(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("001101"), ESV.SetC);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x42)));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         return frame;
@@ -85,7 +85,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameGet(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("0EF001"), new EOJ("001101"), ESV.Get);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         return frame;
@@ -93,7 +93,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameSetGet(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("001101"), ESV.SetGet);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x41)));
         payload.addSecondProperty(new Property(EPC.xE0));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -102,7 +102,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameINF_REQ1(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("001101"), ESV.INF_REQ);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         return frame;
@@ -110,7 +110,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameINF_REQ2(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("001101"), ESV.INF_REQ);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.xE0));
         payload.addFirstProperty(new Property(EPC.x80));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -119,7 +119,7 @@ public class SetGetRequestProcessorTest {
     
     public Frame createFrameInvalidEOJSetGet(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("123456"), ESV.SetGet);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x41)));
         payload.addSecondProperty(new Property(EPC.xE0));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -153,7 +153,7 @@ public class SetGetRequestProcessorTest {
         assertEquals(1, object.getData(EPC.x80).size());
         assertEquals((byte)0x42, object.getData(EPC.x80).get(0));
         Frame frame = receiveWithoutError(subnet);
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.Set_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
         assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
@@ -164,7 +164,7 @@ public class SetGetRequestProcessorTest {
     public void testProcessGet() {
         processor.processGet(subnet, createFrameGet(subnet), false);
         Frame frame = receiveWithoutError(subnet);
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.Get_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
         assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
@@ -176,7 +176,7 @@ public class SetGetRequestProcessorTest {
     public void testProcessSetGet() {
         processor.processSetGet(subnet, createFrameSetGet(subnet), false);
         Frame frame = receiveWithoutError(subnet);
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.SetGet_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
         assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
@@ -201,7 +201,7 @@ public class SetGetRequestProcessorTest {
         assertEquals(subnet.getLocalNode(), frame2.getSender());
         assertEquals(subnet2.getGroupNode(), frame2.getReceiver());
         
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.INF, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
         
@@ -221,7 +221,7 @@ public class SetGetRequestProcessorTest {
         
         assertNull(subnet2.receiveNoWait());
         
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.INF_SNA, payload.getESV());
         assertEquals(2, payload.getFirstOPC());
         assertEquals(EPC.xE0, payload.getFirstPropertyAt(0).getEPC());
@@ -237,7 +237,7 @@ public class SetGetRequestProcessorTest {
         processor.processSetGet(subnet, createFrameInvalidEOJSetGet(subnet), false);
         processor.processSetGet(subnet, createFrameSetGet(subnet), false);
         Frame frame = receiveWithoutError(subnet);
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.SetGet_Res, payload.getESV());
         assertEquals(1, payload.getFirstOPC());
         assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
@@ -259,12 +259,12 @@ public class SetGetRequestProcessorTest {
         }
 
         Frame reqFrame = createFrameGet(subnet);
-        StandardPayload reqPayload = (StandardPayload)reqFrame.getCommonFrame().getEDATA();
+        StandardPayload reqPayload = reqFrame.getCommonFrame().getEDATA(StandardPayload.class);
         EOJ newDEOJ = reqPayload.getDEOJ().getEOJWithInstanceCode((byte)0x00);
         reqPayload.setDEOJ(newDEOJ);
         processor.processGet(subnet, reqFrame, false);
         Frame frame = receiveWithoutError(subnet);
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.Get_Res, payload.getESV());
         assertEquals(new EOJ("001101"), payload.getSEOJ());
         assertEquals(1, payload.getFirstOPC());
@@ -273,7 +273,7 @@ public class SetGetRequestProcessorTest {
         assertEquals((byte)0x41, payload.getFirstPropertyAt(0).getEDT().get(0));
         
         frame = receiveWithoutError(subnet);
-        payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.Get_Res, payload.getESV());
         assertEquals(new EOJ("001102"), payload.getSEOJ());
     }

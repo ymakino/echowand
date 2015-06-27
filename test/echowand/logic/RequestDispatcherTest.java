@@ -91,7 +91,7 @@ public class RequestDispatcherTest {
         
         if (useValidEOJ) {
             assertTrue(res != null);
-            StandardPayload resp = (StandardPayload)res.getCommonFrame().getEDATA();
+            StandardPayload resp = res.getCommonFrame().getEDATA(StandardPayload.class);
             assertEquals(resESV, resp.getESV());
             assertEquals((short)1234, res.getCommonFrame().getTID());
         } else {

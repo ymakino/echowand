@@ -37,7 +37,7 @@ public class NodeProfileObjectListenerTest {
         SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
         Transaction transaction = transactionManager.createTransaction(transactionConfig);
         CommonFrame cf = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get_Res);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.xD6,
                         new Data(new byte[]{(byte)0x02, (byte)0x00, (byte)0x12, (byte)0x01,
                                                         (byte)0x00, (byte)0x11, (byte)0x01})));
@@ -58,7 +58,7 @@ public class NodeProfileObjectListenerTest {
         SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
         Transaction transaction = transactionManager.createTransaction(transactionConfig);
         CommonFrame cf = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get_SNA);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.xD6));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         profileListener.receive(transaction, subnet, frame);
@@ -76,7 +76,7 @@ public class NodeProfileObjectListenerTest {
         SetGetTransactionConfig transactionConfig1 = new SetGetTransactionConfig();
         Transaction transaction1 = transactionManager.createTransaction(transactionConfig1);
         CommonFrame cf1 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get_Res);
-        StandardPayload payload1 = (StandardPayload)cf1.getEDATA();
+        StandardPayload payload1 = cf1.getEDATA(StandardPayload.class);
         payload1.addFirstProperty(new Property(EPC.xD6,
                         new Data(new byte[]{(byte)0x02, (byte)0x00, (byte)0x12, (byte)0x01,
                                                         (byte)0x00, (byte)0x11, (byte)0x01})));
@@ -91,7 +91,7 @@ public class NodeProfileObjectListenerTest {
         SetGetTransactionConfig transactionConfig2 = new SetGetTransactionConfig();
         Transaction transaction2 = transactionManager.createTransaction(transactionConfig2);
         CommonFrame cf2 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get_Res);
-        StandardPayload payload2 = (StandardPayload)cf2.getEDATA();
+        StandardPayload payload2 = cf2.getEDATA(StandardPayload.class);
         payload2.addFirstProperty(new Property(EPC.xD6,
                         new Data(new byte[]{(byte)0x02, (byte)0x00, (byte)0x12, (byte)0x01,
                                                         (byte)0x00, (byte)0x11, (byte)0x01})));

@@ -30,7 +30,7 @@ public class TCPSample0 {
     public static CommonFrame createCommonFrameGet() {
         CommonFrame commonFrame = new CommonFrame(new EOJ("013001"), new EOJ("0ef001"), ESV.Get);
         commonFrame.setTID((short)1);
-        StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80));
         payload.addFirstProperty(new Property(EPC.x88));
         payload.addFirstProperty(new Property(EPC.x9F));
@@ -49,7 +49,7 @@ public class TCPSample0 {
     public static CommonFrame createCommonFrameSetGet() {
         CommonFrame commonFrame = new CommonFrame(new EOJ("013001"), new EOJ("013001"), ESV.SetGet);
         commonFrame.setTID((short)2);
-        StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.xB0, new Data((byte)0x12)));
         payload.addSecondProperty(new Property(EPC.x80));
         payload.addSecondProperty(new Property(EPC.x9F));
@@ -65,7 +65,7 @@ public class TCPSample0 {
     public static CommonFrame createCommonFrameINFC() {
         CommonFrame commonFrame = new CommonFrame(new EOJ("013001"), new EOJ("0ef001"), ESV.INFC);
         commonFrame.setTID((short)3);
-        StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x31)));
         return commonFrame;
     }

@@ -132,7 +132,7 @@ public class ObserveResult {
         boolean result = false;
         
         if (commonFrame.isStandardPayload()) {
-            result = commonFrame.getEDATA() instanceof StandardPayload;
+            result = commonFrame.getEDATA(StandardPayload.class) != null;
         }
         
         LOGGER.exiting(CLASS_NAME, "hasStandardPayload", result);
@@ -163,7 +163,7 @@ public class ObserveResult {
             return false;
         }
         
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         
         if (payload.getESV() != ESV.INF && payload.getESV() != ESV.INFC) {
             LOGGER.exiting(CLASS_NAME, "addFrame", false);

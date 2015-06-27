@@ -18,7 +18,7 @@ public class FrameSample {
             Inet4Subnet subnet = Inet4Subnet.startSubnet();
 
             CommonFrame commonFrame = new CommonFrame(new EOJ("0ef001"), new EOJ("001101"), ESV.Get);
-            StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+            StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
             payload.addFirstProperty(new Property(EPC.x80));
             payload.addFirstProperty(new Property(EPC.xE0));
             

@@ -33,8 +33,8 @@ public class RemoteObjectTest {
     public Frame createGetFrame(Subnet subnet, Frame reqFrame) {
         short tid = reqFrame.getCommonFrame().getTID();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.Get_Res);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
-        EPC epc = ((StandardPayload)reqFrame.getCommonFrame().getEDATA()).getFirstPropertyAt(0).getEPC();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        EPC epc = reqFrame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC();
         if (epc == EPC.x80) {
             payload.addFirstProperty(new Property(EPC.x80, data));
         } else if (epc == EPC.x80) {
@@ -66,10 +66,10 @@ public class RemoteObjectTest {
     
     public Frame createGetFailFrame(Subnet subnet, Frame reqFrame) {
         short tid = reqFrame.getCommonFrame().getTID();
-        StandardPayload reqPayload = (StandardPayload)reqFrame.getCommonFrame().getEDATA();
+        StandardPayload reqPayload = reqFrame.getCommonFrame().getEDATA(StandardPayload.class);
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.Get_SNA);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
-        EPC epc = ((StandardPayload)reqFrame.getCommonFrame().getEDATA()).getFirstPropertyAt(0).getEPC();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        EPC epc = reqFrame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC();
         payload.addFirstProperty(reqPayload.getFirstPropertyAt(0));
         cf.setTID(tid);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -78,10 +78,10 @@ public class RemoteObjectTest {
     
     public Frame createSetFrame(Subnet subnet, Frame reqFrame) {
         short tid = reqFrame.getCommonFrame().getTID();
-        StandardPayload reqPayload = (StandardPayload)reqFrame.getCommonFrame().getEDATA();
+        StandardPayload reqPayload = reqFrame.getCommonFrame().getEDATA(StandardPayload.class);
         data = reqPayload.getFirstPropertyAt(0).getEDT();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.Set_Res);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80));
         cf.setTID(tid);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -90,10 +90,10 @@ public class RemoteObjectTest {
     
     public Frame createSetFailFrame(Subnet subnet, Frame reqFrame) {
         short tid = reqFrame.getCommonFrame().getTID();
-        StandardPayload reqPayload = (StandardPayload)reqFrame.getCommonFrame().getEDATA();
+        StandardPayload reqPayload = reqFrame.getCommonFrame().getEDATA(StandardPayload.class);
         data = reqPayload.getFirstPropertyAt(0).getEDT();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.SetC_SNA);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(reqPayload.getFirstPropertyAt(0));
         cf.setTID(tid);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -102,10 +102,10 @@ public class RemoteObjectTest {
     
     public Frame createAnnoFrame(Subnet subnet, Frame reqFrame) {
         short tid = reqFrame.getCommonFrame().getTID();
-        StandardPayload reqPayload = (StandardPayload)reqFrame.getCommonFrame().getEDATA();
+        StandardPayload reqPayload = reqFrame.getCommonFrame().getEDATA(StandardPayload.class);
         data = reqPayload.getFirstPropertyAt(0).getEDT();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("0EF001"), ESV.INF);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80));
         cf.setTID(tid);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -132,7 +132,7 @@ public class RemoteObjectTest {
             try {
                 do {
                     Frame frame = subnet.receive();
-                    StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
+                    StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
                     switch (payload.getESV()) {
                         case Get:
                             if (payload.getFirstPropertyAt(0).getEPC() == EPC.xE1) {
@@ -300,7 +300,7 @@ public class RemoteObjectTest {
             object.observeData(EPC.x80);
             Frame frame = subnet.receiveNoWait();
             CommonFrame commonFrame = frame.getCommonFrame();
-            StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+            StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
             assertEquals(ESV.INF_REQ, payload.getESV());
             assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());
             assertEquals((byte)0, payload.getFirstPropertyAt(0).getPDC());

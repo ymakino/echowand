@@ -162,12 +162,17 @@ public class FrameSelector implements Selector<Frame> {
     private boolean checkEOJs(Frame frame) {
         LOGGER.entering(CLASS_NAME, "checkEOJs", frame);
         
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            LOGGER.exiting(CLASS_NAME, "checkEOJs", false);
+            return false;
+        }
+        
         if (eojs.isEmpty()) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", true);
             return true;
         }
-        
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
         
         if (eojs.contains(payload.getSEOJ())) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", true);
@@ -186,12 +191,17 @@ public class FrameSelector implements Selector<Frame> {
     private boolean checkEPCs(Frame frame) {
         LOGGER.entering(CLASS_NAME, "checkEPCs", frame);
         
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            LOGGER.exiting(CLASS_NAME, "checkEPCs", false);
+            return false;
+        }
+        
         if (epcs.isEmpty()) {
             LOGGER.exiting(CLASS_NAME, "checkEPCs", true);
             return true;
         }
-        
-        StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
 
         int count = payload.getFirstOPC();
         for (int i = 0; i < count; i++) {

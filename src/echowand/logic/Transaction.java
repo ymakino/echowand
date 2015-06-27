@@ -301,7 +301,13 @@ public class Transaction {
             return false;
         }
         
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            logger.exiting(className, "receiveResponse", false);
+            return false;
+        }
+        
         EOJ responseSEOJ = payload.getSEOJ();
         EOJ responseDEOJ = payload.getDEOJ();
         EOJ requestDEOJ = transactionConfig.getDestinationEOJ();

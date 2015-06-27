@@ -4,6 +4,7 @@ import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.ESV;
+import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.StandardPayload;
@@ -123,6 +124,21 @@ public class UpdateRemoteInfoResult {
         
         LOGGER.exiting(CLASS_NAME, "addEOJ");
     }
+    
+    public boolean hasStandardPayload(Frame frame) {
+        LOGGER.entering(CLASS_NAME, "hasStandardPayload", frame);
+        
+        CommonFrame commonFrame = frame.getCommonFrame();
+        
+        boolean result = false;
+        
+        if (commonFrame.isStandardPayload()) {
+            result = commonFrame.getEDATA(StandardPayload.class) != null;
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "hasStandardPayload", result);
+        return result;
+    }
 
     public synchronized boolean addFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addFrame", frame);
@@ -144,14 +160,14 @@ public class UpdateRemoteInfoResult {
             return false;
         }
 
-        if (!(frame.getCommonFrame().getEDATA() instanceof StandardPayload)) {
+        if (!hasStandardPayload(frame)) {
             invalidFrameList.add(resultFrame);
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
             return false;
         }
 
         Node node = frame.getSender();
-        StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
 
         if (payload.getESV() != ESV.Get_Res && payload.getESV() != ESV.Get_SNA) {
             invalidFrameList.add(resultFrame);

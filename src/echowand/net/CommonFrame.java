@@ -115,7 +115,21 @@ public class CommonFrame {
      * @return このCommonFrameのペイロード
      */
     public Payload getEDATA() {
-        return this.edata;
+        return edata;
+    }
+    
+    /**
+     * ペイロードの型を指定してCommonFrameのペイロードを返す。
+     * ペイロードを指定された型に変換できない場合にはnullを返す。
+     * @param cls ペイロードの型の指定
+     * @return このCommonFrameのペイロード
+     */
+    public <P extends Payload> P getEDATA(Class<P> cls) {
+        try {
+            return cls.cast(edata);
+        } catch (ClassCastException ex) {
+            return null;
+        }
     }
     
     /**

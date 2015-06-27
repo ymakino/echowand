@@ -199,7 +199,7 @@ public class TCPConnectionTest {
     @Test
     public void testSend() throws Exception {
         CommonFrame commonFrame1 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get);
-        StandardPayload p = (StandardPayload) commonFrame1.getEDATA();
+        StandardPayload p = commonFrame1.getEDATA(StandardPayload.class);
         p.addFirstProperty(new Property(EPC.x80));
         p.addFirstProperty(new Property(EPC.x81));
         p.addFirstProperty(new Property(EPC.x82));
@@ -215,7 +215,7 @@ public class TCPConnectionTest {
     @Test
     public void testReceive() throws IOException, NetworkException {
         CommonFrame commonFrame1 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get);
-        StandardPayload p1 = (StandardPayload) commonFrame1.getEDATA();
+        StandardPayload p1 = commonFrame1.getEDATA(StandardPayload.class);
         p1.addFirstProperty(new Property(EPC.x80));
         p1.addFirstProperty(new Property(EPC.x81));
         p1.addFirstProperty(new Property(EPC.x82));
@@ -225,7 +225,7 @@ public class TCPConnectionTest {
         c1.send(commonFrame1);
         
         CommonFrame commonFrame2 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.SetC);
-        StandardPayload p2 = (StandardPayload) commonFrame2.getEDATA();
+        StandardPayload p2 = commonFrame2.getEDATA(StandardPayload.class);
         p2.addFirstProperty(new Property(EPC.x80, new Data((byte)0x00)));
         p2.addFirstProperty(new Property(EPC.x81, new Data((byte)0x00, (byte)0x00)));
         p2.addFirstProperty(new Property(EPC.x82, new Data((byte)0x12, (byte)0x34)));

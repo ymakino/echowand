@@ -105,7 +105,7 @@ public abstract class ResultBase {
         boolean result = false;
         
         if (commonFrame.isStandardPayload()) {
-            result = commonFrame.getEDATA() instanceof StandardPayload;
+            result = commonFrame.getEDATA(StandardPayload.class) != null;
         }
         
         LOGGER.exiting(CLASS_NAME, "hasStandardPayload", result);
@@ -145,7 +145,7 @@ public abstract class ResultBase {
             result = unsentRequestFrameList.add(resultFrame);
         }
 
-        StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
 
         int count = payload.getFirstOPC();
         for (int i = 0; i < count; i++) {
@@ -196,7 +196,7 @@ public abstract class ResultBase {
             return false;
         }
 
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         
         if (!isValidPayload(payload)) {
             invalidFrameList.add(resultFrame);

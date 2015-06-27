@@ -167,7 +167,12 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
             return true;
         }
         
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            LOGGER.exiting(CLASS_NAME, "checkEOJs", false);
+            return false;
+        }
         
         if (eojs.contains(payload.getSEOJ())) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", true);
@@ -193,7 +198,12 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
             return true;
         }
         
-        StandardPayload payload = (StandardPayload) frame.getCommonFrame().getEDATA();
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            LOGGER.exiting(CLASS_NAME, "checkEPCs", false);
+            return false;
+        }
 
         int count = payload.getFirstOPC();
         for (int i = 0; i < count; i++) {

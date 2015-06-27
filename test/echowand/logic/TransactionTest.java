@@ -149,11 +149,11 @@ public class TransactionTest {
 
     public Frame createReplyFrame(Frame frame) {
         CommonFrame commonFrame = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
         
         CommonFrame replyCommonFrame = new CommonFrame(payload.getDEOJ(), payload.getSEOJ(), ESV.Get_Res);
         replyCommonFrame.setTID(commonFrame.getTID());
-        StandardPayload replyPayload = (StandardPayload)replyCommonFrame.getEDATA();
+        StandardPayload replyPayload = replyCommonFrame.getEDATA(StandardPayload.class);
         int len = payload.getFirstOPC();
         for (int i=0; i<len; i++) {
             Property p = payload.getFirstPropertyAt(i);
@@ -438,7 +438,7 @@ public class TransactionTest {
             assertTrue(reqFrame != null);
             Frame repFrame = createReplyFrame(reqFrame);
             CommonFrame cf = repFrame.getCommonFrame();
-            StandardPayload payload = (StandardPayload)cf.getEDATA();
+            StandardPayload payload = cf.getEDATA(StandardPayload.class);
             payload.setSEOJ(new EOJ("001101"));
             t.receiveResponse(repFrame);
             payload.setSEOJ(new EOJ("001102"));
@@ -465,7 +465,7 @@ public class TransactionTest {
             assertTrue(reqFrame != null);
             Frame repFrame = createReplyFrame(reqFrame);
             CommonFrame cf = repFrame.getCommonFrame();
-            StandardPayload payload = (StandardPayload)cf.getEDATA();
+            StandardPayload payload = cf.getEDATA(StandardPayload.class);
             payload.setSEOJ(new EOJ("001101"));
             t.receiveResponse(repFrame);
             payload.setSEOJ(new EOJ("001102"));
