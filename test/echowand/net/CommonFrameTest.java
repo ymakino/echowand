@@ -159,4 +159,17 @@ public class CommonFrameTest {
         assertFalse(f.isStandardPayload());
         
     }
+    
+    @Test
+    public void testGetEDATA() {
+        CommonFrame commonFrame1 = new CommonFrame();
+        assertNotNull(commonFrame1.getEDATA());
+        assertNull(commonFrame1.getEDATA(StandardPayload.class));
+        assertNotNull(commonFrame1.getEDATA(SimplePayload.class));
+        
+        CommonFrame commonFrame2 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get);
+        assertNotNull(commonFrame2.getEDATA());
+        assertNotNull(commonFrame2.getEDATA(StandardPayload.class));
+        assertNull(commonFrame2.getEDATA(SimplePayload.class));
+    }
 }
