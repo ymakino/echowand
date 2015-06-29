@@ -26,11 +26,18 @@ public abstract class ResultBase {
     
     private boolean done;
     
+    private class RequestData {
+        LinkedList<ResultData> dataList;
+        LinkedList<ResultData> unsentDataList;
+    }
+    
     private LinkedList<ResultFrame> requestFrameList;
     private LinkedList<ResultFrame> unsentRequestFrameList;
     private LinkedList<ResultFrame> invalidRequestFrameList;
     private LinkedList<ResultData> requestDataList;
     private LinkedList<ResultData> unsentRequestDataList;
+    private LinkedList<ResultData> requestSecondDataList;
+    private LinkedList<ResultData> unsentRequestSecondDataList;
     private HashMap<ResultData, ResultFrame> requestDataFrameMap;
     
     private LinkedList<ResultFrame> frameList;
@@ -38,6 +45,8 @@ public abstract class ResultBase {
     private LinkedList<ResultFrame> invalidFrameList;
     private LinkedList<ResultData> dataList;
     private LinkedList<ResultData> errorDataList;
+    private LinkedList<ResultData> secondDataList;
+    private LinkedList<ResultData> errorSecondDataList;
     private HashMap<ResultData, ResultFrame> dataFrameMap;
     
     public ResultBase() {
@@ -49,6 +58,8 @@ public abstract class ResultBase {
         invalidRequestFrameList = new LinkedList<ResultFrame>();
         requestDataList = new LinkedList<ResultData>();
         unsentRequestDataList = new LinkedList<ResultData>();
+        requestSecondDataList = new LinkedList<ResultData>();
+        unsentRequestSecondDataList = new LinkedList<ResultData>();
         requestDataFrameMap = new HashMap<ResultData, ResultFrame>();
     
         frameList = new LinkedList<ResultFrame>();
@@ -56,6 +67,8 @@ public abstract class ResultBase {
         invalidFrameList = new LinkedList<ResultFrame>();
         dataList = new LinkedList<ResultData>();
         errorDataList = new LinkedList<ResultData>();
+        secondDataList = new LinkedList<ResultData>();
+        errorSecondDataList = new LinkedList<ResultData>();
         dataFrameMap = new HashMap<ResultData, ResultFrame>();
         
         LOGGER.exiting(CLASS_NAME, "ResultBase");
@@ -97,6 +110,13 @@ public abstract class ResultBase {
     
     public abstract boolean isValidProperty(Property property);
     
+    public boolean isValidSecondProperty(Property property) {
+        LOGGER.entering(CLASS_NAME, "hasStandardPayload", property);
+        
+        LOGGER.exiting(CLASS_NAME, "hasStandardPayload", false);
+        return false;
+    }
+    
     public boolean hasStandardPayload(Frame frame) {
         LOGGER.entering(CLASS_NAME, "hasStandardPayload", frame);
         
@@ -119,6 +139,15 @@ public abstract class ResultBase {
         
         LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
         return result;
+    }
+    
+    private ResultData createResultData(ResultFrame resultFrame, Frame frame, StandardPayload payload, Property property) {
+            Node node = frame.getSender();
+            ESV esv = payload.getESV();
+            EOJ eoj = payload.getSEOJ();
+            EPC epc = property.getEPC();
+            Data data = property.getEDT();
+            return new ResultData(node, esv, eoj, epc, data, resultFrame.time);
     }
     
     public synchronized boolean addRequestFrame(ResultFrame resultFrame, boolean success) {
@@ -150,18 +179,26 @@ public abstract class ResultBase {
         int count = payload.getFirstOPC();
         for (int i = 0; i < count; i++) {
             Property property = payload.getFirstPropertyAt(i);
-
-            Node node = frame.getSender();
-            ESV esv = payload.getESV();
-            EOJ eoj = payload.getSEOJ();
-            EPC epc = property.getEPC();
-            Data data = property.getEDT();
-
-            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
+            ResultData resultData = createResultData(resultFrame, frame, payload, property);
+            
             if (success) {
                 result &= requestDataList.add(resultData);
             } else {
                 result &= unsentRequestDataList.add(resultData);
+            }
+
+            requestDataFrameMap.put(resultData, resultFrame);
+        }
+
+        int countSecond = payload.getSecondOPC();
+        for (int i = 0; i < countSecond; i++) {
+            Property property = payload.getSecondPropertyAt(i);
+            ResultData resultData = createResultData(resultFrame, frame, payload, property);
+            
+            if (success) {
+                result &= requestSecondDataList.add(resultData);
+            } else {
+                result &= unsentRequestSecondDataList.add(resultData);
             }
 
             requestDataFrameMap.put(resultData, resultFrame);
@@ -209,18 +246,27 @@ public abstract class ResultBase {
         int count = payload.getFirstOPC();
         for (int i=0; i<count; i++) {
             Property property = payload.getFirstPropertyAt(i);
+            ResultData resultData = createResultData(resultFrame, frame, payload, property);
             
-            Node node = frame.getSender();
-            ESV esv = payload.getESV();
-            EOJ eoj = payload.getSEOJ();
-            EPC epc = property.getEPC();
-            Data data = property.getEDT();
-            
-            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
             if (isValidProperty(property)) {
                 result &= dataList.add(resultData);
             } else {
                 errorDataList.add(resultData);
+                result = false;
+            }
+            
+            dataFrameMap.put(resultData, resultFrame);
+        }
+        
+        int countSecond = payload.getSecondOPC();
+        for (int i=0; i<countSecond; i++) {
+            Property property = payload.getSecondPropertyAt(i);
+            ResultData resultData = createResultData(resultFrame, frame, payload, property);
+            
+            if (isValidSecondProperty(property)) {
+                result &= secondDataList.add(resultData);
+            } else {
+                errorSecondDataList.add(resultData);
                 result = false;
             }
             
@@ -374,18 +420,54 @@ public abstract class ResultBase {
     public synchronized List<ResultData> getDataList(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "getDataList", resultFrame);
         
-        final ResultFrame selectedFrame = resultFrame;
-        
-        Selector<ResultData> selector = new Selector<ResultData>() {
-            @Override
-            public boolean match(ResultData resultData) {
-                return selectedFrame.equals(dataFrameMap.get(resultData));
-            }
-        };
-        
-        List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
+        List<ResultData> resultList = getDataList(dataFrameMap, resultFrame, dataList);
         
         LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized int countSecondData() {
+        LOGGER.entering(CLASS_NAME, "countSecondData");
+        
+        int count = secondDataList.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countSecondData", count);
+        return count;
+    }
+    
+    public synchronized ResultData getSecondData(int index) {
+        LOGGER.entering(CLASS_NAME, "getSecondData");
+        
+        ResultData resultData = secondDataList.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getSecondData", resultData);
+        return resultData;
+    }
+    
+    public synchronized List<ResultData> getSecondDataList() {
+        LOGGER.entering(CLASS_NAME, "getSecondDataList");
+        
+        List<ResultData> resultList = new LinkedList<ResultData>(secondDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getSecondDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultData> getSecondDataList(Selector<? super ResultData> selector) {
+        LOGGER.entering(CLASS_NAME, "getSecondDataList", selector);
+        
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(secondDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getSecondDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultData> getSecondDataList(ResultFrame resultFrame) {
+        LOGGER.entering(CLASS_NAME, "getSecondDataList", resultFrame);
+        
+        List<ResultData> resultList = getDataList(dataFrameMap, resultFrame, secondDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getSecondDataList", resultList);
         return resultList;
     }
     
@@ -428,18 +510,73 @@ public abstract class ResultBase {
     public synchronized List<ResultData> getRequestDataList(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "getRequestDataList", resultFrame);
         
+        List<ResultData> resultList = getDataList(requestDataFrameMap, resultFrame, requestDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized int countRequestSecondData() {
+        LOGGER.entering(CLASS_NAME, "countRequestSecondData");
+        
+        int count = requestSecondDataList.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countRequestSecondData", count);
+        return count;
+    }
+    
+    public synchronized ResultData getRequestSecondData(int index) {
+        LOGGER.entering(CLASS_NAME, "getRequestSecondData");
+        
+        ResultData resultData = requestSecondDataList.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestSecondData", resultData);
+        return resultData;
+    }
+    
+    public synchronized List<ResultData> getRequestSecondDataList() {
+        LOGGER.entering(CLASS_NAME, "getRequestSecondDataList");
+        
+        List<ResultData> resultList = new LinkedList<ResultData>(requestSecondDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestSecondDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultData> getRequestSecondDataList(Selector<? super ResultData> selector) {
+        LOGGER.entering(CLASS_NAME, "getRequestSecondDataList", selector);
+        
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(requestSecondDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestSecondDataList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultData> getRequestSecondDataList(ResultFrame resultFrame) {
+        LOGGER.entering(CLASS_NAME, "getRequestSecondDataList", resultFrame);
+        
+        List<ResultData> resultList = getDataList(requestDataFrameMap, resultFrame, requestSecondDataList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestSecondDataList", resultList);
+        return resultList;
+    }
+    
+    private List<ResultData> getDataList(HashMap<ResultData, ResultFrame> dataFrameMap, ResultFrame resultFrame, List<ResultData> dataList) {
+        LOGGER.entering(CLASS_NAME, "getDataList", new Object[]{resultFrame, dataList});
+        
         final ResultFrame selectedFrame = resultFrame;
+        final HashMap<ResultData, ResultFrame> selectedMap = dataFrameMap;
         
         Selector<ResultData> selector = new Selector<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
-                return selectedFrame.equals(requestDataFrameMap.get(resultData));
+                return selectedFrame.equals(selectedMap.get(resultData));
             }
         };
         
-        List<ResultData> resultList = new Collector<ResultData>(selector).collect(requestDataList);
+        List<ResultData> resultList = new Collector<ResultData>(selector).collect(dataList);
         
-        LOGGER.exiting(CLASS_NAME, "getRequestDataList", resultList);
+        LOGGER.exiting(CLASS_NAME, "getDataList", resultList);
         return resultList;
     }
 }

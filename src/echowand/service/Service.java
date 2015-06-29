@@ -27,6 +27,7 @@ import echowand.service.result.ResultBase;
 import echowand.service.result.GetResult;
 import echowand.service.result.FrameSelector;
 import echowand.service.result.ObserveResult;
+import echowand.service.result.SetGetResult;
 import echowand.service.result.SetResult;
 import echowand.service.result.UpdateRemoteInfoResult;
 import echowand.util.Pair;
@@ -198,6 +199,28 @@ public class Service {
         }
         
         LOGGER.exiting(CLASS_NAME, "createSetTransactionConfig", transactionConfig);
+        return transactionConfig;
+    }
+    
+    private SetGetTransactionConfig createSetGetTransactionConfig(Node node, EOJ eoj, List<Pair<EPC,Data>> properties, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "createSetGetTransactionConfig", new Object[]{node, eoj, properties});
+        
+        SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
+        
+        transactionConfig.setReceiverNode(node);
+        transactionConfig.setDestinationEOJ(eoj);
+        transactionConfig.setSenderNode(getSubnet().getLocalNode());
+        transactionConfig.setSourceEOJ(new EOJ("0ef001"));
+        
+        for (Pair<EPC,Data> property: properties) {
+            transactionConfig.addSet(property.first, property.second);
+        }
+        
+        for (EPC epc: epcs) {
+            transactionConfig.addGet(epc);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "createSetGetTransactionConfig", transactionConfig);
         return transactionConfig;
     }
     
@@ -444,6 +467,161 @@ public class Service {
 
         LOGGER.exiting(CLASS_NAME, "doSet", setResult);
         return setResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC setEPC, Data setData, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, ceoj, setEPC, setData, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), ceoj.getAllInstanceEOJ(), setEPC, setData, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, EOJ eoj, EPC setEPC, Data setData, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, eoj, setEPC, setData, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), eoj, setEPC, setData, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, ClassEOJ ceoj, EPC setEPC, Data setData, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, ceoj, setEPC, setData, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(node, ceoj.getAllInstanceEOJ(), setEPC, setData, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, EOJ eoj, EPC setEPC, Data setData, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, eoj, setEPC, setData, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(node, eoj, setEPC, setData, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, ceoj, properties, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), ceoj.getAllInstanceEOJ(), properties, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, eoj, properties, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), eoj, properties, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, ceoj, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(node, ceoj.getAllInstanceEOJ(), properties, toList(getEPC), timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, EPC getEPC, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, eoj, properties, getEPC, timeout});
+        
+        SetGetResult setGetResult = doSetGet(node, eoj, properties, toList(getEPC), timeout);
+
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, ClassEOJ ceoj, EPC setEPC, Data setData, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, ceoj, setEPC, setData, epcs, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), ceoj.getAllInstanceEOJ(), setEPC, setData, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, EOJ eoj, EPC setEPC, Data setData, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, eoj, setEPC, setData, epcs, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), eoj, setEPC, setData, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, ClassEOJ ceoj, EPC setEPC, Data setData, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, ceoj, setEPC, setData, epcs, timeout});
+        
+        SetGetResult setGetResult = doSetGet(node, ceoj.getAllInstanceEOJ(), setEPC, setData, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, EOJ eoj, EPC setEPC, Data setData, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, eoj, setEPC, setData, epcs, timeout});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(setEPC, setData));
+        SetGetResult setGetResult = doSetGet(node, eoj, properties, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, ceoj, properties, epcs, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), ceoj.getAllInstanceEOJ(), properties, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, eoj, properties, epcs, timeout});
+        
+        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), eoj, properties, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, ceoj, epcs, timeout});
+        
+        SetGetResult setGetResult = doSetGet(node, ceoj.getAllInstanceEOJ(), properties, epcs, timeout);
+        
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
+    }
+    
+    public SetGetResult doSetGet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, eoj, properties, epcs, timeout});
+        
+        SetGetResult setGetResult = new SetGetResult();
+        
+        SetGetTransactionConfig transactionConfig = createSetGetTransactionConfig(node, eoj, properties, epcs);
+        
+        Transaction transaction = new Transaction(getSubnet(), getTransactionManager(), transactionConfig);
+        transaction.setTimeout(timeout);
+        
+        transaction.addTransactionListener(new ResultBaseTransactionListener(setGetResult));
+        
+        transaction.execute();
+
+        LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
+        return setGetResult;
     }
     
     public UpdateRemoteInfoResult doUpdateRemoteInfo(int timeout) throws SubnetException {

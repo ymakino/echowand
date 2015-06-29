@@ -1,6 +1,7 @@
 package echowand.service;
 
 import echowand.info.ObjectInfo;
+import echowand.object.LocalObject;
 import echowand.object.LocalObjectDelegate;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -142,5 +143,15 @@ public class LocalObjectConfig {
         
         LOGGER.exiting(CLASS_NAME, "getPropertyUpdater", updater);
         return updater;
+    }
+    
+    public void notifyCreated(LocalObject object) {
+        for (PropertyDelegate  delegate : propertyDelegates) {
+            delegate.notifyCreated(object);
+        }
+        
+        for (PropertyUpdater  updater : propertyUpdaters) {
+            updater.notifyCreated(object);
+        }
     }
 }
