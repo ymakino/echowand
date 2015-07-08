@@ -44,24 +44,22 @@ public class InetSubnetTCPReceiverThread extends Thread {
 
     @Override
     public void run() {
-        try {
-            while (!terminated) {
-                try {
-                    Pair<TCPConnection, CommonFrame> pair = receiver.receive();
-                    LOGGER.logp(Level.FINE, CLASS_NAME, "run", "receive: " + pair);
-                    TCPConnection connection = pair.first;
-                    CommonFrame commonFrame = pair.second;
-                    Node localNode = subnet.getLocalNode();
-                    Node remoteNode = subnet.getRemoteNode(connection.getRemoteNodeInfo());
-                    queue.put(new Frame(remoteNode, localNode, commonFrame, connection));
-                } catch (SubnetException ex) {
-                    LOGGER.logp(Level.INFO, CLASS_NAME, "run", "invalid remoteNode", ex);
-                }
+        while (!terminated) {
+            try {
+                Pair<TCPConnection, CommonFrame> pair = receiver.receive();
+                LOGGER.logp(Level.FINE, CLASS_NAME, "run", "receive: " + pair);
+                TCPConnection connection = pair.first;
+                CommonFrame commonFrame = pair.second;
+                Node localNode = subnet.getLocalNode();
+                Node remoteNode = subnet.getRemoteNode(connection.getRemoteNodeInfo());
+                queue.put(new Frame(remoteNode, localNode, commonFrame, connection));
+            } catch (SubnetException ex) {
+                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "invalid remoteNode", ex);
+            } catch (InterruptedException ex) {
+                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "interrupted", ex);
+            } catch (NetworkException ex) {
+                LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
             }
-        } catch (InterruptedException ex) {
-            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "interrupted", ex);
-        } catch (NetworkException ex) {
-            LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
         }
     }
 }
