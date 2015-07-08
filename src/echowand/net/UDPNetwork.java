@@ -4,8 +4,12 @@ import echowand.util.Pair;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +27,7 @@ public class UDPNetwork {
     public static final short  DEFAULT_BUFFER_SIZE = 1500;
     
     private NetworkInterface networkInterface;
+    private List<NetworkInterface> receiverInterfaces;
     private InetAddress localAddress;
     private InetAddress multicastAddress;
     private MulticastSocket multicastSocket;
@@ -31,39 +36,58 @@ public class UDPNetwork {
     private boolean inService = false;
     
     /**
-     * 利用するUDPネットワークおよびローカルアドレス、マルチキャストアドレスを指定してUDPNetworkを生成する。
+     * 利用するローカルアドレス、受信インタフェース、マルチキャストアドレスおよびポート番号を指定してUDPNetworkを生成する。
      * @param localAddress 利用するローカルアドレスの指定
+     * @param receiverInterfaces 受信に利用するネットワークインタフェースの指定
      * @param multicastAddress 利用するマルチキャストアドレスの指定
      * @param portNumber 利用するポート番号の指定
      */
-    public UDPNetwork(InetAddress localAddress, InetAddress multicastAddress, int portNumber) {
+    public UDPNetwork(InetAddress localAddress, Collection<? extends NetworkInterface> receiverInterfaces, InetAddress multicastAddress, int portNumber) {
         this.localAddress = localAddress;
         this.networkInterface = null;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>(receiverInterfaces);
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
     }
     
     /**
-     * 利用するUDPネットワークおよびインタフェース、マルチキャストアドレスを指定してUDPNetworkを生成する。
+     * 利用するインタフェース、受信インタフェース、マルチキャストアドレスおよびポート番号を指定してUDPNetworkを生成する。
      * @param networkInterface 利用するネットワークインタフェースの指定
+     * @param receiverInterfaces 受信に利用するネットワークインタフェースの指定
      * @param multicastAddress 利用するマルチキャストアドレスの指定
      * @param portNumber 利用するポート番号の指定
      */
-    public UDPNetwork(NetworkInterface networkInterface, InetAddress multicastAddress, int portNumber) {
+    public UDPNetwork(NetworkInterface networkInterface, Collection<? extends NetworkInterface> receiverInterfaces, InetAddress multicastAddress, int portNumber) {
         this.localAddress = null;
         this.networkInterface = networkInterface;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>(receiverInterfaces);
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
     }
     
     /**
-     * 利用するUDPネットワークおよびインタフェース、マルチキャストアドレスを指定してUDPNetworkを生成する。
+     * 利用する受信インタフェース、マルチキャストアドレスおよびポート番号を指定してUDPNetworkを生成する。
+     * @param receiverInterfaces 受信に利用するネットワークインタフェースの指定
+     * @param multicastAddress 利用するマルチキャストアドレスの指定
+     * @param portNumber 利用するポート番号の指定
+     */
+    public UDPNetwork(Collection<? extends NetworkInterface> receiverInterfaces, InetAddress multicastAddress, int portNumber) {
+        this.localAddress = null;
+        this.networkInterface = null;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>(receiverInterfaces);
+        this.multicastAddress = multicastAddress;
+        this.portNumber = portNumber;
+    }
+    
+    /**
+     * 利用するマルチキャストアドレスおよびポート番号を指定してUDPNetworkを生成する。
      * @param multicastAddress 利用するマルチキャストアドレスの指定
      * @param portNumber 利用するポート番号の指定
      */
     public UDPNetwork(InetAddress multicastAddress, int portNumber) {
         this.localAddress = null;
         this.networkInterface = null;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>();
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
     }
@@ -89,11 +113,21 @@ public class UDPNetwork {
 
             if (localAddress != null) {
                 multicastSocket.setInterface(localAddress);
-            } else if (networkInterface != null) {
+            }
+            
+            if (networkInterface != null) {
                 multicastSocket.setNetworkInterface(networkInterface);
             }
             
             multicastSocket.joinGroup(multicastAddress);
+            
+            if (!receiverInterfaces.isEmpty()) {
+                InetSocketAddress saddr = new InetSocketAddress(multicastAddress, getPortNumber());
+                for (NetworkInterface receiverInterface : receiverInterfaces) {
+                    multicastSocket.joinGroup(saddr, receiverInterface);
+                }
+            }
+            
             multicastSocket.setLoopbackMode(false);
             multicastSocket.setReuseAddress(false);
 

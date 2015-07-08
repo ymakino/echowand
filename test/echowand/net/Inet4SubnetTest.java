@@ -178,21 +178,25 @@ public class Inet4SubnetTest {
     }
     
     @Test
-    public void testCreationWithNetworkInterface() throws SocketException, SubnetException {
+    public void testCreationWithNetworkInterface() throws SocketException, SubnetException, UnknownHostException {
         subnet.stopService();
 
         for (NetworkInterface nif : getInetInterfaces()) {
             subnet = newInetSubnet(nif);
             assertFalse(subnet.isInService());
+            assertEquals(getLocalAddress(), subnet.getLocalAddress());
             assertEquals(subnet.getNetworkInterface(), nif);
             subnet.stopService();
         }
     }
 
     @Test (expected=SubnetException.class)
-    public void testCreationWithNullNetworkInterface() throws SubnetException {
+    public void testCreationWithNullNetworkInterface() throws SubnetException, UnknownHostException {
         subnet.stopService();
         subnet = newInetSubnet((NetworkInterface)null);
+        assertFalse(subnet.isInService());
+        assertEquals(getLocalAddress(), subnet.getLocalAddress());
+        assertNull(subnet.getNetworkInterface());
     }
 
     @Test
@@ -200,10 +204,10 @@ public class Inet4SubnetTest {
         subnet.stopService();
 
         for (InetAddress addr : getInetAddresses()) {
-            NetworkInterface nif = NetworkInterface.getByInetAddress(addr);
             subnet = newInetSubnet(addr);
             assertFalse(subnet.isInService());
-            assertEquals(nif, subnet.getNetworkInterface());
+            assertEquals(addr, subnet.getLocalAddress());
+            assertNull(subnet.getNetworkInterface());
             subnet.stopService();
         }
     }
