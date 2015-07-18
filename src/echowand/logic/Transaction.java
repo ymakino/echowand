@@ -402,11 +402,9 @@ public class Transaction {
         transactionManager.addTransaction(this);
         
         sendRequest();
-        int timeout_in_ms = getTimeout();
-        if (timeout_in_ms > 0) {
-            timer = new Timer(true);
-            timer.schedule(new TimeoutTimerTask(this), timeout_in_ms);
-        }
+        
+        timer = new Timer(true);
+        timer.schedule(new TimeoutTimerTask(this), getTimeout());
 
         logger.exiting(className, "execute");
     }
