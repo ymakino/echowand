@@ -26,6 +26,7 @@ import echowand.service.result.CaptureResult;
 import echowand.service.result.ResultBase;
 import echowand.service.result.GetResult;
 import echowand.service.result.FrameSelector;
+import echowand.service.result.NotifyResult;
 import echowand.service.result.ObserveResult;
 import echowand.service.result.SetGetResult;
 import echowand.service.result.SetResult;
@@ -582,7 +583,7 @@ public class Service {
     public SetGetResult doSetGet(NodeInfo nodeInfo, ClassEOJ ceoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, ceoj, properties, epcs, timeout});
         
-        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), ceoj.getAllInstanceEOJ(), properties, epcs, timeout);
+        SetGetResult setGetResult = doSetGet(getRemoteNode(nodeInfo), ceoj.getAllInstanceEOJ(), properties, epcs, timeout);
         
         LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
         return setGetResult;
@@ -591,7 +592,7 @@ public class Service {
     public SetGetResult doSetGet(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{nodeInfo, eoj, properties, epcs, timeout});
         
-        SetGetResult setGetResult = doSetGet(getSubnet().getRemoteNode(nodeInfo), eoj, properties, epcs, timeout);
+        SetGetResult setGetResult = doSetGet(getRemoteNode(nodeInfo), eoj, properties, epcs, timeout);
         
         LOGGER.exiting(CLASS_NAME, "doSetGet", setGetResult);
         return setGetResult;
@@ -681,7 +682,7 @@ public class Service {
     public ObserveResult doObserve(NodeInfo nodeInfo, EOJ eoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, eoj, epc});
         
-        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), eoj, epc);
+        ObserveResult observeResult = doObserve(getRemoteNode(nodeInfo), eoj, epc);
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -690,7 +691,7 @@ public class Service {
     public ObserveResult doObserve(NodeInfo nodeInfo, ClassEOJ ceoj, EPC epc) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, ceoj, epc});
         
-        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), ceoj, epc);
+        ObserveResult observeResult = doObserve(getRemoteNode(nodeInfo), ceoj, epc);
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -699,7 +700,7 @@ public class Service {
     public ObserveResult doObserve(NodeInfo nodeInfo, EOJ eoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, eoj, epcs});
         
-        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), eoj, epcs);
+        ObserveResult observeResult = doObserve(getRemoteNode(nodeInfo), eoj, epcs);
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -708,7 +709,7 @@ public class Service {
     public ObserveResult doObserve(NodeInfo nodeInfo, ClassEOJ ceoj, List<EPC> epcs) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{nodeInfo, ceoj, epcs});
         
-        ObserveResult observeResult = doObserve(getSubnet().getRemoteNode(nodeInfo), ceoj, epcs);
+        ObserveResult observeResult = doObserve(getRemoteNode(nodeInfo), ceoj, epcs);
         
         LOGGER.exiting(CLASS_NAME, "doObserve", observeResult);
         return observeResult;
@@ -802,7 +803,7 @@ public class Service {
         
         if (o instanceof NodeInfo) {
             NodeInfo nodeInfo = (NodeInfo)o;
-            return getSubnet().getRemoteNode(nodeInfo);
+            return getRemoteNode(nodeInfo);
         }
         
         throw new SubnetException("Invalid node: " + o);
@@ -1039,14 +1040,83 @@ public class Service {
         return getRemoteObjectManager().add(object);
     }
     
-    public void broadcastNotification(EOJ eoj, EPC epc, ObjectData data) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "broadcastNotification", new Object[]{eoj, epc, data});
+    public NotifyResult doNotify(EOJ eoj, EPC epc, Data data, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, epc, data, timeout});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify(getGroupNode(), eoj, properties, timeout, false);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, properties, timeout});
+        
+        NotifyResult notifyResult = doNotify(getGroupNode(), eoj, properties, timeout, false);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, properties, timeout});
+        
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, false);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties, timeout});
+        
+        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, false);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(EOJ eoj, EPC epc, Data data, int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, epc, data, timeout, responseRequired});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify(getGroupNode(), eoj, properties, timeout, responseRequired);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, properties, timeout, responseRequired});
+        
+        NotifyResult notifyResult = doNotify(getGroupNode(), eoj, properties, timeout, responseRequired);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, properties, timeout, responseRequired});
+        
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, responseRequired);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties, timeout, responseRequired});
+        
+        NotifyResult notifyResult = new NotifyResult(responseRequired);
         
         AnnounceTransactionConfig transactionConfig = new AnnounceTransactionConfig();
+        transactionConfig.setResponseRequired(responseRequired);
         
-        transactionConfig.addAnnounce(epc, data.getData());
-        for (int i=0; i<data.getExtraSize(); i++) {
-            transactionConfig.addAnnounce(epc, data.getExtraDataAt(i));
+        for (Pair<EPC, Data> pair : properties) {
+            transactionConfig.addAnnounce(pair.first, pair.second);
         }
         
         transactionConfig.setReceiverNode(core.getSubnet().getGroupNode());
@@ -1055,20 +1125,68 @@ public class Service {
         transactionConfig.setSourceEOJ(eoj);
         
         Transaction transaction = core.getTransactionManager().createTransaction(transactionConfig);
+        transaction.setTimeout(timeout);
+        
+        transaction.addTransactionListener(new ResultBaseTransactionListener(notifyResult));
+        
         transaction.execute();
         
-        LOGGER.exiting(CLASS_NAME, "broadcastNotification");
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
     }
     
-    public void broadcastInstanceList() throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "broadcastInstanceList");
+    public NotifyResult doNotifyInstanceList() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList");
+        
+        NotifyResult notifyResult = doNotifyInstanceList(getGroupNode(), 0, false);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotifyInstanceList(int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", timeout);
+        
+        NotifyResult notifyResult = doNotifyInstanceList(getGroupNode(), timeout, false);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotifyInstanceList(int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{timeout, responseRequired});
+        
+        NotifyResult notifyResult = doNotifyInstanceList(getGroupNode(), timeout, responseRequired);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotifyInstanceList(NodeInfo nodeInfo, int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{nodeInfo, timeout, responseRequired});
+        
+        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), timeout, responseRequired);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
+        return notifyResult;
+    }
+    
+    public NotifyResult doNotifyInstanceList(Node node, int timeout, boolean responseRequired) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{node, timeout, responseRequired});
         
         EOJ eoj = getCore().getNodeProfileObject().getEOJ();
         EPC epc = EPC.xD5;
         ObjectData data = getCore().getNodeProfileObject().forceGetData(epc);
         
-        broadcastNotification(eoj, epc, data);
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data.getData()));
+        for (int i=0; i<data.getExtraSize(); i++) {
+            properties.add(new Pair<EPC, Data>(epc, data.getExtraDataAt(i)));
+        }
         
-        LOGGER.exiting(CLASS_NAME, "broadcastInstanceList");
+        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, responseRequired);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
+        return notifyResult;
     }
 }
