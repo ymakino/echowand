@@ -403,8 +403,14 @@ public class Transaction {
         
         sendRequest();
         
-        timer = new Timer(true);
-        timer.schedule(new TimeoutTimerTask(this), getTimeout());
+        int timeout = getTimeout();
+        
+        if (timeout == 0) {
+            finish();
+        } else if (timeout > 0) {
+            timer = new Timer(true);
+            timer.schedule(new TimeoutTimerTask(this), timeout);
+        }
 
         logger.exiting(className, "execute");
     }

@@ -12,6 +12,8 @@ import echowand.common.ESV;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.net.Inet4Subnet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -419,6 +421,81 @@ public class TransactionTest {
         try {
             t.execute();
             Thread.sleep(200);
+            assertTrue(t.isDone());
+            assertFalse(t.isWaitingResponse());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    public class TransactionListenerTest implements TransactionListener {
+            public int sendCount = 0;
+            public int receiveCount = 0;
+            public boolean finished = false;
+            public int delay = 0;
+            
+            @Override
+            public void begin(Transaction t) {
+            }
+
+            @Override
+            public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
+                sendCount++;
+            }
+
+            @Override
+            public void receive(Transaction t, Subnet subnet, Frame frame) {
+                receiveCount++;
+            }
+
+            @Override
+            public void finish(Transaction t) {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TransactionTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                finished = true;
+            }
+    }
+    
+    @Test
+    public void testImmediateTimeout() {
+        Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
+        t.setTimeout(0);
+        
+        TransactionListenerTest listener = new TransactionListenerTest();
+        listener.delay = 500;
+        
+        t.addTransactionListener(listener);
+        
+        try {
+            t.execute();
+            assertTrue(t.isDone());
+            assertFalse(t.isWaitingResponse());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test
+    public void testNoTimeout() {
+        Transaction t = new Transaction(subnet, transactionManager, transactionConfig1);
+        t.setTimeout(-1);
+        
+        TransactionListenerTest listener = new TransactionListenerTest();
+        listener.delay = 100;
+        
+        t.addTransactionListener(listener);
+        
+        try {
+            t.execute();
+            assertFalse(t.isDone());
+            Thread.sleep(500);
+            assertFalse(t.isDone());
+            t.finish();
             assertTrue(t.isDone());
             assertFalse(t.isWaitingResponse());
         } catch (Exception e) {

@@ -829,7 +829,14 @@ public class ServiceTest {
         
         CaptureResult captureResult = peerService.doCapture();
         
-        service.doNotifyInstanceList(subnet.getGroupNode(), 0, false);
+        NotifyResult notifyResult = service.doNotifyInstanceList(subnet.getGroupNode(), 0, false);
+        
+        assertEquals(0, notifyResult.countFrames());
+        assertEquals(1, notifyResult.countRequestFrames());
+        assertEquals(ESV.INF, notifyResult.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getESV());
+        assertEquals(1, notifyResult.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
+        assertEquals(EPC.xD5, notifyResult.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
+        assertEquals(subnet.getGroupNode(), notifyResult.getRequestFrame(0).frame.getReceiver());
         Thread.sleep(100);
         
         assertEquals(1, captureResult.countFrames());
