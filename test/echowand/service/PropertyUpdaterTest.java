@@ -22,7 +22,30 @@ public class PropertyUpdaterTest {
      * Test of getIntervalPeriod method, of class PropertyUpdater.
      */
     @Test
-    public void testGetIntervalPeriod() {
+    public void testGetDelay() {
+        PropertyUpdater updater = new PropertyUpdaterImpl();
+        assertEquals(0, updater.getDelay());
+    }
+
+    /**
+     * Test of setIntervalPeriod method, of class PropertyUpdater.
+     */
+    @Test
+    public void testSetDelay() {
+        PropertyUpdater updater = new PropertyUpdaterImpl();
+        
+        updater.setDelay(5000);
+        assertEquals(5000, updater.getDelay());
+        
+        updater.setDelay(0);
+        assertEquals(0, updater.getDelay());
+    }
+
+    /**
+     * Test of getIntervalPeriod method, of class PropertyUpdater.
+     */
+    @Test
+    public void testGetInterval() {
         PropertyUpdater updater = new PropertyUpdaterImpl();
         assertEquals(0, updater.getIntervalPeriod());
     }
@@ -31,7 +54,7 @@ public class PropertyUpdaterTest {
      * Test of setIntervalPeriod method, of class PropertyUpdater.
      */
     @Test
-    public void testSetIntervalPeriod() {
+    public void testSetInterval() {
         PropertyUpdater updater = new PropertyUpdaterImpl();
         
         updater.setIntervalPeriod(5000);

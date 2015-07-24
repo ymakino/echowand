@@ -25,17 +25,27 @@ public class PropertyUpdaterThread extends Thread {
     public void run() {
         LOGGER.entering(CLASS_NAME, "run");
         
+        int delay = updater.getDelay();
+        
+        if (delay > 0) {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException ex) {
+                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "interrupted", ex);
+            }
+        }
+        
         while (!updater.isDone()) {
             
             updater.doLoopOnce();
 
-            int intervalPeriod = updater.getIntervalPeriod();
+            int interval = updater.getIntervalPeriod();
 
-            if (intervalPeriod > 0) {
+            if (interval > 0) {
                 try {
-                    Thread.sleep(intervalPeriod);
+                    Thread.sleep(interval);
                 } catch (InterruptedException ex) {
-                    LOGGER.logp(Level.OFF, CLASS_NAME, "run", "interrupted", ex);
+                    LOGGER.logp(Level.INFO, CLASS_NAME, "run", "interrupted", ex);
                 }
             }
         }

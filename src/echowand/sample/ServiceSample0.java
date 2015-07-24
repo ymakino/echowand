@@ -75,7 +75,7 @@ public class ServiceSample0 {
         private int num=0;
         
         public DummyDataUpdater() {
-            super(1000);
+            super(0, 1000);
         }
 
         private static byte b1(int num) {

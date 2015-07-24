@@ -14,8 +14,20 @@ import static org.junit.Assert.*;
  */
 public class PropertyUpdaterThreadTest {
     
-    private void testRun1(int interval, int sleep1, int sleep2, int mincount, int maxcount) throws InterruptedException {
+    public class PropertyUpdaterImpl extends PropertyUpdater {
+        public LocalObject localObject = null;
+        public int count =0;
+
+        @Override
+        public void loop(LocalObject localObject) {
+            this.localObject = localObject;
+            count++;
+        }
+    }
+    
+    private void testRun1(int delay, int interval, int sleep1, int sleep2, int mincount, int maxcount) throws InterruptedException {
         PropertyUpdaterImpl updater = new PropertyUpdaterImpl();
+        updater.setDelay(delay);
         updater.setIntervalPeriod(interval);
         PropertyUpdaterThread updaterThread = new PropertyUpdaterThread(updater);
         updaterThread.start();
@@ -41,20 +53,16 @@ public class PropertyUpdaterThreadTest {
      * Test of run method, of class PropertyUpdaterThread.
      */
     @Test
-    public void testRun() throws InterruptedException {
-        testRun1(0, 1000, 500, 10000, Integer.MAX_VALUE);
-        testRun1(1, 1000, 500, 500, 1000);
-        testRun1(700, 1000, 1000, 2, 2);
+    public void testRunWithoutDelay() throws InterruptedException {
+        testRun1(0, 0, 1000, 500, 10000, Integer.MAX_VALUE);
+        testRun1(0, 1, 1000, 500, 500, 1000);
+        testRun1(0, 700, 1000, 1000, 2, 2);
     }
     
-    public class PropertyUpdaterImpl extends PropertyUpdater {
-        public LocalObject localObject = null;
-        public int count =0;
-
-        @Override
-        public void loop(LocalObject localObject) {
-            this.localObject = localObject;
-            count++;
-        }
+    @Test
+    public void testRunWithDelay() throws InterruptedException {
+        testRun1(500, 0, 1000, 500, 10000, Integer.MAX_VALUE);
+        testRun1(500, 1, 1000, 500, 250, 1000);
+        testRun1(500, 700, 1000, 1000, 1, 1);
     }
 }
