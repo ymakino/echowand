@@ -5,6 +5,7 @@ import echowand.info.TemperatureSensorInfo;
 import echowand.object.LocalObject;
 import echowand.object.LocalObjectDelegate;
 import echowand.object.ObjectData;
+import java.util.LinkedList;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -221,4 +222,32 @@ public class LocalObjectConfigTest {
         assertEquals(updater2, config.getPropertyUpdater(1));
     }
     
+    /**
+     * Test of notifyCreated method, of class LocalObjectServiceDelegate.
+     */
+    @Test
+    public void testNotifyCreated() {
+        LocalObjectServiceDelegateImpl delegate = new LocalObjectServiceDelegateImpl();
+        assertTrue(config.addDelegate(delegate));
+        
+        LocalObject localObject1 = new LocalObject(new TemperatureSensorInfo());
+        config.notifyCreated(localObject1);
+        assertEquals(1, delegate.objects.size());
+        assertEquals(localObject1, delegate.objects.get(0));
+        
+        LocalObject localObject2 = new LocalObject(new TemperatureSensorInfo());
+        config.notifyCreated(localObject2);
+        assertEquals(2, delegate.objects.size());
+        assertEquals(localObject1, delegate.objects.get(0));
+        assertEquals(localObject2, delegate.objects.get(1));
+    }
+
+    public class LocalObjectServiceDelegateImpl extends LocalObjectServiceDelegate {
+        public LinkedList<LocalObject> objects = new LinkedList<LocalObject>();
+
+        @Override
+        public void notifyCreated(LocalObject object) {
+            objects.add(object);
+        }
+    }
 }

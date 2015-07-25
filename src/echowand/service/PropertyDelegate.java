@@ -45,7 +45,6 @@ public class PropertyDelegate extends LocalObjectAccessInterface {
         return notifyEnabled;
     }
     
-    
     public void notifyCreated(LocalObject object) {
     }
     

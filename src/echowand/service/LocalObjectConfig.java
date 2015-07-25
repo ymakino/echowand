@@ -146,12 +146,18 @@ public class LocalObjectConfig {
     }
     
     public void notifyCreated(LocalObject object) {
-        for (PropertyDelegate  delegate : propertyDelegates) {
-            delegate.notifyCreated(object);
+        for (LocalObjectDelegate delegate : delegates) {
+            if (delegate instanceof LocalObjectServiceDelegate) {
+                ((LocalObjectServiceDelegate)delegate).notifyCreated(object);
+            }
         }
         
-        for (PropertyUpdater  updater : propertyUpdaters) {
-            updater.notifyCreated(object);
+        for (PropertyDelegate  propertyDelegate : propertyDelegates) {
+            propertyDelegate.notifyCreated(object);
+        }
+        
+        for (PropertyUpdater  propertyUpdater : propertyUpdaters) {
+            propertyUpdater.notifyCreated(object);
         }
     }
 }
