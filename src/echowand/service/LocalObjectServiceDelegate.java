@@ -1,12 +1,12 @@
 package echowand.service;
 
 import echowand.object.LocalObject;
-import echowand.object.LocalObjectDefaultDelegate;
+import echowand.object.LocalObjectDelegate;
 
 /**
  *
  * @author ymakino
  */
-public class LocalObjectServiceDelegate extends LocalObjectDefaultDelegate {
-    public void notifyCreated(LocalObject object){}
+public interface LocalObjectServiceDelegate extends LocalObjectDelegate {
+    public void notifyCreation(LocalObject object);
 }

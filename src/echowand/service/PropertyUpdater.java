@@ -83,6 +83,6 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     
     public abstract void loop(LocalObject localObject);
     
-    public void notifyCreated(LocalObject object) {
+    public void notifyCreation(LocalObject object) {
     }
 }

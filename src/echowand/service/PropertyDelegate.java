@@ -45,7 +45,7 @@ public class PropertyDelegate extends LocalObjectAccessInterface {
         return notifyEnabled;
     }
     
-    public void notifyCreated(LocalObject object) {
+    public void notifyCreation(LocalObject object) {
     }
     
     public ObjectData getUserData(LocalObject object, EPC epc) {

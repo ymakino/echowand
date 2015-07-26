@@ -223,31 +223,46 @@ public class LocalObjectConfigTest {
     }
     
     /**
-     * Test of notifyCreated method, of class LocalObjectServiceDelegate.
+     * Test of notifyCreation method, of class LocalObjectServiceDelegate.
      */
     @Test
-    public void testNotifyCreated() {
+    public void testNotifyCreation() {
         LocalObjectServiceDelegateImpl delegate = new LocalObjectServiceDelegateImpl();
         assertTrue(config.addDelegate(delegate));
         
         LocalObject localObject1 = new LocalObject(new TemperatureSensorInfo());
-        config.notifyCreated(localObject1);
+        config.notifyCreation(localObject1);
         assertEquals(1, delegate.objects.size());
         assertEquals(localObject1, delegate.objects.get(0));
         
         LocalObject localObject2 = new LocalObject(new TemperatureSensorInfo());
-        config.notifyCreated(localObject2);
+        config.notifyCreation(localObject2);
         assertEquals(2, delegate.objects.size());
         assertEquals(localObject1, delegate.objects.get(0));
         assertEquals(localObject2, delegate.objects.get(1));
     }
 
-    public class LocalObjectServiceDelegateImpl extends LocalObjectServiceDelegate {
+    public class LocalObjectServiceDelegateImpl implements LocalObjectServiceDelegate {
         public LinkedList<LocalObject> objects = new LinkedList<LocalObject>();
 
         @Override
-        public void notifyCreated(LocalObject object) {
+        public void notifyCreation(LocalObject object) {
             objects.add(object);
+        }
+
+        @Override
+        public void getData(GetState result, LocalObject object, EPC epc) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void setData(SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
 }
