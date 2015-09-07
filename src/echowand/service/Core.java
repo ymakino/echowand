@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Serviceを利用するために必要なechowandクラス群を管理
  * @author ymakino
  */
 public class Core {
@@ -79,6 +79,11 @@ public class Core {
         LOGGER.exiting(CLASS_NAME, "Core");
     }
     
+    /**
+     * 指定されたLocalObjectConfigを追加する。
+     * @param config 追加するLocalObjectConfig
+     * @return 追加に成功したらtrue、そうでなければfalse
+     */
     public boolean addLocalObjectConfig(LocalObjectConfig config) {
         LOGGER.entering(CLASS_NAME, "addLocalObjectConfig", config);
         
@@ -88,6 +93,11 @@ public class Core {
         return result;
     }
     
+    /**
+     * 指定されたLocalObjectConfigを抹消する。
+     * @param config 抹消するLocalObjectConfig
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
     public boolean removeLocalObjectConfig(LocalObjectConfig config) {
         LOGGER.entering(CLASS_NAME, "removeLocalObjectConfig", config);
         

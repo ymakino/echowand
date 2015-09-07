@@ -7,7 +7,7 @@ import echowand.object.ObjectData;
 import java.util.logging.Logger;
 
 /**
- *
+ * PropertyDelegateをLocalObjectDelegateとして利用
  * @author ymakino
  */
 public class LocalObjectPropertyDelegate extends LocalObjectDefaultDelegate {
@@ -16,6 +16,10 @@ public class LocalObjectPropertyDelegate extends LocalObjectDefaultDelegate {
     
     private PropertyDelegate propertyDelegate;
     
+    /**
+     * 利用するPropertyDelegateを指定してLocalObjectPropertyDelegateを生成する。
+     * @param propertyDelegate 利用するPropertyDelegate
+     */
     public LocalObjectPropertyDelegate(PropertyDelegate propertyDelegate) {
         LOGGER.entering(CLASS_NAME, "LocalObjectPropertyDelegate", propertyDelegate);
         

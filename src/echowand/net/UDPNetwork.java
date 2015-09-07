@@ -161,7 +161,7 @@ public class UDPNetwork {
     
     /**
      * バッファの最大長を設定する。
-     * @param bufferSize 
+     * @param bufferSize バッファの最大長
      */
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;

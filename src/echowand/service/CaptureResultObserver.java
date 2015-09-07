@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 /**
- *
+ * CaptureResultにフレームを登録するCaptureSubnetObserver
  * @author ymakino
  */
 public class CaptureResultObserver implements CaptureSubnetObserver {
@@ -15,10 +15,18 @@ public class CaptureResultObserver implements CaptureSubnetObserver {
     
     private LinkedList<CaptureResult> captureResults;
     
+    /**
+     * CaptureResultObserverを生成する。
+     */
     public CaptureResultObserver() {
         captureResults = new LinkedList<CaptureResult>();
     }
     
+    /**
+     * 指定されたCaptureResultを追加する。
+     * @param captureResult 追加するCaptureResult
+     * @return 追加に成功したらtrue、そうでなければfalse
+     */
     public synchronized boolean addCaptureResult(CaptureResult captureResult) {
         LOGGER.entering(CLASS_NAME, "addCaptureResult", captureResult);
         
@@ -28,6 +36,11 @@ public class CaptureResultObserver implements CaptureSubnetObserver {
         return result;
     }
     
+    /**
+     * 指定されたCaptureResultを抹消する。
+     * @param captureResult 抹消するCaptureResult
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
     public synchronized boolean removeCaptureResult(CaptureResult captureResult) {
         LOGGER.entering(CLASS_NAME, "removeCaptureResult", captureResult);
         

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- *
+ * ObserveResultのための状変時アナウンスメッセージ処理
  * @author ymakino
  */
 public class ObserveResultProcessor extends DefaultRequestProcessor {
@@ -19,6 +19,9 @@ public class ObserveResultProcessor extends DefaultRequestProcessor {
     
     private LinkedList<ObserveResult> observeResults;
     
+    /**
+     * ObserveResultProcessorを生成する。
+     */
     public ObserveResultProcessor() {
         LOGGER.entering(CLASS_NAME, "ObserveResultProcessor");
         
@@ -27,6 +30,11 @@ public class ObserveResultProcessor extends DefaultRequestProcessor {
         LOGGER.exiting(CLASS_NAME, "ObserveResultProcessor");
     }
     
+    /**
+     * 状変時アナウンスメッセージを処理するObserveResultを追加する。
+     * @param observeResult 追加するObserveResult
+     * @return 追加に成功した場合にはtrue、そうでなければfalse
+     */
     public synchronized boolean addObserveResult(ObserveResult observeResult) {
         LOGGER.entering(CLASS_NAME, "addObserveResult", observeResult);
         

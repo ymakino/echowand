@@ -42,7 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * ライブラリの様々な機能を提供するServiceインタフェース
  * @author ymakino
  */
 public class Service {
@@ -51,6 +51,10 @@ public class Service {
     
     private Core core;
     
+    /**
+     * Serviceを生成する。
+     * @param core 
+     */
     public Service(Core core) {
         LOGGER.entering(CLASS_NAME, "Service", core);
         

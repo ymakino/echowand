@@ -7,7 +7,7 @@ import echowand.object.ObjectData;
 import java.util.logging.Logger;
 
 /**
- *
+ * LocalObjectとCoreを保持し利用
  * @author ymakino
  */
 public class LocalObjectAccessInterface {
@@ -17,6 +17,11 @@ public class LocalObjectAccessInterface {
     private Core core = null;
     private LocalObject localObject = null;
     
+    /**
+     * 保持するCoreを設定する。
+     * @param core 保持するCore
+     * @return 以前保持していたCore
+     */
     public Core setCore(Core core) {
         LOGGER.entering(CLASS_NAME, "setCore", core);
         
@@ -27,6 +32,11 @@ public class LocalObjectAccessInterface {
         return lastCore;
     }
     
+    /**
+     * 保持するローカルオブジェクトを設定する。
+     * @param object 保持するローカルオブジェクト
+     * @return 以前保持していたローカルオブジェクト
+     */
     public LocalObject setLocalObject(LocalObject object) {
         LOGGER.entering(CLASS_NAME, "setLocalObject", object);
         
@@ -37,14 +47,27 @@ public class LocalObjectAccessInterface {
         return lastObject;
     }
     
+    /**
+     * 保持しているCoreを返す。
+     * @return 保持しているCore
+     */
     public Core getCore() {
         return core;
     }
     
+    /**
+     * 保持しているローカルオブジェクトを返す。
+     * @return 保持しているローカルオブジェクト
+     */
     public LocalObject getLocalObject() {
         return localObject;
     }
     
+    /**
+     * 保持しているローカルオブジェクトのObjectDataを取得する。
+     * @param epc 取得するObjectDataのEPCの指定
+     * @return 取得したObjectData
+     */
     public ObjectData getData(EPC epc) {
         LOGGER.entering(CLASS_NAME, "getData", epc);
         
@@ -54,6 +77,12 @@ public class LocalObjectAccessInterface {
         return data;
     }
     
+    /**
+     * 保持しているCoreを利用しObjectDataを取得する。
+     * @param eoj 取得するObjectData
+     * @param epc
+     * @return 
+     */
     public ObjectData getData(EOJ eoj, EPC epc) {
         LOGGER.entering(CLASS_NAME, "getData", new Object[]{eoj, epc});
         

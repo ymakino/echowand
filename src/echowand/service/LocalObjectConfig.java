@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 /**
- *
+ * CoreがLocalObjectを生成するための設定
  * @author ymakino
  */
 public class LocalObjectConfig {
@@ -19,6 +19,10 @@ public class LocalObjectConfig {
     private LinkedList<PropertyDelegate> propertyDelegates;
     private LinkedList<PropertyUpdater> propertyUpdaters;
     
+    /**
+     * 指定されたObjectInfoを利用するLocalObjectConfigを生成する。
+     * @param objectInfo 利用するObjectInfo
+     */
     public LocalObjectConfig(ObjectInfo objectInfo) {
         LOGGER.entering(CLASS_NAME, "LocalObjectConfig", objectInfo);
         
@@ -30,6 +34,10 @@ public class LocalObjectConfig {
         LOGGER.exiting(CLASS_NAME, "LocalObjectConfig");
     }
     
+    /**
+     * 利用するObjectInfoを返す。
+     * @return 利用するObjectInfo
+     */
     public ObjectInfo getObjectInfo() {
         LOGGER.entering(CLASS_NAME, "getObjectInfo");
         
@@ -37,6 +45,10 @@ public class LocalObjectConfig {
         return objectInfo;
     }
     
+    /**
+     * 登録されているLocalObjectDelegateの個数を返す。
+     * @return 登録されているLocalObjectDelegateの個数
+     */
     public int countDelegates() {
         LOGGER.entering(CLASS_NAME, "countDelegates");
         
@@ -46,6 +58,11 @@ public class LocalObjectConfig {
         return count;
     }
     
+    /**
+     * 指定されたLocalObjectDelegateを追加する。
+     * @param delegate 追加するLocalObjectDelegate
+     * @return 追加に成功したらtrue、そうでなければfalse
+     */
     public boolean addDelegate(LocalObjectDelegate delegate) {
         LOGGER.entering(CLASS_NAME, "addDelegate", delegate);
         
@@ -55,6 +72,11 @@ public class LocalObjectConfig {
         return result;
     }
     
+    /**
+     * 指定されたLocalObjectDelegateを抹消する。
+     * @param delegate 抹消するLocalObjectDelegate
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
     public boolean removeDelegate(LocalObjectDelegate delegate) {
         LOGGER.entering(CLASS_NAME, "removeDelegate", delegate);
         
@@ -64,6 +86,11 @@ public class LocalObjectConfig {
         return result;
     }
     
+    /**
+     * index番目のLocalObjectDelegateを返す。
+     * @param index LocalObjectDelegateのインデックス
+     * @return 指定されたLocalObjectDelegate
+     */
     public LocalObjectDelegate getDelegate(int index) {
         LOGGER.entering(CLASS_NAME, "getDelegate");
         
@@ -73,6 +100,10 @@ public class LocalObjectConfig {
         return delegate;
     }
     
+    /**
+     * 登録されているPropertyDelegateの個数を返す。
+     * @return 登録されているPropertyDelegateの個数
+     */
     public int countPropertyDelegates() {
         LOGGER.entering(CLASS_NAME, "countPropertyDelegates");
         
@@ -82,6 +113,11 @@ public class LocalObjectConfig {
         return count;
     }
     
+    /**
+     * 指定されたPropertyDelegateを追加する。
+     * @param delegate 追加するPropertyDelegate
+     * @return 追加に成功したらtrue、そうでなければfalse
+     */
     public boolean addPropertyDelegate(PropertyDelegate delegate) {
         LOGGER.entering(CLASS_NAME, "addPropertyDelegate", delegate);
         
@@ -91,6 +127,11 @@ public class LocalObjectConfig {
         return result;
     }
     
+    /**
+     * 指定されたPropertyDelegateを抹消する。
+     * @param delegate 抹消するPropertyDelegate
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
     public boolean removePropertyDelegate(PropertyDelegate delegate) {
         LOGGER.entering(CLASS_NAME, "removePropertyDelegate", delegate);
         
@@ -100,6 +141,11 @@ public class LocalObjectConfig {
         return result;
     }
     
+    /**
+     * index番目のPropertyDelegateを返す。
+     * @param index PropertyDelegateのインデックス
+     * @return 指定されたPropertyDelegate
+     */
     public PropertyDelegate getPropertyDelegate(int index) {
         LOGGER.entering(CLASS_NAME, "getPropertyDelegate");
         
@@ -109,6 +155,10 @@ public class LocalObjectConfig {
         return delegate;
     }
     
+    /**
+     * 登録されているPropertyUpdaterの個数を返す。
+     * @return 登録されているPropertyUpdaterの個数
+     */
     public int countPropertyUpdaters() {
         LOGGER.entering(CLASS_NAME, "countPropertyUpdaters");
         
@@ -118,6 +168,11 @@ public class LocalObjectConfig {
         return count;
     }
     
+    /**
+     * 指定されたPropertyUpdaterを追加する。
+     * @param updater 追加するPropertyUpdater
+     * @return 追加に成功したらtrue、そうでなければfalse
+     */
     public boolean addPropertyUpdater(PropertyUpdater updater) {
         LOGGER.entering(CLASS_NAME, "addPropertyUpdater", updater);
         
@@ -127,6 +182,11 @@ public class LocalObjectConfig {
         return result;
     }
     
+    /**
+     * 指定されたPropertyUpdaterを抹消する。
+     * @param updater 抹消するPropertyUpdater
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
     public boolean removePropertyUpdater(PropertyUpdater updater) {
         LOGGER.entering(CLASS_NAME, "removePropertyUpdater", updater);
         
@@ -136,6 +196,11 @@ public class LocalObjectConfig {
         return result;
     }
     
+    /**
+     * index番目のPropertyUpdaterを返す。
+     * @param index PropertyUpdaterのインデックス
+     * @return 指定されたPropertyUpdater
+     */
     public PropertyUpdater getPropertyUpdater(int index) {
         LOGGER.entering(CLASS_NAME, "getPropertyUpdater");
         
@@ -145,6 +210,11 @@ public class LocalObjectConfig {
         return updater;
     }
     
+    /**
+     * このLocalObjectConfigを利用したLocalObjectが生成された時に呼び出される。
+     * 登録されているLocalObjectServiceDelegate、PropertyDelegate、PropertyUpdaterのnotifyCreationを呼び出す。
+     * @param object 生成されたLocalObject
+     */
     public void notifyCreation(LocalObject object) {
         for (LocalObjectDelegate delegate : delegates) {
             if (delegate instanceof LocalObjectServiceDelegate) {

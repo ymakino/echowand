@@ -8,18 +8,27 @@ import echowand.net.SubnetException;
 import java.util.LinkedList;
 
 /**
- *
+ * 送受信したフレームをキャプチャする機能を持つSubnet
+ * キャプチャ処理はCaptureSubnetObserverを利用して記述する
  * @author ymakino
  */
 public class CaptureSubnet implements Subnet {
     private Subnet internalSubnet;
     private LinkedList<CaptureSubnetObserver> observers;
     
+    /**
+     * 実際の処理で利用するSubnetを指定してCaptureSubnetを生成する。
+     * @param subnet 処理に利用するSubnet
+     */
     public CaptureSubnet(Subnet subnet) {
         this.internalSubnet = subnet;
         observers = new LinkedList<CaptureSubnetObserver>();
     }
     
+    /**
+     * 実際の処理で利用するSubnetを返す。
+     * @return 処理で利用するSubnet
+     */
     public Subnet getInternalSubnet() {
         return internalSubnet;
     }
@@ -58,18 +67,37 @@ public class CaptureSubnet implements Subnet {
         return internalSubnet.getGroupNode();
     }
     
+    /**
+     * 登録されているCaptureSubnetObserverの個数を返す。
+     * @return 登録されているCaptureSubnetObserverの数
+     */
     public synchronized int countObservers() {
         return observers.size();
     }
     
+    /**
+     * index番目のCaptureSubnetObserverを返す。
+     * @param index CaptureSubnetObserverのインデックス
+     * @return 指定されたCaptureSubnetObserver
+     */
     public synchronized CaptureSubnetObserver getObserver(int index) {
         return observers.get(index);
     }
     
+    /**
+     * 指定されたCaptureSubnetObserverを追加する。
+     * @param observer 追加するCaptureSubnetObserver
+     * @return 追加に成功したらtrue、そうでなければfalse
+     */
     public synchronized boolean addObserver(CaptureSubnetObserver observer) {
         return observers.add(observer);
     }
     
+    /**
+     * 指定されたCaptureSubnetObserverを抹消する。
+     * @param observer 抹消するCaptureSubnetObserver
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
     public synchronized boolean removeObserver(CaptureSubnetObserver observer) {
         return observers.remove(observer);
     }

@@ -8,7 +8,7 @@ import echowand.object.LocalObjectNotifyDelegate;
 import java.util.logging.Logger;
 
 /**
- *
+ * LocalObjectConfigからローカルオブジェクトを生成
  * @author ymakino
  */
 public class LocalObjectCreator {
@@ -17,6 +17,10 @@ public class LocalObjectCreator {
     
     private LocalObjectConfig config;
     
+    /**
+     * 利用するLocalObjectConfigを指定してLocalObjectCreatorを生成する。
+     * @param config 利用するLocalObjectConfig
+     */
     public LocalObjectCreator(LocalObjectConfig config) {
         LOGGER.entering(CLASS_NAME, "LocalObjectCreator", config);
         
@@ -74,6 +78,12 @@ public class LocalObjectCreator {
         return updater;
     }
     
+    /**
+     * 利用するCoreを指定してローカルオブジェクトを生成する。
+     * @param core 利用するCoreの指定
+     * @return 生成したローカルオブジェクト
+     * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
+     */
     public LocalObjectCreatorResult create(Core core) throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "create", core);
         

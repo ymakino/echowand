@@ -4,7 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * ProperyUpdaterクラスを利用し定期実行を行うスレッド
  * @author ymakino
  */
 public class PropertyUpdaterThread extends Thread {
@@ -13,6 +13,10 @@ public class PropertyUpdaterThread extends Thread {
     
     private PropertyUpdater updater;
     
+    /**
+     * PropertyUpdaterThreadを生成する。
+     * @param updater 利用するPropertyUpdater
+     */
     public PropertyUpdaterThread(PropertyUpdater updater) {
         LOGGER.entering(CLASS_NAME, "PropertyUpdaterThread", updater);
         
@@ -21,6 +25,10 @@ public class PropertyUpdaterThread extends Thread {
         LOGGER.exiting(CLASS_NAME, "PropertyUpdaterThread");
     }
     
+    /**
+     * 定期実行を行う。
+     * 利用するPropertyUpdaterのisDone()がtrueを返す間繰り返す。
+     */
     @Override
     public void run() {
         LOGGER.entering(CLASS_NAME, "run");
