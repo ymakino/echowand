@@ -147,6 +147,16 @@ public class Transaction {
         logger.exiting(className, "doCallBeginTransactionListeners");
     }
     
+    private void doCallSentTransactionListeners(Frame frame, boolean success) {
+        logger.entering(className, "doCallSentTransactionListeners", frame);
+        
+        for (TransactionListener l : cloneTransactionListeners()) {
+            l.send(this, subnet, frame, success);
+        }
+        
+        logger.exiting(className, "doCallSentTransactionListeners");
+    }
+    
     private void doCallReceiveTransactionListeners(Frame frame) {
         logger.entering(className, "doCallReceiveTransactionListeners", frame);
         
@@ -227,6 +237,14 @@ public class Transaction {
         logger.entering(className, "sendRequest");
         
         int count = transactionConfig.getCountPayloads();
+        
+        if (count == 0) {
+            logger.exiting(className, "sendRequest", false);
+            return false;
+        }
+        
+        boolean result = true;
+        
         for (int i = 0; i < count; i++) {
             StandardPayload payload = createPayload(i);
 
@@ -234,11 +252,15 @@ public class Transaction {
             cf.setEDATA(payload);
             cf.setTID(tid);
             Frame frame = new Frame(transactionConfig.getSenderNode(), transactionConfig.getReceiverNode(), cf);
-            subnet.send(frame);
+            boolean success = subnet.send(frame);
+            
+            doCallSentTransactionListeners(frame, success);
+            
+            result &= success;
         }
         
-        logger.exiting(className, "sendRequest", true);
-        return true;
+        logger.exiting(className, "sendRequest", result);
+        return result;
     }
     
     private boolean isValidTransactionESVPair(ESV req, ESV res) {
@@ -279,7 +301,13 @@ public class Transaction {
             return false;
         }
         
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            logger.exiting(className, "receiveResponse", false);
+            return false;
+        }
+        
         EOJ responseSEOJ = payload.getSEOJ();
         EOJ responseDEOJ = payload.getDEOJ();
         EOJ requestDEOJ = transactionConfig.getDestinationEOJ();
@@ -374,10 +402,14 @@ public class Transaction {
         transactionManager.addTransaction(this);
         
         sendRequest();
-        int timeout_in_ms = getTimeout();
-        if (timeout_in_ms > 0) {
+        
+        int timeout = getTimeout();
+        
+        if (timeout == 0) {
+            finish();
+        } else if (timeout > 0) {
             timer = new Timer(true);
-            timer.schedule(new TimeoutTimerTask(this), timeout_in_ms);
+            timer.schedule(new TimeoutTimerTask(this), timeout);
         }
 
         logger.exiting(className, "execute");

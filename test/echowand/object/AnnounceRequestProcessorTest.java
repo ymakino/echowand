@@ -30,7 +30,7 @@ public class AnnounceRequestProcessorTest {
     
     public Frame processFrame(InternalSubnet subnet, AnnounceRequestProcessor listener, EOJ seoj, EOJ deoj, ESV esv) {
         CommonFrame cf = new CommonFrame(seoj, deoj, esv);
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         payload.addFirstProperty(new Property(EPC.x80, new Data((byte)0x42)));
         
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
@@ -84,7 +84,8 @@ public class AnnounceRequestProcessorTest {
         
         frame = processFrame(subnet, listener, new EOJ("001101"), new EOJ("0ef001"), ESV.INFC);
         assertTrue(frame != null);
-        StandardPayload payload = (StandardPayload)frame.getCommonFrame().getEDATA();
+        System.out.println(frame);
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(new EOJ("0ef001"), payload.getSEOJ());
         assertEquals(new EOJ("001101"), payload.getDEOJ());
         assertEquals(ESV.INFC_Res, payload.getESV());

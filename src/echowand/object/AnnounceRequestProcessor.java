@@ -45,13 +45,13 @@ public class AnnounceRequestProcessor extends DefaultRequestProcessor {
         logger.entering(className, "updateINForINFC", frame);
         
         CommonFrame commonFrame = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
         
         RemoteObject object = remoteManager.get(frame.getSender(), payload.getSEOJ());
         
         CommonFrame replyCommonFrame = new CommonFrame(payload.getDEOJ(), payload.getSEOJ(), ESV.INFC_Res);
         replyCommonFrame.setTID(commonFrame.getTID());
-        StandardPayload replyPayload = (StandardPayload)replyCommonFrame.getEDATA();
+        StandardPayload replyPayload = replyCommonFrame.getEDATA(StandardPayload.class);
 
         int len = payload.getFirstOPC();
         for (int i = 0; i < len; i++) {
@@ -70,7 +70,7 @@ public class AnnounceRequestProcessor extends DefaultRequestProcessor {
         logger.entering(className, "replyINForINFC", new Object[]{subnet, frame, replyPayload, object});
         
         CommonFrame commonFrame = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
 
         replyPayload.setDEOJ(payload.getSEOJ());
         CommonFrame replyCommonFrame = new CommonFrame();
@@ -91,7 +91,13 @@ public class AnnounceRequestProcessor extends DefaultRequestProcessor {
         logger.entering(className, "processINForINFC", new Object[]{subnet, frame, needsReply});
         
         CommonFrame commonFrame = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)commonFrame.getEDATA();
+        StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            logger.exiting(className, "processINForINFC", false);
+            return false;
+        }
+        
         EOJ eoj = payload.getDEOJ();
         List<LocalObject> objects;
         

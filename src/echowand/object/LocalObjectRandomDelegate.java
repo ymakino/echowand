@@ -38,7 +38,7 @@ public class LocalObjectRandomDelegate extends LocalObjectDefaultDelegate {
      */
     @Override
     public void getData(GetState result, LocalObject object, EPC epc) {
-        logger.entering(className, "getData", new Object[]{object, epc});
+        logger.entering(className, "getData", new Object[]{result, object, epc});
         
         if (this.epc == epc) {
             byte[] bytes = new byte[len];

@@ -1,0 +1,130 @@
+package echowand.service;
+
+import echowand.object.LocalObject;
+import java.util.logging.Logger;
+
+/**
+ * 定期的に実行を行い、必要に応じてプロパティのアップデートを行う
+ * @author ymakino
+ */
+public abstract class PropertyUpdater extends LocalObjectAccessInterface {
+    private static final Logger LOGGER = Logger.getLogger(PropertyUpdater.class.getName());
+    private static final String CLASS_NAME = PropertyUpdater.class.getName();
+    
+    private int delay;
+    private int intervalPeriod;
+    private boolean done;
+    
+    /**
+     * PropertyUpdaterを生成する。
+     */
+    public PropertyUpdater() {
+        LOGGER.entering(CLASS_NAME, "PropertyUpdater");
+        
+        delay = 0;
+        intervalPeriod = 0;
+        done = false;
+        
+        LOGGER.exiting(CLASS_NAME, "PropertyUpdater");
+    }
+    
+    /**
+     * PropertyUpdaterを生成する。
+     * @param delay 定期実行開始までの遅延時間(ミリ秒)
+     * @param intervalPeriod 定期実行のインターバル時間(ミリ秒)
+     */
+    public PropertyUpdater(int delay, int intervalPeriod) {
+        LOGGER.entering(CLASS_NAME, "PropertyUpdater", new Object[]{delay, intervalPeriod});
+        
+        this.delay = delay;
+        this.intervalPeriod = intervalPeriod;
+        done = false;
+        
+        LOGGER.exiting(CLASS_NAME, "PropertyUpdater");
+    }
+    
+    /**
+     * 定期実行開始までの遅延時間を返す。
+     * @return 定期実行開始までの遅延時間(ミリ秒)
+     */
+    public int getDelay() {
+        LOGGER.entering(CLASS_NAME, "getDelay");
+        
+        LOGGER.exiting(CLASS_NAME, "getDelay");
+        return delay;
+    }
+    
+    /**
+     * 定期実行開始までの遅延時間を設定する。
+     * @param delay 定期実行開始までの遅延時間(ミリ秒)
+     */
+    public void setDelay(int delay) {
+        LOGGER.entering(CLASS_NAME, "setDelay", delay);
+        
+        this.delay = delay;
+        
+        LOGGER.exiting(CLASS_NAME, "setDelay");
+    }
+    
+    /**
+     * 定期実行のインターバル時間を返す。
+     * @return 定期実行のインターバル時間(ミリ秒)
+     */
+    public int getIntervalPeriod() {
+        LOGGER.entering(CLASS_NAME, "getIntervalPeriod");
+        
+        LOGGER.exiting(CLASS_NAME, "getIntervalPeriod");
+        return intervalPeriod;
+    }
+    
+    /**
+     * 定期実行のインターバル時間を設定する。
+     * @param intervalPeriod 定期実行のインターバル時間(ミリ秒)
+     */
+    public void setIntervalPeriod(int intervalPeriod) {
+        LOGGER.entering(CLASS_NAME, "setIntervalPeriod", intervalPeriod);
+        
+        this.intervalPeriod = intervalPeriod;
+        
+        LOGGER.exiting(CLASS_NAME, "setIntervalPeriod");
+    }
+    
+    /**
+     * 定期的実行を終了する。
+     */
+    public void done() {
+        done = true;
+    }
+    
+    /**
+     * 定期的実行が終了してかどうかを返す。
+     * @return 定期的実行が終了している場合にはtrue、そうでなければfalse
+     */
+    public boolean isDone() {
+        return done;
+    }
+
+    /**
+     * 設定したローカルオブジェクトを利用してloopメソッドを呼び出す。
+     */
+    public void doLoopOnce() {
+        LOGGER.entering(CLASS_NAME, "doLoopOnce");
+        
+        loop(getLocalObject());
+        
+        LOGGER.exiting(CLASS_NAME, "doLoopOnce");
+    }
+    
+    /**
+     * 定期的に実行される。
+     * @param localObject 設定されているローカルオブジェクト
+     */
+    public abstract void loop(LocalObject localObject);
+    
+    /**
+     * ローカルオブジェクトが生成された時に呼び出される。
+     * @param object 生成されたローカルオブジェクト
+     */
+    public void notifyCreation(LocalObject object) {
+    }
+}

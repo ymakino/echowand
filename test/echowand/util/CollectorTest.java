@@ -14,7 +14,7 @@ class DummySelector<T> implements Selector<T> {
     }
 
     @Override
-    public boolean select(T object) {
+    public boolean match(T object) {
         return this.object.equals(object);
     }
 };

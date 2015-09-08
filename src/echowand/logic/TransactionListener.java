@@ -15,9 +15,18 @@ public interface TransactionListener {
     public void begin(Transaction t);
     
     /**
+     * 送信したリクエストフレームの処理を行う。
+     * @param t リクエストを送信したTransaction
+     * @param subnet リクエストを送信したサブネット
+     * @param frame リクエストフレーム
+     * @param success 送信に成功した場合にはtrue、失敗した場合にはfalse
+     */
+    public void send(Transaction t, Subnet subnet, Frame frame, boolean success);
+    
+    /**
      * 受信したレスポンスフレームの処理を行う。
      * @param t レスポンスを受信したTransaction
-     * @param subnet レスポンスが送受信されたサブネット
+     * @param subnet レスポンスを受信したサブネット
      * @param frame レスポンスフレーム
      */
     public void receive(Transaction t, Subnet subnet, Frame frame);

@@ -1,10 +1,11 @@
 package echowand.net;
 
-import echowand.util.Pair;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ public class InetSubnet implements Subnet {
     private TCPAcceptor tcpAcceptor;
 
     private NetworkInterface networkInterface;
+    private List<NetworkInterface> receiverInterfaces;
     private InetAddress multicastAddress;
     private int portNumber;
 
@@ -48,12 +50,13 @@ public class InetSubnet implements Subnet {
      * InetSubnetの初期化を行う。
      *
      * @param networkInterface ネットワークインタフェースの指定
+     * @param receiverInterfaces 受信用ネットワークインタフェースの指定
      * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
      * @param portNumber ポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    protected void initialize(NetworkInterface networkInterface, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
+    protected void initialize(NetworkInterface networkInterface, Collection<? extends NetworkInterface> receiverInterfaces, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{networkInterface, loopbackAddress, multicastAddress, portNumber});
 
         if (!isValidAddress(loopbackAddress)) {
@@ -66,6 +69,7 @@ public class InetSubnet implements Subnet {
 
         this.localAddress = null;
         this.networkInterface = networkInterface;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>(receiverInterfaces);
         this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
@@ -81,12 +85,13 @@ public class InetSubnet implements Subnet {
      * InetSubnetの初期化を行う。
      *
      * @param localAddress ローカルアドレスの指定
+     * @param receiverInterfaces 受信用ネットワークインタフェースの指定
      * @param loopbackAddress ループバックアドレスの指定
      * @param multicastAddress マルチキャストアドレスの指定
      * @param portNumber ポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    protected void initialize(InetAddress localAddress, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
+    protected void initialize(InetAddress localAddress, Collection<? extends NetworkInterface> receiverInterfaces, InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{localAddress, loopbackAddress, multicastAddress, portNumber});
         
         if (!isValidAddress(localAddress)) {
@@ -101,17 +106,13 @@ public class InetSubnet implements Subnet {
             throw new SubnetException("invalid multicast address: " + multicastAddress);
         }
 
-        try {
-            this.networkInterface = NetworkInterface.getByInetAddress(localAddress);
-        } catch (SocketException ex) {
-            throw new SubnetException("catched exception", ex);
-        }
-
         this.localAddress = localAddress;
+        this.networkInterface = null;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>(receiverInterfaces);
         this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
-
+        
         createUDPNetwork();
         createTCPReceiver();
         createTCPAcceptor();
@@ -140,6 +141,7 @@ public class InetSubnet implements Subnet {
 
         this.localAddress = null;
         this.networkInterface = null;
+        this.receiverInterfaces = new LinkedList<NetworkInterface>();
         this.loopbackAddress = loopbackAddress;
         this.multicastAddress = multicastAddress;
         this.portNumber = portNumber;
@@ -155,9 +157,11 @@ public class InetSubnet implements Subnet {
         LOGGER.entering(CLASS_NAME, "createUDPNetwork");
 
         if (localAddress != null) {
-            udpNetwork = new UDPNetwork(localAddress, multicastAddress, portNumber);
+            udpNetwork = new UDPNetwork(localAddress, receiverInterfaces, multicastAddress, portNumber);
         } else if (networkInterface != null) {
-            udpNetwork = new UDPNetwork(networkInterface, multicastAddress, portNumber);
+            udpNetwork = new UDPNetwork(networkInterface, receiverInterfaces, multicastAddress, portNumber);
+        } else if (!receiverInterfaces.isEmpty()) {
+            udpNetwork = new UDPNetwork(receiverInterfaces, multicastAddress, portNumber);
         } else {
             udpNetwork = new UDPNetwork(multicastAddress, portNumber);
         }
@@ -624,7 +628,7 @@ public class InetSubnet implements Subnet {
         }
     }
 
-    private InetAddress getLocalAddress() {
+    public InetAddress getLocalAddress() {
         if (localAddress != null) {
             return localAddress;
         } else {

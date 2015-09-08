@@ -39,7 +39,7 @@ public class LocalObjectNotifyDelegateTest {
         Frame frame = subnet.receiveNoWait();
         assertTrue(frame != null);
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
         assertEquals(ESV.INF, payload.getESV());
         assertEquals(subnet.getLocalNode(), frame.getSender());
         assertEquals(subnet.getGroupNode(), frame.getReceiver());

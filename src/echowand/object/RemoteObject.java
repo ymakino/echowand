@@ -134,12 +134,13 @@ public class RemoteObject implements EchonetObject {
         }
 
         CommonFrame cf = frame.getCommonFrame();
-        if (!(cf.getEDATA() instanceof StandardPayload)) {
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
             logger.exiting(className, "isValidFrame", false);
             return false;
         }
-
-        StandardPayload payload = (StandardPayload) cf.getEDATA();
+        
         if (!payload.getSEOJ().equals(eoj)) {
             logger.exiting(className, "isValidFrame", false);
             return false;
@@ -157,7 +158,13 @@ public class RemoteObject implements EchonetObject {
             return null;
         }
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload) cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            logger.exiting(className, "getValidFirstProperty", null);
+            return null;
+        }
+        
         if (payload.getFirstOPC() != 1) {
             logger.exiting(className, "getValidFirstProperty", null);
             return null;
@@ -193,6 +200,10 @@ public class RemoteObject implements EchonetObject {
             dataList = new LinkedList<Data>();
             
             logger.exiting(className, "RemoteObjectGetTransactionListener.begin");
+        }
+        
+        @Override
+        public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
         }
 
         @Override
@@ -238,6 +249,10 @@ public class RemoteObject implements EchonetObject {
         
         @Override
         public void begin(Transaction t) {
+        }
+
+        @Override
+        public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
         }
 
         @Override

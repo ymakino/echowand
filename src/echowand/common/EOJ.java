@@ -32,8 +32,8 @@ public class EOJ {
         try {
             this.classEOJ = new ClassEOJ(eoj.substring(0,4));
             this.instanceCode = (byte) Integer.parseInt(eoj.substring(4, 6), 16);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid EOJ: " + eoj);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid EOJ: " + eoj, ex);
         }
     }
         

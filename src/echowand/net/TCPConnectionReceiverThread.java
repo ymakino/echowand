@@ -41,26 +41,31 @@ public class TCPConnectionReceiverThread extends Thread {
     public void run() {
         LOGGER.entering(CLASS_NAME, "run");
 
-        try {
-            while (!terminated) {
+        while (!terminated) {
+            
+            if (connection.isInputClosed()) {
+                break;
+            }
+            
+            try {
                 CommonFrame commonFrame = connection.receive();
                 LOGGER.logp(Level.FINE, CLASS_NAME, "run", "receive: " + commonFrame);
                 if (commonFrame == null) {
                     break;
                 }
-            }
-        } catch (NetworkException ex) {
-            if (!connection.isInputClosed()) {
-                LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
-            }
-        } finally {
-            try {
-                connection.close();
             } catch (NetworkException ex) {
-                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
+                if (!connection.isInputClosed()) {
+                    LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
+                }
             }
-
-            LOGGER.exiting(CLASS_NAME, "run");
         }
+        
+        try {
+            connection.close();
+        } catch (NetworkException ex) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
+        }
+
+        LOGGER.exiting(CLASS_NAME, "run");
     }
 }

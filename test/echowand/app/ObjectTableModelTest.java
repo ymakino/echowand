@@ -259,7 +259,7 @@ public class ObjectTableModelTest {
                     for (;;) {
                         frame = subnet.receive();
                         commonFrame = frame.getCommonFrame();
-                        payload = (StandardPayload) commonFrame.getEDATA();
+                        payload = commonFrame.getEDATA(StandardPayload.class);
 
                         if (payload.getESV() == ESV.SetC && payload.getFirstPropertyAt(0).getEPC() == EPC.x80) {
                             break;
@@ -283,7 +283,7 @@ public class ObjectTableModelTest {
                 try {
                     Frame frame = subnet.receive();
                     CommonFrame commonFrame = frame.getCommonFrame();
-                    StandardPayload payload = (StandardPayload) commonFrame.getEDATA();
+                    StandardPayload payload = commonFrame.getEDATA(StandardPayload.class);
                     
                     assertEquals(ESV.Get, payload.getESV());
                     assertEquals(EPC.x80, payload.getFirstPropertyAt(0).getEPC());

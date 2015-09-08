@@ -41,14 +41,14 @@ public class InetSubnetTCPAcceptorThread extends Thread {
     public void run() {
         LOGGER.entering(CLASS_NAME, "run");
 
-        try {
-            while (!terminated) {
+        while (!terminated) {
+            try {
                 TCPConnection connection = acceptor.accept();
                 subnet.registerTCPConnection(connection);
                 LOGGER.logp(Level.FINE, CLASS_NAME, "run", "accept", connection);
+            } catch (NetworkException ex) {
+                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
             }
-        } catch (NetworkException ex) {
-            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
         }
 
         LOGGER.exiting(CLASS_NAME, "run");

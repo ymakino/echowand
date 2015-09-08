@@ -6,6 +6,7 @@ import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -44,28 +45,42 @@ public class RemoteObjectManager {
     
     /**
      * 指定されたRemoteObjectを登録する。
+     * 既にオブジェクトのEOJが登録済の場合には何も行わない。
      * @param object 登録するRemoteObject
+     * @return 登録に成功した場合はtrue、失敗した場合はfalse
      */
-    public synchronized void add(RemoteObject object) {
+    public synchronized boolean add(RemoteObject object) {
         logger.entering(className, "add", object);
         
-        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
-        map.put(object.getEOJ(), object);
+        boolean result = false;
         
-        logger.exiting(className, "add");
+        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
+        if (!map.containsKey(object.getEOJ())) {
+            map.put(object.getEOJ(), object);
+            result = true;
+        }
+        
+        logger.exiting(className, "add", result);
+        return result;
     }
     
     /**
      * 指定されたRemoteObjectの登録を抹消する。
      * @param object 登録を抹消するRemoteObject
+     * @return 登録の抹消に成功した場合はtrue、失敗した場合はfalse
      */
-    public synchronized void remove(RemoteObject object) {
+    public synchronized boolean remove(RemoteObject object) {
         logger.entering(className, "remove", object);
         
-        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
-        map.remove(object.getEOJ());
+        boolean result = false;
         
-        logger.exiting(className, "remove");
+        HashMap<EOJ, RemoteObject> map = getOrCreateNodeHashMap(object.getNode());
+        if (map.remove(object.getEOJ()) != null) {
+            result = true;
+        }
+        
+        logger.exiting(className, "remove", result);
+        return result;
     }
     
     /**
@@ -84,7 +99,7 @@ public class RemoteObjectManager {
         return object;
     }
     
-    private synchronized LinkedList<RemoteObject> getAllObjects() {
+    private synchronized List<RemoteObject> getAllObjects() {
         logger.entering(className, "getAllObjects");
         
         LinkedList<RemoteObject> newList = new LinkedList<RemoteObject>();
@@ -104,12 +119,12 @@ public class RemoteObjectManager {
      * @param node Nodeの指定
      * @return 指定したNodeとEOJで検索されたRemoteObject
      */
-    public synchronized LinkedList<RemoteObject> getAtNode(final Node node) {
+    public synchronized List<RemoteObject> getAtNode(final Node node) {
         logger.entering(className, "getAtNode", node);
         
-        LinkedList<RemoteObject> objectList = get(new Selector<RemoteObject>() {
+        List<RemoteObject> objectList = get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getNode().equals(node);
             }
         });
@@ -123,11 +138,11 @@ public class RemoteObjectManager {
      * @param selector リモートオブジェクトの選択
      * @return 選択したリモートオブジェクトのリスト
      */
-    public LinkedList<RemoteObject> get(Selector<RemoteObject> selector) {
+    public List<RemoteObject> get(Selector<? super RemoteObject> selector) {
         logger.entering(className, "get", selector);
         
         Collector<RemoteObject> collector = new Collector<RemoteObject>(selector);
-        LinkedList<RemoteObject> objectList = collector.collect(getAllObjects());
+        List<RemoteObject> objectList = collector.collect(getAllObjects());
         
         logger.exiting(className, "get", objectList);
         return objectList;
@@ -137,7 +152,7 @@ public class RemoteObjectManager {
      * ノードのリストを返す。
      * @return ノードのリスト
      */
-    public LinkedList<Node> getNodes() {
+    public List<Node> getNodes() {
         logger.entering(className, "getNodes");
         
         LinkedList<Node> nodeList = new LinkedList<Node>(objects.keySet());

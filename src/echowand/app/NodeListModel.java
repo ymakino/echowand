@@ -3,6 +3,7 @@ package echowand.app;
 import echowand.net.Node;
 import echowand.object.RemoteObjectManager;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.AbstractListModel;
 
 /**
@@ -11,14 +12,14 @@ import javax.swing.AbstractListModel;
  */
 public class NodeListModel extends AbstractListModel {
     private RemoteObjectManager remoteManager;
-    private LinkedList<Node> nodes;
+    private List<Node> nodes;
 
     NodeListModel(RemoteObjectManager remoteManager) {
         this.remoteManager = remoteManager;
         this.nodes = remoteManager.getNodes();
     }
     
-    private LinkedList<Node> subtractNodeList(LinkedList<Node> base, LinkedList<Node> subst) {
+    private List<Node> subtractNodeList(List<Node> base, List<Node> subst) {
         LinkedList<Node> resultList = new LinkedList<Node>();
         int size = base.size();
         for (int i=0; i<size; i++) {
@@ -32,10 +33,10 @@ public class NodeListModel extends AbstractListModel {
     }
     
     public synchronized void updateNodes() {
-        LinkedList<Node> newNodes = remoteManager.getNodes();
+        List<Node> newNodes = remoteManager.getNodes();
         
-        LinkedList<Node> removedNodes = subtractNodeList(nodes, newNodes);
-        LinkedList<Node> addedNodes = subtractNodeList(newNodes, nodes);
+        List<Node> removedNodes = subtractNodeList(nodes, newNodes);
+        List<Node> addedNodes = subtractNodeList(newNodes, nodes);
         
         if (removedNodes.size() == 0 && addedNodes.size() == 0) {
             return;

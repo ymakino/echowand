@@ -108,7 +108,7 @@ public class CommonFrameTest {
         EOJ seoj = new EOJ("001101");
         EOJ deoj = new EOJ("002201");
         CommonFrame frame = new CommonFrame(seoj, deoj, ESV.SetC);
-        StandardPayload payload = (StandardPayload)frame.getEDATA();
+        StandardPayload payload = frame.getEDATA(StandardPayload.class);
         assertEquals(new EOJ("001101"), payload.getSEOJ());
         assertEquals(new EOJ("002201"), payload.getDEOJ());
         assertEquals(ESV.SetC, payload.getESV());
@@ -158,5 +158,18 @@ public class CommonFrameTest {
         assertEquals((byte)0x82, f.getEHD2());
         assertFalse(f.isStandardPayload());
         
+    }
+    
+    @Test
+    public void testGetEDATA() {
+        CommonFrame commonFrame1 = new CommonFrame();
+        assertNotNull(commonFrame1.getEDATA());
+        assertNull(commonFrame1.getEDATA(StandardPayload.class));
+        assertNotNull(commonFrame1.getEDATA(SimplePayload.class));
+        
+        CommonFrame commonFrame2 = new CommonFrame(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get);
+        assertNotNull(commonFrame2.getEDATA());
+        assertNotNull(commonFrame2.getEDATA(StandardPayload.class));
+        assertNull(commonFrame2.getEDATA(SimplePayload.class));
     }
 }

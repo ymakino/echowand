@@ -151,11 +151,17 @@ public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
     }
     
     private List<LocalObject> getObjectsForClassCountData() {
+        logger.entering(className, "getObjectsForClassCountData");
+        
+        List<LocalObject> resultList;
         if (countOnlyDeviceClass) {
-            return manager.getDeviceObjects();
+            resultList = manager.getDeviceObjects();
         } else {
-            return manager.getAllObjects();
+            resultList = manager.getAllObjects();
         }
+        
+        logger.exiting(className, "getObjectsForClassCountData", resultList);
+        return resultList;
     }
     
     private ObjectData getClassCountData() {
@@ -251,7 +257,7 @@ public class NodeProfileObjectDelegate extends LocalObjectDefaultDelegate {
      */
     @Override
     public void getData(GetState result, LocalObject object, EPC epc) {
-        logger.entering(className, "getData");
+        logger.entering(className, "getData", new Object[]{result, object, epc});
 
         switch (epc) {
             case xD3:

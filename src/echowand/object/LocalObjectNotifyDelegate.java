@@ -26,12 +26,12 @@ public class LocalObjectNotifyDelegate extends LocalObjectDefaultDelegate {
      * @param transactionManager 通知トランザクションの生成に利用するTransactionManager
      */
     public LocalObjectNotifyDelegate(Subnet subnet, TransactionManager transactionManager) {
-        logger.entering(className, "addObject", new Object[]{subnet, transactionManager});
+        logger.entering(className, "LocalObjectNotifyDelegate", new Object[]{subnet, transactionManager});
         
         this.subnet = subnet;
         this.transactionManager = transactionManager;
         
-        logger.exiting(className, "addObject");
+        logger.exiting(className, "LocalObjectNotifyDelegate");
     }
     
     /**
@@ -44,7 +44,7 @@ public class LocalObjectNotifyDelegate extends LocalObjectDefaultDelegate {
      */
     @Override
     public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
-        logger.entering(className, "notifyDataChanged", new Object[]{object, epc, curData, oldData});
+        logger.entering(className, "notifyDataChanged", new Object[]{result, object, epc, curData, oldData});
         
         if (object.isObservable(epc) && !curData.equals(oldData)) {
             try {

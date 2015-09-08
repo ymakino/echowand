@@ -8,6 +8,7 @@ import echowand.logic.TransactionListener;
 import echowand.logic.TransactionManager;
 import echowand.net.*;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -42,6 +43,17 @@ public class NodeProfileObjectListener implements TransactionListener {
      */
     @Override
     public void begin(Transaction t) {
+    }
+
+    /**
+     * フレームが送信された時に呼び出される。
+     * @param t フレームを送信したトランザクション
+     * @param subnet フレームを送信したサブネット
+     * @param frame 送信したフレーム
+     * @param success 送信に成功した場合にはtrue、失敗した場合にはfalse
+     */
+    @Override
+    public void send(Transaction t, Subnet subnet, Frame frame, boolean success) {
     }
     
     /**
@@ -104,7 +116,12 @@ public class NodeProfileObjectListener implements TransactionListener {
         logger.entering(className, "receive", new Object[]{t, subnet, frame});
         
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload) cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class);
+        
+        if (payload == null) {
+            logger.logp(Level.WARNING, className, "receive", "invalid frame: ", frame);
+            return;
+        }
         
         if (manager.get(frame.getSender(), new EOJ("0ef001")) == null) {
             manager.add(new RemoteObject(subnet, frame.getSender(), new EOJ("0ef001"), transactionManager));

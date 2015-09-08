@@ -20,6 +20,7 @@ import echowand.object.RemoteObject;
 import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.LinkedList;
+import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.*;
 
@@ -44,11 +45,11 @@ public class RemoteObjectManagerTest {
             try {
                 Frame receivedFrame = subnet.receive();
                 CommonFrame receivedCommonFrame = receivedFrame.getCommonFrame();
-                StandardPayload receivedPayload = (StandardPayload) receivedCommonFrame.getEDATA();
+                StandardPayload receivedPayload = receivedCommonFrame.getEDATA(StandardPayload.class);
 
                 CommonFrame sendCommonFrame = new CommonFrame(receivedPayload.getDEOJ(), receivedPayload.getSEOJ(), ESV.Get_Res);
                 sendCommonFrame.setTID(receivedCommonFrame.getTID());
-                StandardPayload sendPayload = (StandardPayload) sendCommonFrame.getEDATA();
+                StandardPayload sendPayload = sendCommonFrame.getEDATA(StandardPayload.class);
                 sendPayload.addFirstProperty(new Property(EPC.xE0, new Data((byte) 0x12, (byte) 0x34)));
                 Frame sendFrame = new Frame(subnet.getLocalNode(), receivedFrame.getSender(), sendCommonFrame);
                 
@@ -94,25 +95,40 @@ public class RemoteObjectManagerTest {
         assertTrue(object2 == null);
     }
     
+    public void testAdd() {
+        InternalSubnet subnet = new InternalSubnet();
+        TransactionManager transactionManager = new TransactionManager(subnet);
+        RemoteObjectManager manager = new RemoteObjectManager();
+        RemoteObject object1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
+        assertTrue(manager.add(object1));
+        assertFalse(manager.add(object1));
+        RemoteObject object2 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001102"), transactionManager);
+        assertTrue(manager.add(object2));
+    }
+    
     @Test
     public void testUpdateObjects() {
         InternalSubnet subnet = new InternalSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager manager = new RemoteObjectManager();
+        
         RemoteObject object1 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
-        manager.add(object1);
+        assertTrue(manager.add(object1));
         RemoteObject object2 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
-        manager.add(object2);
+        assertFalse(manager.add(object2));
+        assertTrue(manager.remove(object1));
+        assertFalse(manager.remove(object2));
         RemoteObject object3 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
-        manager.add(object3);
+        assertTrue(manager.add(object3));
+        
         RemoteObject object4 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001201"), transactionManager);
-        manager.add(object4);
+        assertTrue(manager.add(object4));
         RemoteObject object5 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001201"), transactionManager);
-        manager.add(object5);
+        assertFalse(manager.add(object5));
         
         assertEquals(object3, manager.get(subnet.getLocalNode(), new EOJ("001101")));
         assertEquals(null, manager.get(subnet.getLocalNode(), new EOJ("001102")));
-        assertEquals(object5, manager.get(subnet.getLocalNode(), new EOJ("001201")));
+        assertEquals(object4, manager.get(subnet.getLocalNode(), new EOJ("001201")));
         assertEquals(null, manager.get(subnet.getLocalNode(), new EOJ("001202")));
     }
 
@@ -132,25 +148,25 @@ public class RemoteObjectManagerTest {
         RemoteObject object5 = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001202"), transactionManager);
         manager.add(object5);
 
-        LinkedList<RemoteObject> list1 = manager.get(new Selector<RemoteObject>() {
+        List<RemoteObject> list1 = manager.get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getEOJ().getClassEOJ().equals(new ClassEOJ("0011"));
             }
         });
         assertEquals(3, list1.size());
         
-        LinkedList<RemoteObject> list2 = manager.get(new Selector<RemoteObject>() {
+        List<RemoteObject> list2 = manager.get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getEOJ().getClassEOJ().equals(new ClassEOJ("0012"));
             }
         });
         assertEquals(2, list2.size());
         
-        LinkedList<RemoteObject> list3 = manager.get(new Selector<RemoteObject>() {
+        List<RemoteObject> list3 = manager.get(new Selector<RemoteObject>() {
             @Override
-            public boolean select(RemoteObject object) {
+            public boolean match(RemoteObject object) {
                 return object.getNode().equals(subnet.getLocalNode());
             }
         });

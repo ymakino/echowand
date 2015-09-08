@@ -99,7 +99,7 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
     private boolean doSetAllData(Frame frame, LocalObject object, StandardPayload res) {
         logger.entering(className, "doSetAllData", new Object[]{frame, object, res});
         
-        StandardPayload req = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload req = frame.getCommonFrame().getEDATA(StandardPayload.class);
         
         LocalSetGetAtomic localSetGetAtomic = new LocalSetGetAtomic(object);
         
@@ -118,7 +118,7 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
     private boolean doGetAllData(Frame frame, LocalObject object, StandardPayload res, boolean announce) {
         logger.entering(className, "doGetAllData", new Object[]{frame, object, res, announce});
         
-        StandardPayload req = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload req = frame.getCommonFrame().getEDATA(StandardPayload.class);
         
         LocalSetGetAtomic localSetGetAtomic = new LocalSetGetAtomic(object);
         localSetGetAtomic.setAnnounce(announce);
@@ -138,7 +138,7 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
     private boolean doSetGetAllData(Frame frame, LocalObject object, StandardPayload res) {
         logger.entering(className, "doSetGetAllData", new Object[]{frame, object, res});
         
-        StandardPayload req = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload req = frame.getCommonFrame().getEDATA(StandardPayload.class);
         
         LocalSetGetAtomic localSetGetAtomic = new LocalSetGetAtomic(object);
         
@@ -173,7 +173,7 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
         cf.setTID(tid);
         cf.setEDATA(res);
         
-        StandardPayload req = (StandardPayload)frame.getCommonFrame().getEDATA();
+        StandardPayload req = frame.getCommonFrame().getEDATA(StandardPayload.class); 
         res.setDEOJ(req.getSEOJ());
         res.setSEOJ(object.getEOJ());
         
@@ -190,7 +190,7 @@ public class SetGetRequestProcessor extends DefaultRequestProcessor {
     
     private List<LocalObject> getDestinationObject(Frame frame) {
         CommonFrame cf = frame.getCommonFrame();
-        StandardPayload payload = (StandardPayload)cf.getEDATA();
+        StandardPayload payload = cf.getEDATA(StandardPayload.class); 
         EOJ eoj = payload.getDEOJ();
         if (eoj.isAllInstance()) {
             return manager.getWithClassEOJ(eoj.getClassEOJ());

@@ -38,7 +38,7 @@ public class ObjectListModel extends AbstractListModel {
         return true;
     }
     
-    private LinkedList<RemoteObject> getObjectsAtNode(Node node) {
+    private List<RemoteObject> getObjectsAtNode(Node node) {
         return remoteManager.getAtNode(node);
     }
     

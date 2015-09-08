@@ -4,9 +4,11 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.logic.SetGetTransactionConfig;
 import echowand.logic.Transaction;
+import echowand.logic.TransactionListener;
 import echowand.logic.TransactionManager;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 /**
@@ -24,6 +26,8 @@ public class InstanceListRequestExecutor {
     private int timeout;
     private boolean done;
     
+    private LinkedList<TransactionListener> listeners;
+    
     /**
      * InstanceListRequestExecutorを生成する。
      * @param subnet Subnetの指定
@@ -39,6 +43,7 @@ public class InstanceListRequestExecutor {
         this.transaction = null;
         this.timeout = 2000;
         this.done = false;
+        this.listeners = new LinkedList<TransactionListener>();
         
         logger.exiting(className, "InstanceListRequestExecutor");
     }
@@ -55,6 +60,22 @@ public class InstanceListRequestExecutor {
         return transaction.isDone();
     }
     
+    public int countTransactionListeners() {
+        return listeners.size();
+    }
+    
+    public TransactionListener getTransactionListener(int index) {
+        return listeners.get(index);
+    }
+    
+    public boolean addTransactionListener(TransactionListener listener) {
+        return listeners.add(listener);
+    }
+    
+    public boolean removeTransactionListener(TransactionListener listener) {
+        return listeners.remove(listener);
+    }
+    
     private Transaction createTransaction() {
         logger.entering(className, "createTransaction");
         
@@ -66,8 +87,13 @@ public class InstanceListRequestExecutor {
         transactionConfig.addGet(EPC.xD6);
         Transaction newTransaction = transactionManager.createTransaction(transactionConfig);
         newTransaction.setTimeout(timeout);
+        
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(remoteManager, transactionManager);
         newTransaction.addTransactionListener(profileListener);
+        
+        for (TransactionListener listener : listeners) {
+            newTransaction.addTransactionListener(listener);
+        }
         
         logger.exiting(className, "createTransaction", newTransaction);
         return newTransaction;

@@ -35,7 +35,11 @@ public class InetSubnetUDPReceiverThread extends Thread {
      * 強制的な割り込みを行うわけではないので、即座に終了しない可能性がある。
      */
     public void terminate() {
+        LOGGER.entering(CLASS_NAME, "terminate");
+
         terminated = true;
+
+        LOGGER.exiting(CLASS_NAME, "terminate");
     }
 
     @Override
