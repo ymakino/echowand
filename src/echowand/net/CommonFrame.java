@@ -121,6 +121,7 @@ public class CommonFrame {
     /**
      * ペイロードの型を指定してCommonFrameのペイロードを返す。
      * ペイロードを指定された型に変換できない場合にはnullを返す。
+     * @param <P> 取得するペイロードの型
      * @param cls ペイロードの型の指定
      * @return このCommonFrameのペイロード
      */

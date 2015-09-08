@@ -52,8 +52,8 @@ public class Service {
     private Core core;
     
     /**
-     * Serviceを生成する。
-     * @param core 
+     * 利用するCoreを指定してServiceを生成する。
+     * @param core 利用するCore
      */
     public Service(Core core) {
         LOGGER.entering(CLASS_NAME, "Service", core);
@@ -63,22 +63,42 @@ public class Service {
         LOGGER.exiting(CLASS_NAME, "Service");
     }
     
+    /**
+     * 利用するCoreを返す。
+     * @return 利用するCore
+     */
     public Core getCore() {
         return core;
     }
     
+    /**
+     * 利用するSubnetを返す。
+     * @return 利用するSubnet
+     */
     public Subnet getSubnet() {
         return core.getSubnet();
     }
     
+    /**
+     * 利用するLocalObjectManagerを返す。
+     * @return 利用するLocalObjectManager
+     */
     public LocalObjectManager getLocalObjectManager() {
         return core.getLocalObjectManager();
     }
     
+    /**
+     * 利用するRemoteObjectManagerを返す。
+     * @return 利用するRemoteObjectManager
+     */
     public RemoteObjectManager getRemoteObjectManager() {
         return core.getRemoteObjectManager();
     }
     
+    /**
+     * 利用するTransactionManagerを返す。
+     * @return 利用するTransactionManager
+     */
     public TransactionManager getTransactionManager() {
         return core.getTransactionManager();
     }

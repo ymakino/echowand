@@ -65,7 +65,7 @@ public class LocalObjectAccessInterface {
     
     /**
      * 保持しているローカルオブジェクトのObjectDataを取得する。
-     * @param epc 取得するObjectDataのEPCの指定
+     * @param epc 取得するEPCの指定
      * @return 取得したObjectData
      */
     public ObjectData getData(EPC epc) {
@@ -78,10 +78,10 @@ public class LocalObjectAccessInterface {
     }
     
     /**
-     * 保持しているCoreを利用しObjectDataを取得する。
-     * @param eoj 取得するObjectData
-     * @param epc
-     * @return 
+     * 保持しているCoreを利用しローカルオブジェクトのObjectDataを取得する。
+     * @param eoj ローカルオブジェクトの指定
+     * @param epc 取得するEPCの指定
+     * @return 取得したObjectData
      */
     public ObjectData getData(EOJ eoj, EPC epc) {
         LOGGER.entering(CLASS_NAME, "getData", new Object[]{eoj, epc});
@@ -97,6 +97,12 @@ public class LocalObjectAccessInterface {
         return data;
     }
     
+    /**
+     * 保持しているローカルオブジェクトにObjectDataを設定する。
+     * @param epc 設定するEPCの指定
+     * @param data 設定するObjectData
+     * @return 設定に成功した場合にはtrue、そうでなければfalse
+     */
     public boolean setData(EPC epc, ObjectData data) {
         LOGGER.entering(CLASS_NAME, "setData", new Object[]{epc, data});
         
@@ -106,6 +112,13 @@ public class LocalObjectAccessInterface {
         return result;
     }
     
+    /**
+     * 保持しているCoreを利用しローカルオブジェクトにObjectDataを設定する。
+     * @param eoj ローカルオブジェクトの指定
+     * @param epc 設定するEPCの指定
+     * @param data 設定するObjectData
+     * @return 設定に成功した場合にはtrue、そうでなければfalse
+     */
     public boolean setData(EOJ eoj, EPC epc, ObjectData data) {
         LOGGER.entering(CLASS_NAME, "setData", new Object[]{eoj, epc, data});
         
