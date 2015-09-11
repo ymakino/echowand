@@ -1,4 +1,4 @@
-echowand - An ECHONET Lite Library for Java
+echowand - Yet Another ECHONET Lite Library for Java
 ============================
 
 Copyright (c) 2012-2015 Yoshiki Makino
