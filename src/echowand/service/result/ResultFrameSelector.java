@@ -25,21 +25,86 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
     private ArrayList<EPC> epcs;
     
     private static <T> List<T> toList(T... objects) {
-        ArrayList<T> list = new ArrayList<T>(objects.length);
         
         if (objects.length == 1 && objects[0] == null) {
-            return list;
+            return new ArrayList<T>();
         }
         
-        list.addAll(Arrays.asList(objects));
+        ArrayList<T> list = new ArrayList<T>(Arrays.asList(objects));
         
         return list;
     }
     
     public ResultFrameSelector() {
-        this.nodes = new ArrayList<Node>();
-        this.eojs = new ArrayList<EOJ>();
-        this.epcs = new ArrayList<EPC>();
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector");
+        
+        init(null, null, null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(Node node) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", node);
+        
+        init(toList(node), null, null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(EOJ eoj) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", eoj);
+        
+        init(null, toList(eoj), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", epc);
+        
+        init(null, null, toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(Node node, EOJ eoj) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{node, eoj});
+        
+        init(toList(node), toList(eoj), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{eoj, epc});
+        
+        init(null, toList(eoj), toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(ClassEOJ ceoj) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", ceoj);
+        
+        init(null, toList(ceoj.getAllInstanceEOJ()), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(Node node, ClassEOJ ceoj) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{node, ceoj});
+        
+        init(toList(node), toList(ceoj.getAllInstanceEOJ()), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
+    }
+    
+    public ResultFrameSelector(ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{ceoj, epc});
+        
+        init(null, toList(ceoj.getAllInstanceEOJ()), toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
     public ResultFrameSelector(Node node, EOJ eoj, EPC epc) {
@@ -50,7 +115,7 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
         LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public ResultFrameSelector(List<Node> nodes, EOJ eoj, EPC epc) {
+    public ResultFrameSelector(List<? extends Node> nodes, EOJ eoj, EPC epc) {
         LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, eoj, epc});
         
         init(nodes, toList(eoj), toList(epc));
@@ -66,7 +131,7 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
         LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public ResultFrameSelector(List<Node> nodes, EOJ eoj, List<EPC> epcs) {
+    public ResultFrameSelector(List<? extends Node> nodes, EOJ eoj, List<EPC> epcs) {
         LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, eoj, epcs});
         
         init(nodes, toList(eoj), epcs);
@@ -82,7 +147,7 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
         LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public ResultFrameSelector(List<Node> nodes, ClassEOJ ceoj, EPC epc) {
+    public ResultFrameSelector(List<? extends Node> nodes, ClassEOJ ceoj, EPC epc) {
         LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, ceoj, epc});
         
         init(nodes, toList(ceoj.getAllInstanceEOJ()), toList(epc));
@@ -98,7 +163,7 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
         LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public ResultFrameSelector(List<Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
+    public ResultFrameSelector(List<? extends Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
         LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, ceoj, epcs});
         
         init(nodes, toList(ceoj.getAllInstanceEOJ()), epcs);
@@ -106,7 +171,7 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
         LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    public ResultFrameSelector(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+    public ResultFrameSelector(List<? extends Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
         LOGGER.entering(CLASS_NAME, "ResultFrameSelector", new Object[]{nodes, eojs, epcs});
         
         init(nodes, eojs, epcs);
@@ -114,7 +179,7 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
         LOGGER.exiting(CLASS_NAME, "ResultFrameSelector");
     }
     
-    private void init(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+    private void init(List<? extends Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
         LOGGER.entering(CLASS_NAME, "init", new Object[]{nodes, eojs, epcs});
         
         if (nodes == null) {

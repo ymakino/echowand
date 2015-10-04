@@ -1,5 +1,6 @@
 package echowand.service.result;
 
+import echowand.common.ClassEOJ;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.net.Node;
@@ -22,13 +23,12 @@ public class ResultDataSelector implements Selector<ResultData> {
     private List<EPC> epcs;
     
     private static <T> List<T> toList(T... objects) {
-        ArrayList<T> list = new ArrayList<T>(objects.length);
         
         if (objects.length == 1 && objects[0] == null) {
-            return list;
+            return new ArrayList<T>();
         }
         
-        list.addAll(Arrays.asList(objects));
+        ArrayList<T> list = new ArrayList<T>(Arrays.asList(objects));
         
         return list;
     }
@@ -41,10 +41,66 @@ public class ResultDataSelector implements Selector<ResultData> {
         LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
     }
     
-    public ResultDataSelector(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
-        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, eojs, epcs});
+    public ResultDataSelector(Node node) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", node);
         
-        init(nodes, eojs, epcs);
+        init(toList(node), null, null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(EOJ eoj) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", eoj);
+        
+        init(null, toList(eoj), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", epc);
+        
+        init(null, null, toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(Node node, EOJ eoj) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{node, eoj});
+        
+        init(toList(node), toList(eoj), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{eoj, epc});
+        
+        init(null, toList(eoj), toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(ClassEOJ ceoj) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", ceoj);
+        
+        init(null, toList(ceoj.getAllInstanceEOJ()), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(Node node, ClassEOJ ceoj) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{node, ceoj});
+        
+        init(toList(node), toList(ceoj.getAllInstanceEOJ()), null);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{ceoj, epc});
+        
+        init(null, toList(ceoj.getAllInstanceEOJ()), toList(epc));
         
         LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
     }
@@ -57,7 +113,71 @@ public class ResultDataSelector implements Selector<ResultData> {
         LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
     }
     
-    private void init(List<Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+    public ResultDataSelector(List<? extends Node> nodes, EOJ eoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, eoj, epc});
+        
+        init(nodes, toList(eoj), toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(Node node, EOJ eoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{node, eoj, epcs});
+        
+        init(toList(node), toList(eoj), epcs);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(List<? extends Node> nodes, EOJ eoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, eoj, epcs});
+        
+        init(nodes, toList(eoj), epcs);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(Node node, ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{node, ceoj, epc});
+        
+        init(toList(node), toList(ceoj.getAllInstanceEOJ()), toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(List<? extends Node> nodes, ClassEOJ ceoj, EPC epc) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, ceoj, epc});
+        
+        init(nodes, toList(ceoj.getAllInstanceEOJ()), toList(epc));
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(Node node, ClassEOJ ceoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{node, ceoj, epcs});
+        
+        init(toList(node), toList(ceoj.getAllInstanceEOJ()), epcs);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(List<? extends Node> nodes, ClassEOJ ceoj, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, ceoj, epcs});
+        
+        init(nodes, toList(ceoj.getAllInstanceEOJ()), epcs);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    public ResultDataSelector(List<? extends Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
+        LOGGER.entering(CLASS_NAME, "ResultDataSelector", new Object[]{nodes, eojs, epcs});
+        
+        init(nodes, eojs, epcs);
+        
+        LOGGER.exiting(CLASS_NAME, "ResultDataSelector");
+    }
+    
+    private void init(List<? extends Node> nodes, List<EOJ> eojs, List<EPC> epcs) {
         LOGGER.entering(CLASS_NAME, "init", new Object[]{nodes, eojs, epcs});
         
         if (nodes == null) {
