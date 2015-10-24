@@ -34,7 +34,7 @@ public class PropertyUpdaterThreadTest {
         
         Thread.sleep(sleep1);
         
-        updater.done();
+        updater.finish();
         int count1 = updater.count;
         
         assertTrue(count1 >= mincount);

@@ -143,7 +143,7 @@ public class Service {
         public void finish(Transaction t) {
             LOGGER.entering(CLASS_NAME, "ResultBaseTransactionListener.finish", t);
             
-            result.done();
+            result.finish();
             
             LOGGER.exiting(CLASS_NAME, "ResultBaseTransactionListener.finish");
         }

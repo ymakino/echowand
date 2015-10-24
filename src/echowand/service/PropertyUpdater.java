@@ -92,27 +92,37 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     /**
      * 定期的実行を終了する。
      */
-    public void done() {
+    public synchronized void finish() {
         done = true;
     }
     
     /**
-     * 定期的実行が終了してかどうかを返す。
+     * 定期的実行が終了しているかどうかを返す。
      * @return 定期的実行が終了している場合にはtrue、そうでなければfalse
      */
-    public boolean isDone() {
+    public synchronized boolean isDone() {
         return done;
     }
 
     /**
      * 設定したローカルオブジェクトを利用してloopメソッドを呼び出す。
+     * すでに定期的実行が終了している場合には、loopメソッドを呼び出さずfalseを返す。
+     * loopメソッド実行後、再度定期的実行が終了しているか確認を行い、
+     * 定期的実行が終了していればfalseを返す。
+     * @return 定期的実行が終了していない場合にはtrue、そうでなければfalse
      */
-    public void doLoopOnce() {
+    public synchronized boolean doLoopOnce() {
         LOGGER.entering(CLASS_NAME, "doLoopOnce");
         
-        loop(getLocalObject());
+        boolean result = !isDone();
         
-        LOGGER.exiting(CLASS_NAME, "doLoopOnce");
+        if (result) {
+            loop(getLocalObject());
+            result = !isDone();
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "doLoopOnce", result);
+        return result;
     }
     
     /**

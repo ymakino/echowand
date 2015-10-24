@@ -139,15 +139,15 @@ public abstract class ResultBase {
         LOGGER.exiting(CLASS_NAME, "ResultBase");
     }
     
-    public synchronized void done() {
-        LOGGER.entering(CLASS_NAME, "done");
+    public synchronized void finish() {
+        LOGGER.entering(CLASS_NAME, "finish");
         
         if (!done) {
             done = true;
             notifyAll();
         }
         
-        LOGGER.exiting(CLASS_NAME, "done");
+        LOGGER.exiting(CLASS_NAME, "finish");
     }
     
     public synchronized boolean isDone() {
@@ -320,6 +320,10 @@ public abstract class ResultBase {
     public synchronized boolean addRequestFrame(ResultFrame resultFrame, boolean success) {
         LOGGER.entering(CLASS_NAME, "addRequestFrame", new Object[]{resultFrame, success});
         
+        if (isDone()) {
+            return false;
+        }
+        
         if (requestFrameManager.contains(resultFrame)) {
             LOGGER.exiting(CLASS_NAME, "addRequestFrame", false);
             return false;
@@ -372,6 +376,10 @@ public abstract class ResultBase {
     
     public synchronized boolean addFrame(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "addFrame", resultFrame);
+        
+        if (isDone()) {
+            return false;
+        }
         
         if (responseFrameManager.contains(resultFrame)) {
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
@@ -502,6 +510,15 @@ public abstract class ResultBase {
         LOGGER.entering(CLASS_NAME, "getRequestFrameList");
         
         List<ResultFrame> resultList = requestFrameManager.cloneList();
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultList);
+        return resultList;
+    }
+    
+    public synchronized List<ResultFrame> getRequestFrameList(boolean success) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrameList", success);
+        
+        List<ResultFrame> resultList = requestFrameManager.cloneList(success);
         
         LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultList);
         return resultList;

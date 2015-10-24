@@ -43,9 +43,7 @@ public class PropertyUpdaterThread extends Thread {
             }
         }
         
-        while (!updater.isDone()) {
-            
-            updater.doLoopOnce();
+        while (updater.doLoopOnce()) {
 
             int interval = updater.getIntervalPeriod();
 

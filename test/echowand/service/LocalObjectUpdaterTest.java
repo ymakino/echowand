@@ -141,8 +141,8 @@ public class LocalObjectUpdaterTest {
         
         Thread.sleep(2000);
         
-        propertyUpdater1.done();
-        propertyUpdater2.done();
+        propertyUpdater1.finish();
+        propertyUpdater2.finish();
         
         int count1 = propertyUpdater1.count;
         int count2 = propertyUpdater2.count;

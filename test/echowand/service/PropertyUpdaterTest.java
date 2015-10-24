@@ -73,11 +73,11 @@ public class PropertyUpdaterTest {
         
         assertFalse(updater.isDone());
         
-        updater.done();
+        updater.finish();
         
         assertTrue(updater.isDone());
         
-        updater.done();
+        updater.finish();
         
         assertTrue(updater.isDone());
     }
@@ -91,11 +91,11 @@ public class PropertyUpdaterTest {
         
         assertFalse(updater.isDone());
         
-        updater.done();
+        updater.finish();
         
         assertTrue(updater.isDone());
         
-        updater.done();
+        updater.finish();
         
         assertTrue(updater.isDone());
     }
@@ -121,12 +121,18 @@ public class PropertyUpdaterTest {
         assertEquals(0, updater.getIntervalPeriod());
         assertEquals(null, updater.localObject);
         
-        updater.doLoopOnce();
+        assertTrue(updater.doLoopOnce());
         assertEquals(1, updater.count);
         assertEquals(1, updater.getIntervalPeriod());
         assertEquals(localObject, updater.localObject);
         
-        updater.doLoopOnce();
+        assertTrue(updater.doLoopOnce());
+        assertEquals(2, updater.count);
+        assertEquals(2, updater.getIntervalPeriod());
+        assertEquals(localObject, updater.localObject);
+        
+        updater.finish();
+        assertFalse(updater.doLoopOnce());
         assertEquals(2, updater.count);
         assertEquals(2, updater.getIntervalPeriod());
         assertEquals(localObject, updater.localObject);
