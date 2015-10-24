@@ -39,6 +39,11 @@ echowandを利用していますが、ECHONET Lite 規格認証の申請を行�
 echowandの基本的な使い方
 ---------
 
+###開発環境###
+echowandは[NetBeans](http://netbeans.org/)を利用して開発しています。その他の環境での動作確認はしておりません。
+開発には[Oracle JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+を利用していますが、JDK 6以降であれば問題なく動作するはずです。
+
 ###`Core`の生成と初期化###
 `echowand.service.Core`クラス(以下`Core`とする)を利用することでライブラリの初期化を
 容易に行うことが可能です。もし個別の機能を独立して利用する場合には、`Core`を利用せずに
@@ -125,11 +130,49 @@ core.addLocalObjectConfig(config);
 ```
 
 ここではローカルオブジェクトの生成に必要な情報を与えるだけであり、実際にローカルオブジェクトが
-生成されるのは、`Core`の`startService`が呼び出された時になります。
+生成されるのは`Core`の`startService`が呼び出された時になります。
 ここで記述した温度センサの動作プログラムは
 [echowand.sample.SampleLocalObject.java](https://github.com/ymakino/echowand/blob/master/src/echowand/sample/SampleLocalObject.java)
 にあります。
-このプログラムはRaspberry PiのRaspbianで動作することを確認済みです。(2015/9/9時点)
+2015年10月24日現在、このプログラムはRaspberry Pi(Model B+、2 Model B)のRaspbianで動作することを確認済みです。
+その他のモデルでもおそらく問題なく動作すると思いますが動作確認はしていません。
+
+_このサンプルプログラムをRaspberry Piで動作させるためには、NetBeansで生成したechowand.jarファイルをRaspberry Piにコピーします。_
+_scpコマンドやUSBメモリ等を利用することで、echowand.jarファイルをRaspberry Piにコピーしてください。_
+_scpを利用する場合には、例えば以下のようなコマンドをNetBeansを利用しているマシンで実行します。_
+_コマンドを実行後、パスワードを聞かれますのでRaspberry Piのパスワードを入力しEnterキーを押します。_
+_この操作例では、Raspberry PiのIPアドレスが192.168.0.1だと仮定しています。_
+
+```sh
+[myname@localhost ~]$ scp Documents/NetBeansProjects/echowand/dist/echowand.jar pi@192.168.0.1:
+```
+
+_echowand.jarファイルのコピー後、Raspberry Piにログインします。_
+_Raspberry PiでGUIを利用している場合には、ターミナルを起動してコマンド入力可能なウィンドウを表示します。_
+_必要であれば、cdコマンドを利用してコピーしたファイルの存在するディレクトリに移動してください。_
+_その後、以下の通りコマンドを実行することで温度センサとして動作を開始します。_
+_また、`Ctrl-C`(Controlキーを押しながらCキーを押す)でプログラムは停止します。_
+
+ ```sh
+pi@raspberrypi ~ $ java -cp echowand.jar echowand.sample.SampleLocalObject
+ ```
+
+_動作確認のために、NetBeansを利用しているマシン等でechowand.app.ObjectViewerを起動します。_
+_この時、利用するマシンがRaspberry Piと同一のネットワークに接続しており正常に通信が行えることを先に確認しておきます。_
+_echowand.app.ObjectViewer起動時にインタフェース選択ウィンドウが表示されます。_
+_適切なインタフェースを選択しOKボタンを押すと、ObjectViewerのメインウィンドウが表示されます。_
+_192.168.0.1(Raspberry PiのIPアドレス)をクリックしEOJが001101(温度センサ)であるデバイスが存在していることを確認します。_
+_さらに、001101(温度センサ)をクリックすることで、デバイスのプロパティの情報がウィンドウ下部のテーブルに表示されます。_
+_EPCがE0であるプロパティのデータが温度の値となりますので、`/sys/class/thermal/thermal_zone0/temp`の値と比べてみてください。_
+
+_値の取得だけではなく、値の設定も可能なもう少し複雑なプログラム例が_
+_[echowand.sample.SampleLEDLocalObject.java](https://github.com/ymakino/echowand/blob/master/src/echowand/sample/SampleLEDLocalObject.java)_
+_にあります。この例では一般照明(EOJは029001)を実装しRaspberry Pi上のLEDを制御します。_
+_EPCが80であるプロパティの値を30に設定すると点灯、31に設定すると消灯します。_
+
+ ```sh
+pi@raspberrypi ~ $ java -cp echowand.jar echowand.sample.SampleLEDLocalObject
+ ```
 
 ###`Core`の処理を開始###
 ここまでの処理で`Core`の作成は完了しますがローカルオブジェクトの生成やその他の初期化等は
