@@ -215,19 +215,19 @@ public class LocalObjectConfig {
      * 登録されているLocalObjectServiceDelegate、PropertyDelegate、PropertyUpdaterのnotifyCreationを呼び出す。
      * @param object 生成されたLocalObject
      */
-    public void notifyCreation(LocalObject object) {
+    public void notifyCreation(LocalObject object, Core core) {
         for (LocalObjectDelegate delegate : delegates) {
             if (delegate instanceof LocalObjectServiceDelegate) {
-                ((LocalObjectServiceDelegate)delegate).notifyCreation(object);
+                ((LocalObjectServiceDelegate)delegate).notifyCreation(object, core);
             }
         }
         
         for (PropertyDelegate  propertyDelegate : propertyDelegates) {
-            propertyDelegate.notifyCreation(object);
+            propertyDelegate.notifyCreation(object, core);
         }
         
         for (PropertyUpdater  propertyUpdater : propertyUpdaters) {
-            propertyUpdater.notifyCreation(object);
+            propertyUpdater.notifyCreation(object, core);
         }
     }
 }

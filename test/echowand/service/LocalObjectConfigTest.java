@@ -231,12 +231,12 @@ public class LocalObjectConfigTest {
         assertTrue(config.addDelegate(delegate));
         
         LocalObject localObject1 = new LocalObject(new TemperatureSensorInfo());
-        config.notifyCreation(localObject1);
+        config.notifyCreation(localObject1, null);
         assertEquals(1, delegate.objects.size());
         assertEquals(localObject1, delegate.objects.get(0));
         
         LocalObject localObject2 = new LocalObject(new TemperatureSensorInfo());
-        config.notifyCreation(localObject2);
+        config.notifyCreation(localObject2, null);
         assertEquals(2, delegate.objects.size());
         assertEquals(localObject1, delegate.objects.get(0));
         assertEquals(localObject2, delegate.objects.get(1));
@@ -244,10 +244,12 @@ public class LocalObjectConfigTest {
 
     public class LocalObjectServiceDelegateImpl implements LocalObjectServiceDelegate {
         public LinkedList<LocalObject> objects = new LinkedList<LocalObject>();
+        public Core core;
 
         @Override
-        public void notifyCreation(LocalObject object) {
+        public void notifyCreation(LocalObject object, Core core) {
             objects.add(object);
+            this.core = core;
         }
 
         @Override

@@ -89,7 +89,7 @@ public class LocalObjectCreator {
         
         LocalObject object = createLocalObject(core);
         LocalObjectUpdater updater = createUpdater(object, core);
-        config.notifyCreation(object);
+        config.notifyCreation(object, core);
         
         LocalObjectCreatorResult result = new LocalObjectCreatorResult(object, updater);
         LOGGER.exiting(CLASS_NAME, "create", result);
