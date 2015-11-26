@@ -323,6 +323,14 @@ public class Core {
             localObjectUpdaters.add(creatorResult.updater);
         }
     }
+    
+    private CaptureSubnet getCaptureSubnet() {
+        if (subnet instanceof ExtendedSubnet) {
+            return ((ExtendedSubnet)subnet).getSubnet(CaptureSubnet.class);
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Coreを初期化する。
@@ -353,8 +361,9 @@ public class Core {
 
         captureResultObserver = createCaptureResultObserver();
 
-        if (subnet instanceof CaptureSubnet) {
-            ((CaptureSubnet) subnet).addObserver(captureResultObserver);
+        CaptureSubnet captureSubnet = getCaptureSubnet();
+        if (captureSubnet != null) {
+            captureSubnet.addObserver(captureResultObserver);
             captureEnabled = true;
         }
 

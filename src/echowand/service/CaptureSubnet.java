@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * キャプチャ処理はCaptureSubnetObserverを利用して記述する
  * @author ymakino
  */
-public class CaptureSubnet implements Subnet {
+public class CaptureSubnet implements ExtendedSubnet {
     private Subnet internalSubnet;
     private LinkedList<CaptureSubnetObserver> observers;
     
@@ -25,10 +25,24 @@ public class CaptureSubnet implements Subnet {
         observers = new LinkedList<CaptureSubnetObserver>();
     }
     
+    @Override
+    public <S extends Subnet> S getSubnet(Class<S> cls) {
+        if (cls.isInstance(this)) {
+            return cls.cast(this);
+        } else if (cls.isInstance(getInternalSubnet())) {
+            return cls.cast(getInternalSubnet());
+        } else if (getInternalSubnet() instanceof ExtendedSubnet) {
+            return ((ExtendedSubnet)getInternalSubnet()).getSubnet(cls);
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * 実際の処理で利用するSubnetを返す。
      * @return 処理で利用するSubnet
      */
+    @Override
     public Subnet getInternalSubnet() {
         return internalSubnet;
     }

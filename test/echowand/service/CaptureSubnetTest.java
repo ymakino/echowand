@@ -5,6 +5,7 @@ import echowand.common.EPC;
 import echowand.common.ESV;
 import echowand.net.CommonFrame;
 import echowand.net.Frame;
+import echowand.net.Inet4Subnet;
 import echowand.net.InternalNodeInfo;
 import echowand.net.InternalSubnet;
 import echowand.net.Property;
@@ -57,6 +58,15 @@ public class CaptureSubnetTest {
     
     @After
     public void tearDown() {
+    }
+    
+    @Test
+    public void testGetSubnet() {
+        assertEquals(subnet, subnet.getSubnet(Subnet.class));
+        assertEquals(subnet, subnet.getSubnet(ExtendedSubnet.class));
+        assertEquals(subnet, subnet.getSubnet(CaptureSubnet.class));
+        assertEquals(internalSubnet, subnet.getSubnet(InternalSubnet.class));
+        assertNull(subnet.getSubnet(Inet4Subnet.class));
     }
 
     @Test
