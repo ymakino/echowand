@@ -125,6 +125,18 @@ public class RemoteObject implements EchonetObject {
         }
     }
     
+    /**
+     * トランザクションのタイムアウト時間を取得する。
+     * @return 設定されているタイムアウトの時間(ミリ秒)
+     */
+    public int getTimeout() {
+        logger.entering(className, "getTimeout");
+        
+        int timeout = this.timeout;
+        logger.exiting(className, "getTimeout", timeout);
+        return timeout;
+    }
+    
     private boolean isValidFrame(Frame frame) {
         logger.entering(className, "isValidFrame", frame);
 
