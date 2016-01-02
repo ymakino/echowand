@@ -12,10 +12,7 @@ import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.object.AnnounceRequestProcessor;
 import echowand.object.LocalObject;
-import echowand.object.LocalObjectDateTimeDelegate;
 import echowand.object.LocalObjectManager;
-import echowand.object.LocalObjectNotifyDelegate;
-import echowand.object.NodeProfileObjectDelegate;
 import echowand.object.RemoteObjectManager;
 import echowand.object.SetGetRequestProcessor;
 import java.util.LinkedList;
@@ -42,6 +39,7 @@ public class Core {
     private ObserveResultProcessor observeResultProcessor;
     private CaptureResultObserver captureResultObserver;
     
+    private NodeProfileObjectConfig nodeProfileObjectConfig;
     private LinkedList<LocalObjectConfig> localObjectConfigs;
     private LinkedList<LocalObjectUpdater> localObjectUpdaters;
     
@@ -58,6 +56,7 @@ public class Core {
         LOGGER.entering(CLASS_NAME, "Core");
         
         this.subnet = new CaptureSubnet(Inet4Subnet.startSubnet());
+        nodeProfileObjectConfig = new NodeProfileObjectConfig();
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
         
@@ -73,10 +72,19 @@ public class Core {
         LOGGER.entering(CLASS_NAME, "Core", subnet);
         
         this.subnet = subnet;
+        nodeProfileObjectConfig = new NodeProfileObjectConfig();
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
         
         LOGGER.exiting(CLASS_NAME, "Core");
+    }
+    
+    /**
+     * ノードプロファイルオブジェクト作成に利用するNodeProfileObjectConfigを返す。
+     * @return ノードプロファイルオブジェクト作成に利用するNodeProfileObjectConfig
+     */
+    public NodeProfileObjectConfig getNodeProfileObjectConfig() {
+        return nodeProfileObjectConfig;
     }
     
     /**
@@ -198,18 +206,6 @@ public class Core {
         LOGGER.exiting(CLASS_NAME, "createNodeProfileInfo", nodeProfileInfo);
         return nodeProfileInfo;
     }
-
-    private LocalObject createNodeProfileObject(Subnet subnet, LocalObjectManager manager, TransactionManager transactionManager) {
-        LOGGER.entering(CLASS_NAME, "createNodeProfileObject", new Object[]{subnet, manager, transactionManager});
-        
-        LocalObject nodeProfile = new LocalObject(createNodeProfileInfo());
-        nodeProfile.addDelegate(new LocalObjectDateTimeDelegate());
-        nodeProfile.addDelegate(new NodeProfileObjectDelegate(manager));
-        nodeProfile.addDelegate(new LocalObjectNotifyDelegate(subnet, transactionManager));
-        
-        LOGGER.exiting(CLASS_NAME, "createNodeProfileObject", nodeProfile);
-        return nodeProfile;
-    }
     
     private TransactionManager createTransactionManager(Subnet subnet) {
         LOGGER.entering(CLASS_NAME, "createTransactionManager", new Object[]{subnet});
@@ -320,7 +316,9 @@ public class Core {
         for (LocalObjectConfig config : localObjectConfigs) {
             LocalObjectCreator creator = new LocalObjectCreator(config);
             LocalObjectCreatorResult creatorResult = creator.create(this);
-            localObjectUpdaters.add(creatorResult.updater);
+            if (creatorResult.updater != null) {
+                localObjectUpdaters.add(creatorResult.updater);
+            }
         }
     }
     
@@ -348,7 +346,6 @@ public class Core {
         transactionManager = createTransactionManager(subnet);
         remoteManager = createRemoteObjectManager();
         localManager = createLocalObjectManager();
-        nodeProfileObject = createNodeProfileObject(subnet, localManager, transactionManager);
 
         setGetRequestProcessor = createSetGetRequestProcessor(localManager);
         announceRequestProcessor = createAnnounceRequestProcessor(localManager, remoteManager);
@@ -366,8 +363,16 @@ public class Core {
             captureSubnet.addObserver(captureResultObserver);
             captureEnabled = true;
         }
-
-        localManager.add(nodeProfileObject);
+        
+        try {
+            LocalObjectCreatorResult creatorResult = new LocalObjectCreator(nodeProfileObjectConfig).create(this);
+            nodeProfileObject = creatorResult.object;
+            if (creatorResult.updater != null) {
+                localObjectUpdaters.add(creatorResult.updater);
+            }
+        } catch (TooManyObjectsException ex) {
+            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         initialized = true;
         
@@ -377,9 +382,7 @@ public class Core {
     
     private void startUpdateThreads() {
         for (LocalObjectUpdater updater : localObjectUpdaters) {
-            if (updater != null) {
-                new Thread(updater).start();
-            }
+            new Thread(updater).start();
         }
     }
     

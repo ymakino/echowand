@@ -2,6 +2,7 @@ package echowand.service;
 
 import echowand.common.EPC;
 import echowand.info.TemperatureSensorInfo;
+import echowand.net.InternalSubnet;
 import echowand.object.LocalObject;
 import echowand.object.LocalObjectDelegate;
 import echowand.object.ObjectData;
@@ -266,5 +267,109 @@ public class LocalObjectConfigTest {
         public void notifyDataChanged(NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
+    }
+    
+    public class DummyLazyConfiguration implements LocalObjectConfig.LazyConfiguration {
+        public int count = 0;
+        public LocalObjectConfig config;
+        public Core core;
+        
+        @Override
+        public void configure(LocalObjectConfig config, Core core) {
+            count++;
+            this.config = config;
+            this.core = core;
+        }
+    }
+
+    @Test
+    public void testAddLazyConfiguration() {
+        LocalObjectConfig.LazyConfiguration configuration = new DummyLazyConfiguration();
+        assertTrue(config.addLazyConfiguration(configuration));
+    }
+
+    @Test
+    public void testCountLazyConfigurations() {
+        assertEquals(0, config.countLazyConfigurations());
+        
+        LocalObjectConfig.LazyConfiguration configuration = new DummyLazyConfiguration();
+        assertTrue(config.addLazyConfiguration(configuration));
+        
+        assertEquals(1, config.countLazyConfigurations());
+    }
+
+    @Test
+    public void testGetLazyConfiguration() {
+        LocalObjectConfig.LazyConfiguration configuration1 = new DummyLazyConfiguration();
+        assertTrue(config.addLazyConfiguration(configuration1));
+        
+        assertEquals(configuration1, config.getLazyConfiguration((0)));
+        
+        LocalObjectConfig.LazyConfiguration configuration2 = new DummyLazyConfiguration();
+        assertTrue(config.addLazyConfiguration(configuration2));
+        
+        assertEquals(configuration1, config.getLazyConfiguration((0)));
+        assertEquals(configuration2, config.getLazyConfiguration((1)));
+    }
+
+    @Test
+    public void testRemoveLazyConfiguration() {
+        LocalObjectConfig.LazyConfiguration configuration1 = new DummyLazyConfiguration();
+        LocalObjectConfig.LazyConfiguration configuration2 = new DummyLazyConfiguration();
+        
+        assertTrue(config.addLazyConfiguration(configuration1));
+        
+        assertTrue(config.removeLazyConfiguration(configuration1));
+        assertFalse(config.removeLazyConfiguration(configuration1));
+        
+        assertTrue(config.addLazyConfiguration(configuration1));
+        assertTrue(config.addLazyConfiguration(configuration2));
+        
+        assertTrue(config.removeLazyConfiguration((configuration2)));
+        assertFalse(config.removeLazyConfiguration((configuration2)));
+    }
+
+    @Test
+    public void testContainsLazyConfiguration() {
+        LocalObjectConfig.LazyConfiguration configuration1 = new DummyLazyConfiguration();
+        LocalObjectConfig.LazyConfiguration configuration2 = new DummyLazyConfiguration();
+        
+        assertFalse(config.containsLazyConfiguration(configuration1));
+        assertFalse(config.containsLazyConfiguration(configuration2));
+        
+        assertTrue(config.addLazyConfiguration(configuration1));
+        
+        assertTrue(config.containsLazyConfiguration(configuration1));
+        assertFalse(config.containsLazyConfiguration(configuration2));
+        
+        assertTrue(config.addLazyConfiguration(configuration2));
+        
+        assertTrue(config.containsLazyConfiguration(configuration1));
+        assertTrue(config.containsLazyConfiguration(configuration2));
+        
+        assertTrue(config.removeLazyConfiguration(configuration1));
+        
+        assertFalse(config.containsLazyConfiguration(configuration1));
+        assertTrue(config.containsLazyConfiguration(configuration2));
+    }
+
+    @Test
+    public void testLazyConfigure() {
+        Core core = new Core(new InternalSubnet());
+        DummyLazyConfiguration configuration1 = new DummyLazyConfiguration();
+        DummyLazyConfiguration configuration2 = new DummyLazyConfiguration();
+        
+        config.addLazyConfiguration(configuration1);
+        config.addLazyConfiguration(configuration2);
+        
+        config.lazyConfigure(core);
+        
+        assertEquals(config, configuration1.config);
+        assertEquals(core, configuration1.core);
+        assertEquals(1, configuration1.count);
+        
+        assertEquals(config, configuration2.config);
+        assertEquals(core, configuration2.core);
+        assertEquals(1, configuration2.count);
     }
 }

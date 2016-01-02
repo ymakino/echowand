@@ -18,6 +18,11 @@ public class LocalObjectConfig {
     private LinkedList<LocalObjectDelegate> delegates;
     private LinkedList<PropertyDelegate> propertyDelegates;
     private LinkedList<PropertyUpdater> propertyUpdaters;
+    private LinkedList<LazyConfiguration> lazyConfigurations;
+    
+    public interface LazyConfiguration {
+        void configure(LocalObjectConfig config, Core core);
+    }
     
     /**
      * 指定されたObjectInfoを利用するLocalObjectConfigを生成する。
@@ -30,6 +35,7 @@ public class LocalObjectConfig {
         delegates = new LinkedList<LocalObjectDelegate>();
         propertyDelegates = new LinkedList<PropertyDelegate>();
         propertyUpdaters = new LinkedList<PropertyUpdater>();
+        lazyConfigurations = new LinkedList<LazyConfiguration>();
         
         LOGGER.exiting(CLASS_NAME, "LocalObjectConfig");
     }
@@ -214,6 +220,7 @@ public class LocalObjectConfig {
      * このLocalObjectConfigを利用したLocalObjectが生成された時に呼び出される。
      * 登録されているLocalObjectServiceDelegate、PropertyDelegate、PropertyUpdaterのnotifyCreationを呼び出す。
      * @param object 生成されたLocalObject
+     * @param core 生成に利用したCore
      */
     public void notifyCreation(LocalObject object, Core core) {
         for (LocalObjectDelegate delegate : delegates) {
@@ -228,6 +235,85 @@ public class LocalObjectConfig {
         
         for (PropertyUpdater  propertyUpdater : propertyUpdaters) {
             propertyUpdater.notifyCreation(object, core);
+        }
+    }
+    
+    /**
+     * 指定されたLazyConfigurationを追加する。
+     * @param configuration 追加するLazyConfiguration
+     * @return 追加に成功した場合にはtrue、失敗した場合にはfalse
+     */
+    public boolean addLazyConfiguration(LazyConfiguration configuration) {
+        LOGGER.entering(CLASS_NAME, "addLazyConfiguration", configuration);
+        
+        boolean result = lazyConfigurations.add(configuration);
+        
+        LOGGER.exiting(CLASS_NAME, "addLazyConfiguration", configuration);
+        return result;
+    }
+    
+    /**
+     * 登録されているLazyConfigurationの個数を返す。
+     * @return 登録されているLazyConfigurationの個数
+     */
+    public int countLazyConfigurations() {
+        LOGGER.entering(CLASS_NAME, "countLazyConfigurations");
+        
+        int count = lazyConfigurations.size();
+        
+        LOGGER.exiting(CLASS_NAME, "countLazyConfigurations", count);
+        return count;
+    }
+    
+    /**
+     * index番目のLazyConfigurationを返す。
+     * @param index LazyConfigurationのインデックス
+     * @return 指定されたLazyConfiguration
+     */
+    public LazyConfiguration getLazyConfiguration(int index) {
+        LOGGER.entering(CLASS_NAME, "getLazyConfiguration");
+        
+        LazyConfiguration configuration = lazyConfigurations.get(index);
+        
+        LOGGER.exiting(CLASS_NAME, "getLazyConfiguration", configuration);
+        return configuration;
+    }
+    
+    /**
+     * 指定されたLazyConfigurationを抹消する。
+     * @param configuration 抹消するLazyConfiguration
+     * @return 抹消に成功したらtrue、そうでなければfalse
+     */
+    public boolean removeLazyConfiguration(LazyConfiguration configuration) {
+        LOGGER.entering(CLASS_NAME, "removeLazyConfiguration", configuration);
+        
+        boolean result = lazyConfigurations.remove(configuration);
+        
+        LOGGER.exiting(CLASS_NAME, "removeLazyConfiguration", configuration);
+        return result;
+    }
+    
+    /**
+     * 指定されたLazyConfigurationが登録されているかどうかを返す。
+     * @param configuration 登録の確認を行うLazyConfiguration
+     * @return 登録されていたらtrue、そうでなければfalse
+     */
+    public boolean containsLazyConfiguration(LazyConfiguration configuration) {
+        LOGGER.entering(CLASS_NAME, "removeLazyConfiguration", configuration);
+        
+        boolean result = lazyConfigurations.contains(configuration);
+        
+        LOGGER.exiting(CLASS_NAME, "removeLazyConfiguration", configuration);
+        return result;
+    }
+    
+    /**
+     * 登録されたLazyConfigurationのconfigureメソッドを呼び出す。
+     * @param core 利用されるCoreの指定
+     */
+    public void lazyConfigure(Core core) {
+        for (LazyConfiguration lazyConfiguration : lazyConfigurations) {
+            lazyConfiguration.configure(this, core);
         }
     }
 }

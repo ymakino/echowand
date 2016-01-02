@@ -1,5 +1,6 @@
 package echowand.service;
 
+import echowand.common.ClassEOJ;
 import echowand.common.EPC;
 import echowand.info.ObjectInfo;
 import echowand.info.TemperatureSensorInfo;
@@ -24,7 +25,7 @@ import static org.junit.Assert.*;
 public class CoreTest {
     private Core core;
     private Subnet subnet;
-    
+
     private Core newCore() {
         subnet = new InternalSubnet();
         core =  new Core(subnet);
@@ -106,7 +107,7 @@ public class CoreTest {
         Core core = newCore();
         assertNull(core.getTransactionManager());
         core.startService();
-        assertTrue(core.getTransactionManager() != null);
+        assertNotNull(core.getTransactionManager());
     }
 
     /**
@@ -117,7 +118,7 @@ public class CoreTest {
         Core core = newCore();
         assertNull(core.getRemoteObjectManager());
         core.startService();
-        assertTrue(core.getRemoteObjectManager() != null);
+        assertNotNull(core.getRemoteObjectManager());
     }
 
     /**
@@ -128,7 +129,7 @@ public class CoreTest {
         Core core = newCore();
         assertNull(core.getLocalObjectManager());
         core.startService();
-        assertTrue(core.getLocalObjectManager() != null);
+        assertNotNull(core.getLocalObjectManager());
     }
 
     /**
@@ -138,8 +139,8 @@ public class CoreTest {
     public void testGetNodeProfileObject() throws TooManyObjectsException {
         Core core = newCore();
         assertNull(core.getNodeProfileObject());
-        core.startService();
-        assertTrue(core.getNodeProfileObject() != null);
+        core.initialize();
+        assertNotNull(core.getNodeProfileObject());
     }
 
     /**
@@ -296,5 +297,10 @@ public class CoreTest {
         assertTrue(core.isInService());
         assertTrue(core.isInitialized());
     }
-    
+
+    @Test
+    public void testGetNodeProfileObjectConfig() {
+        core = newCore();
+        assertEquals(new ClassEOJ("0ef0"), core.getNodeProfileObjectConfig().getObjectInfo().getClassEOJ());
+    }
 }

@@ -87,6 +87,7 @@ public class LocalObjectCreator {
     public LocalObjectCreatorResult create(Core core) throws TooManyObjectsException {
         LOGGER.entering(CLASS_NAME, "create", core);
         
+        config.lazyConfigure(core);
         LocalObject object = createLocalObject(core);
         LocalObjectUpdater updater = createUpdater(object, core);
         config.notifyCreation(object, core);
