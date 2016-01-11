@@ -1,7 +1,5 @@
 package echowand.service;
 
-import echowand.common.EPC;
-import echowand.info.NodeProfileInfo;
 import echowand.logic.Listener;
 import echowand.logic.MainLoop;
 import echowand.logic.RequestDispatcher;
@@ -194,17 +192,6 @@ public class Core {
     
     public CaptureResultObserver getCaptureResultObserver() {
         return captureResultObserver;
-    }
-
-    private NodeProfileInfo createNodeProfileInfo() {
-        LOGGER.entering(CLASS_NAME, "createNodeProfileInfo");
-        
-        NodeProfileInfo nodeProfileInfo = new NodeProfileInfo();
-        nodeProfileInfo.add(EPC.x97, true, false, false, 2);
-        nodeProfileInfo.add(EPC.x98, true, false, false, 4);
-        
-        LOGGER.exiting(CLASS_NAME, "createNodeProfileInfo", nodeProfileInfo);
-        return nodeProfileInfo;
     }
     
     private TransactionManager createTransactionManager(Subnet subnet) {
