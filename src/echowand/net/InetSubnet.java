@@ -60,7 +60,7 @@ public class InetSubnet implements Subnet {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{networkInterface, loopbackAddress, multicastAddress, portNumber});
 
         if (!isValidAddress(loopbackAddress)) {
-            throw new SubnetException("invalid loopback address: " + localAddress);
+            throw new SubnetException("invalid loopback address: " + loopbackAddress);
         }
 
         if (!isValidAddress(multicastAddress)) {
@@ -99,7 +99,7 @@ public class InetSubnet implements Subnet {
         }
 
         if (!isValidAddress(loopbackAddress)) {
-            throw new SubnetException("invalid loopback address: " + localAddress);
+            throw new SubnetException("invalid loopback address: " + loopbackAddress);
         }
 
         if (!isValidAddress(multicastAddress)) {
@@ -276,7 +276,7 @@ public class InetSubnet implements Subnet {
         tcpReceiverThread.start();
 
         if (tcpAcceptorEnabled) {
-            tcpAcceptorThread = new InetSubnetTCPAcceptorThread(this, tcpAcceptor);
+            tcpAcceptorThread = new InetSubnetTCPAcceptorThread(this, getTCPAcceptor());
             tcpAcceptorThread.start();
         }
 
