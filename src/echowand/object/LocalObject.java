@@ -89,7 +89,7 @@ public class LocalObject implements EchonetObject {
      * @param data 設定するデータの内容
      * @return 設定に成功したらtrue、そうでなければfalse
      */
-    public boolean forceSetData(EPC epc, ObjectData data) {
+    public synchronized boolean forceSetData(EPC epc, ObjectData data) {
         logger.entering(className, "forceSetData", new Object[]{epc, data});
         
         ObjectData oldData = this.getData(epc);
@@ -122,7 +122,7 @@ public class LocalObject implements EchonetObject {
      * @return 設定に成功したらtrue、そうでなければfalse
      */
     @Override
-    public boolean setData(EPC epc, ObjectData data) {
+    public synchronized boolean setData(EPC epc, ObjectData data) {
         logger.entering(className, "setData", new Object[]{epc, data});
         
         if (!this.isSettable(epc)) {
@@ -167,7 +167,7 @@ public class LocalObject implements EchonetObject {
      * @param epc データのEPC
      * @return プロパティのデータ、存在しない場合にはnull
      */
-    public ObjectData forceGetData(EPC epc) {
+    public synchronized ObjectData forceGetData(EPC epc) {
         logger.entering(className, "forceGetData", epc);
         
         LocalObjectDelegate.GetState result = getDataDelegate(epc);
@@ -191,7 +191,7 @@ public class LocalObject implements EchonetObject {
      * @return プロパティのデータ、存在しない場合にはnull
      */
     @Override
-    public ObjectData getData(EPC epc) {
+    public synchronized ObjectData getData(EPC epc) {
         logger.entering(className, "getData", epc);
         
         if (!this.isGettable(epc)) {

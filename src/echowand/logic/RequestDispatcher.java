@@ -4,7 +4,6 @@ import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.StandardPayload;
 import echowand.net.Subnet;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
@@ -55,6 +54,33 @@ public class RequestDispatcher implements Listener {
         processors.remove(processor);
         
         logger.exiting(className, "removeRequestProcessor");
+    }
+    
+    /**
+     * 登録されているRequestProcessorの数を返す。
+     * @return 登録されているRequestProcessorの数
+     */
+    public synchronized int countRequestProcessors() {
+        logger.entering(className, "countRequestProcessor");
+        
+        int count = processors.size();
+        
+        logger.exiting(className, "countRequestProcessor", count);
+        return count;
+    }
+    
+    /**
+     * index番目に登録されているRequestProcessorを返す。
+     * @param index RequestProcessorのインデックス
+     * @return 指定されたRequestProcessor
+     */
+    public synchronized RequestProcessor getRequestProcessor(int index) {
+        logger.entering(className, "getRequestProcessor", index);
+        
+        RequestProcessor processor = processors.get(index);
+        
+        logger.exiting(className, "countRequestProcessor", processor);
+        return processor;
     }
     
     /**

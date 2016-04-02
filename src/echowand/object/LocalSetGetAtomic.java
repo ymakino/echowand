@@ -97,13 +97,58 @@ public class LocalSetGetAtomic implements Runnable {
         
         boolean permission;
         if (announce) {
-            permission = object.isObservable(epc);
+            permission = object.isGettable(epc) || object.isObservable(epc);
         } else {
             permission = object.isGettable(epc);
         }
         
         logger.exiting(className, "hasGetOrAnnouncePermission", permission);
         return permission;
+    }
+    
+    private boolean doSetGet() {
+        logger.entering(className, "doSetGet");
+
+        if (done) {
+            logger.exiting(className, "doSetGet", false);
+            return false;
+        }
+
+        for (Property property : setProperties) {
+            if (object.setData(property.getEPC(), new ObjectData(property.getEDT()))) {
+                setResult.add(new Property(property.getEPC()));
+            } else {
+                setResult.add(property);
+                success = false;
+            }
+        }
+
+        for (Property property : getProperties) {
+            ObjectData data = null;
+
+            if (hasGetOrAnnouncePermission(object, property.getEPC())) {
+                data = object.forceGetData(property.getEPC());
+            }
+
+            if (data != null) {
+                getResult.add(new Property(property.getEPC(), data.getData()));
+                
+                if (announce) {
+                    for (int i=0; i<data.getExtraSize(); i++) {
+                        getResult.add(new Property(property.getEPC(), data.getExtraDataAt(i)));
+                    }
+                }
+                
+            } else {
+                getResult.add(new Property(property.getEPC()));
+                success = false;
+            }
+        }
+
+        done = true;
+
+        logger.exiting(className, "doSetGet", true);
+        return true;
     }
 
     /**
@@ -113,39 +158,11 @@ public class LocalSetGetAtomic implements Runnable {
     public void run() {
         logger.entering(className, "run");
 
-        try {
-            if (done) {
-                return;
-            }
-
-            for (Property property : setProperties) {
-                if (object.setData(property.getEPC(), new ObjectData(property.getEDT()))) {
-                    setResult.add(new Property(property.getEPC()));
-                } else {
-                    setResult.add(property);
-                    success = false;
-                }
-            }
-
-            for (Property property : getProperties) {
-                ObjectData data = null;
-
-                if (hasGetOrAnnouncePermission(object, property.getEPC())) {
-                    data = object.forceGetData(property.getEPC());
-                }
-
-                if (data != null) {
-                    getResult.add(new Property(property.getEPC(), data.getData()));
-                } else {
-                    getResult.add(new Property(property.getEPC()));
-                    success = false;
-                }
-            }
-
-            done = true;
-        } finally {
-            logger.exiting(className, "run");
+        synchronized (object) {
+            doSetGet();
         }
+        
+        logger.exiting(className, "run");
     }
     
     /**

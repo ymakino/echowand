@@ -3,13 +3,12 @@ package echowand.object;
 import echowand.common.Data;
 import echowand.common.EPC;
 import echowand.info.DeviceObjectInfo;
-import echowand.info.NodeProfileInfo;
 import echowand.net.Property;
-import echowand.object.ObjectData;
-import echowand.object.LocalObject;
-import echowand.object.LocalSetGetAtomic;
 import echowand.info.TemperatureSensorInfo;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.junit.Assert.*;
 import org.junit.*;
 
@@ -195,11 +194,10 @@ public class LocalSetGetAtomicTest {
         
         assertTrue(localSetGetAtomic.isSuccess());
     }
-    
-    @Test
-    public void testAnnounce() {
+        
+    private void testAnnouncePrivate(boolean gettable, boolean observable) {
         DeviceObjectInfo objectInfo = getWritableTemperatureSensorInfo();
-        objectInfo.add(EPC.xE1, false, false, true, 1);
+        objectInfo.add(EPC.xE1, gettable, false, observable, 1);
         LocalObject object = new LocalObject(objectInfo);
         object.forceSetData(EPC.x80, new ObjectData((byte)0x41));
         object.forceSetData(EPC.xE0, new ObjectData((byte)0x12, (byte)0x34));
@@ -216,9 +214,119 @@ public class LocalSetGetAtomicTest {
         assertEquals(1, getResult.get(0).getPDC());
         assertEquals(1, getResult.get(0).getEDT().size());
         assertEquals(EPC.xE0, getResult.get(1).getEPC());
-        assertEquals(0, getResult.get(1).getPDC());
+        assertEquals(2, getResult.get(1).getPDC());
+        assertEquals(2, getResult.get(1).getEDT().size());
         assertEquals(EPC.xE1, getResult.get(2).getEPC());
         assertEquals(1, getResult.get(2).getPDC());
         assertEquals(1, getResult.get(2).getEDT().size());
+    }
+    
+    @Test
+    public void testAnnounce() {
+        testAnnouncePrivate(true, true);
+        testAnnouncePrivate(true, false);
+        testAnnouncePrivate(false, true);
+    }
+    
+    private void testExtraDataPrivate(boolean gettable, boolean observable) {
+        DeviceObjectInfo objectInfo = getWritableTemperatureSensorInfo();
+        objectInfo.add(EPC.xE1, gettable, false, observable, 1);
+        LocalObject object = new LocalObject(objectInfo);
+        LinkedList<Data> dataList = new LinkedList<Data>();
+        
+        Data data1 = new Data((byte)0x12, (byte)0x34);
+        Data data2 = new Data((byte)0x56, (byte)0x78);
+        dataList.add(data1);
+        dataList.add(data2);
+        
+        object.forceSetData(EPC.xE1, new ObjectData(dataList));
+        
+        LocalSetGetAtomic localSetGetAtomic1 = new LocalSetGetAtomic(object);
+        localSetGetAtomic1.addGet(new Property(EPC.xE1));
+        localSetGetAtomic1.run();
+        
+        if (gettable) {
+            List<Property> getResult1 = localSetGetAtomic1.getGetResult();
+            assertEquals(1, getResult1.size());
+            assertEquals(EPC.xE1, getResult1.get(0).getEPC());
+            assertEquals(data1, getResult1.get(0).getEDT());
+        } else {
+            List<Property> getResult1 = localSetGetAtomic1.getGetResult();
+            assertEquals(1, getResult1.size());
+            assertEquals(EPC.xE1, getResult1.get(0).getEPC());
+            assertEquals(new Data(), getResult1.get(0).getEDT());
+        }
+        
+        LocalSetGetAtomic localSetGetAtomic2 = new LocalSetGetAtomic(object);
+        localSetGetAtomic2.addGet(new Property(EPC.xE1));
+        localSetGetAtomic2.setAnnounce(true);
+        localSetGetAtomic2.run();
+        
+        List<Property> getResult2 = localSetGetAtomic2.getGetResult();
+        assertEquals(2, getResult2.size());
+        assertEquals(EPC.xE1, getResult2.get(0).getEPC());
+        assertEquals(data1, getResult2.get(0).getEDT());
+        assertEquals(EPC.xE1, getResult2.get(1).getEPC());
+        assertEquals(data2, getResult2.get(1).getEDT());
+    }
+    
+    @Test
+    public void testExtraData() {
+        testExtraDataPrivate(true, true);
+        testExtraDataPrivate(true, false);
+        testExtraDataPrivate(false, true);
+    }
+    
+    public class AtomicTestDelegate extends LocalObjectDefaultDelegate {
+            private int count = 0;
+
+            @Override
+            public synchronized void getData(LocalObjectDelegate.GetState result, LocalObject object, EPC epc) {
+            }
+
+            @Override
+            public synchronized void setData(LocalObjectDelegate.SetState result, LocalObject object, EPC epc, ObjectData newData, ObjectData curData) {
+            }
+
+            @Override
+            public void notifyDataChanged(LocalObjectDelegate.NotifyState result, LocalObject object, EPC epc, ObjectData curData, ObjectData oldData) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(LocalSetGetAtomicTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+    }
+    
+    @Test
+    public void testAtomically() throws InterruptedException {
+        DeviceObjectInfo objectInfo = getWritableTemperatureSensorInfo();
+        LocalObject object = new LocalObject(objectInfo);
+        object.forceSetData(EPC.x80, new ObjectData((byte)0x41));
+        object.forceSetData(EPC.xE0, new ObjectData((byte)0x12, (byte)0x34));
+        
+        AtomicTestDelegate delegate = new AtomicTestDelegate();
+        object.addDelegate(delegate);
+        
+        final LocalSetGetAtomic atomic1 = new LocalSetGetAtomic(object);
+        Data data1 = new Data((byte)0x31);
+        atomic1.addSet(new Property(EPC.x80, data1));
+        atomic1.addGet(new Property(EPC.x80));
+        
+        final LocalSetGetAtomic atomic2 = new LocalSetGetAtomic(object);
+        Data data2 = new Data((byte)0x32);
+        atomic2.addSet(new Property(EPC.x80, data2));
+        atomic2.addGet(new Property(EPC.x80));
+        
+        Thread t1 = new Thread(atomic1);
+        Thread t2 = new Thread(atomic2);
+        t1.start();
+        t2.start();
+        
+        t1.join();
+        t2.join();
+        
+        assertEquals(data1, atomic1.getGetResult().get(0).getEDT());
+        assertEquals(data2, atomic2.getGetResult().get(0).getEDT());
     }
 }
