@@ -358,7 +358,7 @@ public class Core {
                 localObjectUpdaters.add(creatorResult.updater);
             }
         } catch (TooManyObjectsException ex) {
-            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.logp(Level.WARNING, CLASS_NAME, "initialize", "cannot create NodeProfileObject", ex);
         }
 
         initialized = true;

@@ -63,6 +63,11 @@ public class TCPConnection implements Connection {
 
         InetNodeInfo remoteInetNodeInfo = (InetNodeInfo) remoteNodeInfo;
         InetAddress remoteAddress = remoteInetNodeInfo.getAddress();
+        
+        if (remoteInetNodeInfo.hasPortNumber()) {
+            portNumber = remoteInetNodeInfo.getPortNumber();
+        }
+        
         InetSocketAddress remoteSocketAddress = new InetSocketAddress(remoteAddress, portNumber);
 
         socket = new Socket();

@@ -24,7 +24,7 @@ public class UDPNetwork {
     /**
      * 受信データ用バッファのデフォルトサイズ
      */
-    public static final short  DEFAULT_BUFFER_SIZE = 1500;
+    public static final int  DEFAULT_BUFFER_SIZE = 1500;
     
     private NetworkInterface networkInterface;
     private List<NetworkInterface> receiverInterfaces;
@@ -34,6 +34,8 @@ public class UDPNetwork {
     private int portNumber;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
     private boolean inService = false;
+    
+    private boolean remotePortNumberEnabled;
     
     /**
      * 利用するローカルアドレス、受信インタフェース、マルチキャストアドレスおよびポート番号を指定してUDPNetworkを生成する。
@@ -150,6 +152,20 @@ public class UDPNetwork {
         return portNumber;
     }
     
+    public synchronized boolean setPortNumber(int portNumber) {
+        LOGGER.entering(CLASS_NAME, "setPortNumber", portNumber);
+        
+        if (isInService()) {
+            LOGGER.exiting(CLASS_NAME, "setPortNumber", false);
+            return false;
+        }
+        
+        this.portNumber = portNumber;
+        
+        LOGGER.exiting(CLASS_NAME, "setPortNumber", true);
+        return true;
+    }
+    
     /**
      * バッファの最大長を返す。
      * @return バッファの最大長
@@ -173,6 +189,53 @@ public class UDPNetwork {
      */
     public synchronized boolean isInService() {
         return inService;
+    }
+    
+    /**
+     * リモートノードのポート番号を認識するかを返す。
+     * ポート番号を認識する場合、ポート番号が異なる場合には異なるNodeを生成する。
+     * @return リモートノードのポート番号を認識する場合にあtrue、そうでなければfalse
+     */
+    public boolean isRemotePortNumberEnabled() {
+        return remotePortNumberEnabled;
+    }
+    
+    /**
+     * リモートノードのポート番号を識別するように設定する。
+     * サービス開始前に呼び出す必要がある。
+     * @return 設定が成功した場合にはtrue、そうでければfalse
+     */
+    public synchronized boolean enableRemotePortNumber() {
+        LOGGER.entering(CLASS_NAME, "enableRemotePortNumber");
+        
+        if (isInService()) {
+            LOGGER.exiting(CLASS_NAME, "enableRemotePortNumber", false);
+            return false;
+        }
+        
+        remotePortNumberEnabled = true;
+        
+        LOGGER.exiting(CLASS_NAME, "enableRemotePortNumber", true);
+        return true;
+    }
+    
+    /**
+     * リモートノードのポート番号を識別しないように設定する。
+     * サービス開始前に呼び出す必要が有る。
+     * @return 設定が成功した場合にはtrue、そうでければfalse
+     */
+    public synchronized boolean disableRemotePortNumber() {
+        LOGGER.entering(CLASS_NAME, "disableRemotePortNumber");
+        
+        if (isInService()) {
+            LOGGER.exiting(CLASS_NAME, "disableRemotePortNumber", false);
+            return false;
+        }
+        
+        remotePortNumberEnabled = false;
+        
+        LOGGER.exiting(CLASS_NAME, "disableRemotePortNumber", true);
+        return true;
     }
     
     /**
@@ -237,6 +300,10 @@ public class UDPNetwork {
             InetAddress receiver = remoteNodeInfo.getAddress();
             int port = getPortNumber();
             
+            if (remoteNodeInfo.hasPortNumber()) {
+                port = remoteNodeInfo.getPortNumber();
+            }
+            
             DatagramPacket packet = new DatagramPacket(data, data.length, receiver, port);
             
             multicastSocket.send(packet);
@@ -288,7 +355,14 @@ public class UDPNetwork {
             
             InetAddress addr = packet.getAddress();
             
-            Pair<InetNodeInfo, CommonFrame> pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr), commonFrame);
+            Pair<InetNodeInfo, CommonFrame> pair;
+            
+            if (isRemotePortNumberEnabled()) {
+                int port = packet.getPort();
+                pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr, port), commonFrame);
+            } else {
+                pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr), commonFrame);
+            }
             LOGGER.exiting(CLASS_NAME, "receive", pair);
             return pair;
         } catch (IOException ex) {

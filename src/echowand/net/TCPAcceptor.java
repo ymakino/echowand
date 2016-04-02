@@ -18,27 +18,45 @@ public class TCPAcceptor {
     private static final String CLASS_NAME = TCPAcceptor.class.getName();
     
     private InetAddress address;
-    private int port;
+    private int portNumber;
     private ServerSocket serverSocket;
     private LinkedList<TCPAcceptorObserver> observers;
     
     /**
      * 接続待ちポート番号を指定して、TCPAcceptorを生成する。
-     * @param port 接続待ちポート番号の指定
+     * @param portNumber 接続待ちポート番号の指定
      */
-    public TCPAcceptor(int port) {
-        this(null, port);
+    public TCPAcceptor(int portNumber) {
+        this(null, portNumber);
     }
     
     /**
      * 接続待ちポート番号とIPアドレスを指定して、TCPAcceptorを生成する。
      * @param address 接続待ちIPアドレスの指定
-     * @param port 接続待ちポート番号の指定
+     * @param portNumber 接続待ちポート番号の指定
      */
-    public TCPAcceptor(InetAddress address, int port) {
+    public TCPAcceptor(InetAddress address, int portNumber) {
         this.address = address;
-        this.port = port;
+        this.portNumber = portNumber;
         observers = new LinkedList<TCPAcceptorObserver>();
+    }
+    
+    public int getPortNumber() {
+        return portNumber;
+    }
+    
+    public boolean setPortNumber(int portNumber) {
+        LOGGER.entering(CLASS_NAME, "setPortNumber", portNumber);
+        
+        if (isInService()) {
+            LOGGER.exiting(CLASS_NAME, "setPortNumber", false);
+            return false;
+        }
+        
+        this.portNumber = portNumber;
+        
+        LOGGER.exiting(CLASS_NAME, "setPortNumber", true);
+        return true;
     }
     
     private synchronized LinkedList<TCPAcceptorObserver> cloneObservers() {
@@ -138,9 +156,9 @@ public class TCPAcceptor {
             InetSocketAddress saddr;
             
             if (address == null) {
-                saddr = new InetSocketAddress(port);
+                saddr = new InetSocketAddress(portNumber);
             } else {
-                saddr = new InetSocketAddress(address, port);
+                saddr = new InetSocketAddress(address, portNumber);
             }
             serverSocket.bind(saddr);
         } catch (IOException ex) {

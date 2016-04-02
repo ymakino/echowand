@@ -398,4 +398,52 @@ public class Inet4SubnetTest {
         } catch (SubnetException ex) {
         }
     }
+    
+    @Test
+    public void testGetPortNumber() {
+        assertEquals(3610, subnet.getPortNumber());
+    }
+
+    @Test
+    public void testSetPortNumber() throws SubnetException {
+        assertTrue(subnet.setPortNumber(4000));
+        assertEquals(4000, subnet.getPortNumber());
+        
+        subnet.startService();
+        
+        assertFalse(subnet.setPortNumber(4000));
+    }
+
+    @Test
+    public void testIsRemotePortNumberEnabled() {
+        assertFalse(subnet.isRemotePortNumberEnabled());
+    }
+
+    @Test
+    public void testEnableRemotePortNumber() throws SubnetException {
+        assertTrue(subnet.enableRemotePortNumber());
+        assertTrue(subnet.isRemotePortNumberEnabled());
+        
+        subnet.startService();
+        
+        assertFalse(subnet.enableRemotePortNumber());
+        assertTrue(subnet.isRemotePortNumberEnabled());
+        
+        assertFalse(subnet.disableRemotePortNumber());
+        assertTrue(subnet.isRemotePortNumberEnabled());
+    }
+
+    @Test
+    public void testDisableRemotePortNumber() throws SubnetException {
+        assertTrue(subnet.disableRemotePortNumber());
+        assertFalse(subnet.isRemotePortNumberEnabled());
+        
+        subnet.startService();
+        
+        assertFalse(subnet.disableRemotePortNumber());
+        assertFalse(subnet.isRemotePortNumberEnabled());
+        
+        assertFalse(subnet.enableRemotePortNumber());
+        assertFalse(subnet.isRemotePortNumberEnabled());
+    }
 }

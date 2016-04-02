@@ -389,7 +389,7 @@ public class InetSubnet implements Subnet {
         TCPConnection connection;
 
         try {
-            connection = new TCPConnection(getLocalNode().getNodeInfo(), remoteNode.getNodeInfo(), DEFAULT_PORT_NUMBER, timeout);
+            connection = new TCPConnection(getLocalNode().getNodeInfo(), remoteNode.getNodeInfo(), portNumber, timeout);
         } catch (NetworkException ex) {
             SubnetException exception = new SubnetException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "newTCPConnection", exception);
@@ -668,5 +668,72 @@ public class InetSubnet implements Subnet {
 
         LOGGER.exiting(CLASS_NAME, "getGroupNode", groupNode);
         return groupNode;
+    }
+    
+    public int getPortNumber() {
+        LOGGER.entering(CLASS_NAME, "getPortNumber");
+        
+        LOGGER.exiting(CLASS_NAME, "getPortNumber", portNumber);
+        return portNumber;
+    }
+    
+    public synchronized boolean setPortNumber(int portNumber) {
+        LOGGER.entering(CLASS_NAME, "setPortNumber", portNumber);
+        
+        if (isInService()) {
+            LOGGER.exiting(CLASS_NAME, "setPortNumber", false);
+            return false;
+        }
+        
+        this.portNumber = portNumber;
+        
+        boolean result = true;
+        result &= udpNetwork.setPortNumber(portNumber);
+        result &= tcpAcceptor.setPortNumber(portNumber);
+        
+        LOGGER.exiting(CLASS_NAME, "setPortNumber", result);
+        return result;
+    }
+    
+    /**
+     * リモートノードのポート番号を認識するかを返す。
+     * ポート番号を認識する場合、ポート番号が異なる場合には異なるNodeを生成する。
+     * @return リモートノードのポート番号を認識する場合にはtrue、そうでなければfalse
+     */
+    public boolean isRemotePortNumberEnabled() {
+        LOGGER.entering(CLASS_NAME, "isRemotePortNumberEnabled");
+        
+        boolean result = udpNetwork.isRemotePortNumberEnabled();
+        
+        LOGGER.exiting(CLASS_NAME, "isRemotePortNumberEnabled", result);
+        return result;
+    }
+    
+    /**
+     * リモートノードのポート番号を認識するように設定する。
+     * サービス開始後に設定することはできない。
+     * @return 設定に成功した場合にはtrue、そうでなければfalse
+     */
+    public boolean enableRemotePortNumber() {
+        LOGGER.entering(CLASS_NAME, "enableRemotePortNumber");
+        
+        boolean result = udpNetwork.enableRemotePortNumber();
+        
+        LOGGER.exiting(CLASS_NAME, "enableRemotePortNumber", result);
+        return result;
+    }
+    
+    /**
+     * リモートノードのポート番号を認識しないように設定する。
+     * サービス開始後に設定することはできない。
+     * @return 設定に成功した場合にはtrue、そうでなければfalse
+     */
+    public boolean disableRemotePortNumber() {
+        LOGGER.entering(CLASS_NAME, "disableRemotePortNumber");
+        
+        boolean result = udpNetwork.disableRemotePortNumber();
+        
+        LOGGER.exiting(CLASS_NAME, "disableRemotePortNumber", result);
+        return result;
     }
 }
