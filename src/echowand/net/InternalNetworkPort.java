@@ -19,7 +19,7 @@ public class InternalNetworkPort {
      * 接続先のInternalNetworkを設定する。
      * nullが指定された場合にはInternalNetworkとの接続を切断する。
      * @param network 接続するInternalNetwork、もしくはnull
-     * @return 設定に精巧した場合はtrue、失敗した場合にはfalse
+     * @return 設定に成功した場合はtrue、失敗した場合にはfalse
      */
     public synchronized boolean setNetwork(InternalNetwork network) {
         if (this.network != null) {
@@ -99,9 +99,6 @@ public class InternalNetworkPort {
      * @throws SubnetException 取り出しに失敗した場合
      */
     public Frame receiveNoWait() throws SubnetException {
-        if (loopbackQueue.isEmpty()) {
-            return null;
-        }
-        return receive();
+        return loopbackQueue.poll();
     }
 }
