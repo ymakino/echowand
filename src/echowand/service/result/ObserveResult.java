@@ -33,6 +33,24 @@ public class ObserveResult {
     private boolean dataListEnabled = true;
     private boolean frameListEnabled = true;
     private boolean done;
+    
+    private ObserveListener observeListener = null;
+    
+    public ObserveResult(ObserveListener observeListener) {
+        this.observeListener = observeListener;
+    }
+    
+    public synchronized void setObserveListener(ObserveListener observeListener) {
+        LOGGER.entering(CLASS_NAME, "setObserveListener", observeListener);
+        
+        this.observeListener = observeListener;
+        
+        if (observeListener != null && !done) {
+            observeListener.begin(this);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "setObserveListener");
+    }
 
     public synchronized void enableDataList() {
         LOGGER.entering(CLASS_NAME, "enableDataList");
@@ -103,6 +121,10 @@ public class ObserveResult {
         if (!done) {
             processor.removeObserveResult(this);
             done = true;
+            
+            if (observeListener != null) {
+                observeListener.finish(this);
+            }
         }
         
         LOGGER.exiting(CLASS_NAME, "stopObserve");
@@ -195,6 +217,10 @@ public class ObserveResult {
             if (frameListEnabled && dataListEnabled) {
                 dataFrameMap.put(resultData, resultFrame);
             }
+        }
+        
+        if (observeListener != null) {
+            observeListener.receive(this, resultFrame);
         }
         
         LOGGER.exiting(CLASS_NAME, "addFrame", result);

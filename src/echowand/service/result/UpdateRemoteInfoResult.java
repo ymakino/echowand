@@ -23,16 +23,24 @@ public class UpdateRemoteInfoResult {
     private static final String CLASS_NAME = UpdateRemoteInfoResult.class.getName();
 
     private InstanceListRequestExecutor executor;
+    private LinkedList<ResultFrame> requestFrameList;
+    private LinkedList<ResultFrame> requestFrameSuccessList;
+    private LinkedList<ResultFrame> requestFrameFailList;
     private LinkedList<ResultFrame> frameList;
     private LinkedList<ResultFrame> errorFrameList;
     private LinkedList<ResultFrame> invalidFrameList;
     private LinkedList<Node> nodeList;
     private HashMap<Node, LinkedList<EOJ>> nodeEOJMap;
+    
+    private UpdateRemoteInfoListener updateRemoteInfoListener;
 
     public UpdateRemoteInfoResult(InstanceListRequestExecutor executor) {
         LOGGER.entering(CLASS_NAME, "UpdateRemoteInfoResult", executor);
 
         this.executor = executor;
+        requestFrameList = new LinkedList<ResultFrame>();
+        requestFrameSuccessList = new LinkedList<ResultFrame>();
+        requestFrameFailList = new LinkedList<ResultFrame>();
         frameList = new LinkedList<ResultFrame>();
         errorFrameList = new LinkedList<ResultFrame>();
         invalidFrameList = new LinkedList<ResultFrame>();
@@ -40,6 +48,14 @@ public class UpdateRemoteInfoResult {
         nodeEOJMap = new HashMap<Node, LinkedList<EOJ>>();
 
         LOGGER.exiting(CLASS_NAME, "UpdateRemoteInfoResult");
+    }
+    
+    public synchronized void setUpdateRemoteInfoListener(UpdateRemoteInfoListener updateRemoteInfoListener) {
+        LOGGER.entering(CLASS_NAME, "setUpdateRemoteInfoListener", updateRemoteInfoListener);
+        
+        this.updateRemoteInfoListener = updateRemoteInfoListener;
+        
+        LOGGER.exiting(CLASS_NAME, "setUpdateRemoteInfoListener");
     }
 
     public boolean isDone() {
@@ -58,6 +74,27 @@ public class UpdateRemoteInfoResult {
 
         LOGGER.exiting(CLASS_NAME, "join");
     }
+    
+    public void begin() {
+        LOGGER.entering(CLASS_NAME, "begin");
+
+        if (updateRemoteInfoListener != null) {
+            updateRemoteInfoListener.begin(this);
+        }
+
+        LOGGER.exiting(CLASS_NAME, "begin");
+    }
+    
+    public void finish() {
+        LOGGER.entering(CLASS_NAME, "finish");
+
+        if (updateRemoteInfoListener != null) {
+            updateRemoteInfoListener.finish(this);
+        }
+
+        LOGGER.exiting(CLASS_NAME, "finish");
+    }
+
 
     private int addEOJs(Node node, StandardPayload payload) {
         LOGGER.entering(CLASS_NAME, "addEOJs", new Object[]{node, payload});
@@ -139,6 +176,34 @@ public class UpdateRemoteInfoResult {
         LOGGER.exiting(CLASS_NAME, "hasStandardPayload", result);
         return result;
     }
+    
+    public synchronized boolean addRequestFrame(Frame frame, boolean success) {
+        LOGGER.entering(CLASS_NAME, "addRequestFrame", new Object[]{frame, success});
+
+        boolean result = addRequestFrame(createResultFrame(frame), success);
+
+        LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
+        return result;
+    }
+    
+    public synchronized boolean addRequestFrame(ResultFrame resultFrame, boolean success) {
+        LOGGER.entering(CLASS_NAME, "addRequestFrame", new Object[]{resultFrame, success});
+
+        boolean result = requestFrameList.add(resultFrame);
+        
+        if (success) {
+            result &= requestFrameSuccessList.add(resultFrame);
+        } else {
+            result &= requestFrameFailList.add(resultFrame);
+        }
+        
+        if (updateRemoteInfoListener != null) {
+            updateRemoteInfoListener.send(this, resultFrame, success);
+        }
+
+        LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
+        return result;
+    }
 
     public synchronized boolean addFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "addFrame", frame);
@@ -182,6 +247,11 @@ public class UpdateRemoteInfoResult {
         }
 
         boolean result = frameList.add(resultFrame);
+        
+        if (updateRemoteInfoListener != null) {
+            updateRemoteInfoListener.receive(this, resultFrame);
+        }
+        
         LOGGER.exiting(CLASS_NAME, "addFrame", result);
         return result;
     }
@@ -194,6 +264,76 @@ public class UpdateRemoteInfoResult {
 
         LOGGER.exiting(CLASS_NAME, "createResultFrame", resultFrame);
         return resultFrame;
+    }
+
+    public synchronized int countRequestFrames() {
+        LOGGER.entering(CLASS_NAME, "countRequestFrames");
+
+        int count = requestFrameList.size();
+        LOGGER.exiting(CLASS_NAME, "countRequestFrames", count);
+        return count;
+    }
+
+    public synchronized int countRequestFrames(boolean success) {
+        LOGGER.entering(CLASS_NAME, "countRequestFrames", success);
+
+        int count;
+        
+        if (success) {
+            count = requestFrameSuccessList.size();
+        } else {
+            count = requestFrameFailList.size();
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "countRequestFrames", count);
+        return count;
+    }
+
+    public synchronized ResultFrame getRequestFrame(int index) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrame", index);
+
+        ResultFrame resultFrame = requestFrameList.get(index);
+        LOGGER.exiting(CLASS_NAME, "getRequestFrame", resultFrame);
+        return resultFrame;
+    }
+
+    public synchronized ResultFrame getRequestFrame(int index, boolean success) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrame", new Object[]{index, success});
+
+        ResultFrame resultFrame;
+        
+        if (success) {
+            resultFrame = requestFrameSuccessList.get(index);
+        } else {
+            resultFrame = requestFrameFailList.get(index);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrame", resultFrame);
+        return resultFrame;
+    }
+    
+    public synchronized List<ResultFrame> getRequestFrameList() {
+        LOGGER.entering(CLASS_NAME, "getRequestFrameList");
+        
+        LinkedList<ResultFrame> resultFrameList = new LinkedList<ResultFrame>(requestFrameList);
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultFrameList);
+        return resultFrameList;
+    }
+    
+    public synchronized List<ResultFrame> getRequestFrameList(boolean success) {
+        LOGGER.entering(CLASS_NAME, "getRequestFrameList", success);
+        
+        LinkedList<ResultFrame> resultFrameList ;
+        
+        if (success) {
+            resultFrameList = new LinkedList<ResultFrame>(requestFrameSuccessList);
+        } else {
+            resultFrameList = new LinkedList<ResultFrame>(requestFrameFailList);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "getRequestFrameList", resultFrameList);
+        return resultFrameList;
     }
 
     public synchronized int countFrames() {

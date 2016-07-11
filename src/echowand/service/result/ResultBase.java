@@ -14,13 +14,14 @@ import echowand.util.Selector;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
  * @author ymakino
  */
-public abstract class ResultBase {
+public abstract class ResultBase<ResultType extends ResultBase> {
     private static final Logger LOGGER = Logger.getLogger(ResultBase.class.getName());
     private static final String CLASS_NAME = ResultBase.class.getName();
     
@@ -116,10 +117,15 @@ public abstract class ResultBase {
     
     private HashMap<ResultData, ResultFrame> dataFrameMap;
     
-    public ResultBase() {
+    private Class<ResultType> cls;
+    private ResultListener<ResultType> listener;
+    
+    public ResultBase(Class<ResultType> cls) {
         LOGGER.entering(CLASS_NAME, "ResultBase");
         
         done = false;
+        
+        this.cls = cls;
         
         requestFrameManager = new ResultListManager<ResultFrame>();
         invalidRequestFrameList = new LinkedList<ResultFrame>();
@@ -139,12 +145,34 @@ public abstract class ResultBase {
         LOGGER.exiting(CLASS_NAME, "ResultBase");
     }
     
+    private ResultType self() {
+        return cls.cast(this);
+    }
+    
+    protected synchronized void setResultListener(ResultListener<ResultType> listener) {
+        this.listener = listener;
+    }
+    
+    public synchronized void begin() {
+        LOGGER.entering(CLASS_NAME, "begin");
+        
+        if (listener != null) {
+            listener.begin(self());
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "begin");
+    }
+    
     public synchronized void finish() {
         LOGGER.entering(CLASS_NAME, "finish");
         
         if (!done) {
             done = true;
             notifyAll();
+        }
+        
+        if (listener != null) {
+            listener.finish(self());
         }
         
         LOGGER.exiting(CLASS_NAME, "finish");
@@ -360,6 +388,10 @@ public abstract class ResultBase {
 
             requestDataFrameMap.put(resultData, resultFrame);
         }
+            
+        if (listener != null) {
+            listener.send(self(), resultFrame, success);
+        }
         
         LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
         return result;
@@ -423,6 +455,10 @@ public abstract class ResultBase {
                 result &= responseSecondDataManager.add(resultData, isValidSecondProperty(property));
 
                 dataFrameMap.put(resultData, resultFrame);
+            }
+            
+            if (listener != null) {
+                listener.receive(self(), resultFrame);
             }
 
             LOGGER.exiting(CLASS_NAME, "addFrame", result);

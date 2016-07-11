@@ -9,9 +9,21 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class SetGetResult extends ResultBase {
+public class SetGetResult extends ResultBase<SetGetResult> {
     private static final Logger LOGGER = Logger.getLogger(SetGetResult.class.getName());
     private static final String CLASS_NAME = SetGetResult.class.getName();
+    
+    public SetGetResult() {
+        super(SetGetResult.class);
+    }
+    
+    public synchronized void setSetGetListener(SetGetListener listener) {
+        LOGGER.entering(CLASS_NAME, "setSetGetListener", listener);
+        
+        setResultListener(listener);
+        
+        LOGGER.exiting(CLASS_NAME, "setSetGetListener");
+    }
     
     @Override
     public boolean isSuccessPayload(StandardPayload payload) {

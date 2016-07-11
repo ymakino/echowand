@@ -9,14 +9,23 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class NotifyResult extends ResultBase {
+public class NotifyResult extends ResultBase<NotifyResult> {
     private static final Logger LOGGER = Logger.getLogger(NotifyResult.class.getName());
     private static final String CLASS_NAME = NotifyResult.class.getName();
     
     private boolean responseRequired = false;
     
     public NotifyResult(boolean responseRequired) {
+        super(NotifyResult.class);
         this.responseRequired = responseRequired;
+    }
+    
+    public synchronized void setNotifyListener(NotifyListener notifyListener) {
+        LOGGER.entering(CLASS_NAME, "setNotifyListener", notifyListener);
+        
+        setResultListener(notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "setNotifyListener");
     }
     
     @Override

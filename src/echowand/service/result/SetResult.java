@@ -9,14 +9,23 @@ import java.util.logging.Logger;
  *
  * @author ymakino
  */
-public class SetResult extends ResultBase {
+public class SetResult extends ResultBase<SetResult> {
     private static final Logger LOGGER = Logger.getLogger(SetResult.class.getName());
     private static final String CLASS_NAME = SetResult.class.getName();
     
     private boolean responseRequired = false;
     
     public SetResult(boolean responseRequired) {
+        super(SetResult.class);
         this.responseRequired = responseRequired;
+    }
+    
+    public synchronized void setSetListener(SetListener setListener) {
+        LOGGER.entering(CLASS_NAME, "setSetListener", setListener);
+        
+        setResultListener(setListener);
+        
+        LOGGER.exiting(CLASS_NAME, "setSetListener");
     }
     
     @Override

@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
  * @author ymakino
  */
 public class ResultBaseTest {
-    ResultBase resultBase;
+    ResultBaseImpl resultBase;
     Subnet subnet;
     
     public ResultBaseTest() {
@@ -1398,7 +1398,11 @@ public class ResultBaseTest {
         assertEquals(new Data(), dataList.get(0).data);
     }
 
-    public class ResultBaseImpl extends ResultBase {
+    public class ResultBaseImpl extends ResultBase<ResultBaseImpl> {
+        
+        public ResultBaseImpl() {
+            super(ResultBaseImpl.class);
+        }
 
         @Override
         public boolean isSuccessPayload(StandardPayload payload) {

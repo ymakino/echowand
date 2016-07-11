@@ -24,6 +24,8 @@ public class CaptureResult {
     private LinkedList<ResultFrame> receivedFrameList;
     private boolean done;
     
+    private CaptureListener captureListener;
+    
     public CaptureResult(CaptureResultObserver observer) {
         LOGGER.entering(CLASS_NAME, "CaptureResult", new Object[]{observer});
         
@@ -33,9 +35,23 @@ public class CaptureResult {
         sentFrameList = new LinkedList<ResultFrame>();
         receivedFrameList = new LinkedList<ResultFrame>();
         
+        captureListener = null;
+        
         done = false;
         
         LOGGER.exiting(CLASS_NAME, "CaptureResult");
+    }
+    
+    public synchronized void setCaptureListener(CaptureListener captureListener) {
+        LOGGER.entering(CLASS_NAME, "setCaptureListener", captureListener);
+        
+        this.captureListener = captureListener;
+        
+        if (captureListener != null && !done) {
+            captureListener.begin(this);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "setCaptureListener");
     }
     
     public synchronized void stopCapture() {
@@ -44,6 +60,10 @@ public class CaptureResult {
         if (!done) {
             observer.removeCaptureResult(this);
             done = true;
+        
+            if (captureListener != null) {
+                captureListener.finish(this);
+            }
         }
         
         LOGGER.exiting(CLASS_NAME, "stopCapture");
@@ -83,6 +103,10 @@ public class CaptureResult {
         result &= frameList.add(resultFrame);
         result &= sentFrameList.add(resultFrame);
         
+        if (captureListener != null) {
+            captureListener.send(this, resultFrame);
+        }
+        
         LOGGER.exiting(CLASS_NAME, "addSentFrame", result);
         return result;
     }
@@ -113,6 +137,10 @@ public class CaptureResult {
         
         result &= frameList.add(resultFrame);
         result &= receivedFrameList.add(resultFrame);
+        
+        if (captureListener != null) {
+            captureListener.receive(this, resultFrame);
+        }
         
         LOGGER.exiting(CLASS_NAME, "addReceivedFrame", result);
         return result;
