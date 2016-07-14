@@ -3,6 +3,7 @@ package echowand.service.result;
 import echowand.common.ESV;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
+import echowand.service.TimestampManager;
 import java.util.logging.Logger;
 
 /**
@@ -13,8 +14,8 @@ public class GetResult extends ResultBase<GetResult> {
     private static final Logger LOGGER = Logger.getLogger(GetResult.class.getName());
     private static final String CLASS_NAME = GetResult.class.getName();
     
-    public GetResult() {
-        super(GetResult.class);
+    public GetResult(TimestampManager timestampManager) {
+        super(GetResult.class, timestampManager);
     }
     
     public synchronized void setGetListener(GetListener getListener) {

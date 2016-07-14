@@ -12,6 +12,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.ObserveResultProcessor;
+import echowand.service.TimestampManager;
 import echowand.util.Selector;
 import java.util.List;
 import org.junit.After;
@@ -55,7 +56,7 @@ public class ObserveResultTest {
     public void setUp() {
         selector = new TestFrameSelector();
         ObserveResultProcessor processor = new ObserveResultProcessor();
-        result = new ObserveResult(selector, processor);
+        result = new ObserveResult(selector, processor, new TimestampManager());
     }
     
     @After

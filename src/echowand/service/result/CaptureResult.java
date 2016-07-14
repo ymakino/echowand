@@ -3,6 +3,7 @@ package echowand.service.result;
 import echowand.util.SelectorMember;
 import echowand.net.Frame;
 import echowand.service.CaptureResultObserver;
+import echowand.service.TimestampManager;
 import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ public class CaptureResult {
     private static final String CLASS_NAME = CaptureResult.class.getName();
     
     private CaptureResultObserver observer;
+    private TimestampManager timestampManager;
     
     private LinkedList<ResultFrame> frameList;
     private LinkedList<ResultFrame> sentFrameList;
@@ -26,10 +28,11 @@ public class CaptureResult {
     
     private CaptureListener captureListener;
     
-    public CaptureResult(CaptureResultObserver observer) {
-        LOGGER.entering(CLASS_NAME, "CaptureResult", new Object[]{observer});
+    public CaptureResult(CaptureResultObserver observer, TimestampManager timestampManager) {
+        LOGGER.entering(CLASS_NAME, "CaptureResult", new Object[]{observer, timestampManager});
         
         this.observer = observer;
+        this.timestampManager = timestampManager;
         
         frameList = new LinkedList<ResultFrame>();
         sentFrameList = new LinkedList<ResultFrame>();
@@ -149,8 +152,8 @@ public class CaptureResult {
     private synchronized ResultFrame createResultFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "createResultFrame", frame);
         
-        long time = System.currentTimeMillis();
-        ResultFrame resultFrame = new ResultFrame(frame, time);
+        long timestamp = timestampManager.get(frame, System.currentTimeMillis());
+        ResultFrame resultFrame = new ResultFrame(frame, timestamp);
         
         LOGGER.exiting(CLASS_NAME, "createResultFrame", resultFrame);
         return resultFrame;

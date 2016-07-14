@@ -9,6 +9,7 @@ import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.StandardPayload;
 import echowand.object.InstanceListRequestExecutor;
+import echowand.service.TimestampManager;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class UpdateRemoteInfoResult {
     private static final String CLASS_NAME = UpdateRemoteInfoResult.class.getName();
 
     private InstanceListRequestExecutor executor;
+    private TimestampManager timestampManager;
     private LinkedList<ResultFrame> requestFrameList;
     private LinkedList<ResultFrame> requestFrameSuccessList;
     private LinkedList<ResultFrame> requestFrameFailList;
@@ -34,10 +36,12 @@ public class UpdateRemoteInfoResult {
     
     private UpdateRemoteInfoListener updateRemoteInfoListener;
 
-    public UpdateRemoteInfoResult(InstanceListRequestExecutor executor) {
-        LOGGER.entering(CLASS_NAME, "UpdateRemoteInfoResult", executor);
+    public UpdateRemoteInfoResult(InstanceListRequestExecutor executor, TimestampManager timestampManager) {
+        LOGGER.entering(CLASS_NAME, "UpdateRemoteInfoResult", new Object[]{executor, timestampManager});
 
         this.executor = executor;
+        this.timestampManager = timestampManager;
+        
         requestFrameList = new LinkedList<ResultFrame>();
         requestFrameSuccessList = new LinkedList<ResultFrame>();
         requestFrameFailList = new LinkedList<ResultFrame>();
@@ -259,8 +263,8 @@ public class UpdateRemoteInfoResult {
     private synchronized ResultFrame createResultFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "createResultFrame", frame);
 
-        long time = System.currentTimeMillis();
-        ResultFrame resultFrame = new ResultFrame(frame, time);
+        long timestamp = timestampManager.get(frame, System.currentTimeMillis());
+        ResultFrame resultFrame = new ResultFrame(frame, timestamp);
 
         LOGGER.exiting(CLASS_NAME, "createResultFrame", resultFrame);
         return resultFrame;

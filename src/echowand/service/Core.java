@@ -35,6 +35,9 @@ public class Core {
     private SetGetRequestProcessor setGetRequestProcessor;
     private AnnounceRequestProcessor announceRequestProcessor;
     private ObserveResultProcessor observeResultProcessor;
+    
+    private TimestampManager timestampManager;
+    private TimestampObserver timestampObserver;
     private CaptureResultObserver captureResultObserver;
     
     private NodeProfileObjectConfig nodeProfileObjectConfig;
@@ -186,8 +189,20 @@ public class Core {
         return announceRequestProcessor;
     }
     
+    /**
+     * 利用中のObserveResultProcessorを返す。initializeメソッドを呼び出すまではnullを返す。
+     * @return 利用中のObserveResultProcessor
+     */
     public ObserveResultProcessor getObserveResultProsessor() {
         return observeResultProcessor;
+    }
+    
+    public TimestampManager getTimestampManager() {
+        return timestampManager;
+    }
+    
+    public TimestampObserver getTimestampObserver() {
+        return timestampObserver;
     }
     
     public CaptureResultObserver getCaptureResultObserver() {
@@ -266,6 +281,15 @@ public class Core {
         return captureResultObserver;
     }
     
+    private TimestampObserver createTimestampObserver() {
+        LOGGER.entering(CLASS_NAME, "createTimestampObserver");
+        
+        TimestampObserver timestampObserver = new TimestampObserver(timestampManager);
+        
+        LOGGER.exiting(CLASS_NAME, "createTimestampObserver", timestampObserver);
+        return timestampObserver;
+    }
+    
     private MainLoop createMainLoop(Subnet subnet, Listener... listeners) {
         LOGGER.entering(CLASS_NAME, "createMainLoop", new Object[]{subnet, listeners});
         
@@ -320,9 +344,8 @@ public class Core {
     /**
      * Coreを初期化する。
      * @return 初期化が成功すればtrue、すでに初期化済みであればfalse
-     * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
      */
-    public synchronized boolean initialize() throws TooManyObjectsException {
+    public synchronized boolean initialize() {
         LOGGER.entering(CLASS_NAME, "initialize");
         
         if (initialized) {
@@ -343,10 +366,13 @@ public class Core {
         requestDispatcher.addRequestProcessor(announceRequestProcessor);
         requestDispatcher.addRequestProcessor(observeResultProcessor);
 
+        timestampManager = new TimestampManager();
+        timestampObserver = createTimestampObserver();
         captureResultObserver = createCaptureResultObserver();
 
         CaptureSubnet captureSubnet = getCaptureSubnet();
         if (captureSubnet != null) {
+            captureSubnet.addObserver(timestampObserver);
             captureSubnet.addObserver(captureResultObserver);
             captureEnabled = true;
         }

@@ -287,7 +287,7 @@ public class Service {
     public GetResult doGet(Node node, EOJ eoj, List<EPC> epcs, int timeout, GetListener getListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, eoj, epcs, timeout, getListener});
         
-        GetResult getResult = new GetResult();
+        GetResult getResult = new GetResult(core.getTimestampManager());
         getResult.setGetListener(getListener);
         
         SetGetTransactionConfig transactionConfig = createGetTransactionConfig(node, eoj, epcs);
@@ -306,7 +306,7 @@ public class Service {
     public SetResult doSet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired, SetListener setListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSet", new Object[]{node, eoj, properties, timeout, responseRequired, setListener});
         
-        SetResult setResult = new SetResult(responseRequired);
+        SetResult setResult = new SetResult(responseRequired, core.getTimestampManager());
         setResult.setSetListener(setListener);
         
         SetGetTransactionConfig transactionConfig = createSetTransactionConfig(node, eoj, properties);
@@ -326,7 +326,7 @@ public class Service {
     public SetGetResult doSetGet(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, List<EPC> epcs, int timeout, SetGetListener setGetListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doSetGet", new Object[]{node, eoj, properties, epcs, timeout, setGetListener});
         
-        SetGetResult setGetResult = new SetGetResult();
+        SetGetResult setGetResult = new SetGetResult(core.getTimestampManager());
         setGetResult.setSetGetListener(setGetListener);
         
         SetGetTransactionConfig transactionConfig = createSetGetTransactionConfig(node, eoj, properties, epcs);
@@ -357,7 +357,7 @@ public class Service {
         InstanceListRequestExecutor executor = new InstanceListRequestExecutor(
                 getSubnet(), getTransactionManager(), getRemoteObjectManager());
         
-        UpdateRemoteInfoResult updateRemoteInfoResult = new UpdateRemoteInfoResult(executor);
+        UpdateRemoteInfoResult updateRemoteInfoResult = new UpdateRemoteInfoResult(executor, core.getTimestampManager());
         updateRemoteInfoResult.setUpdateRemoteInfoListener(updateRemoteInfoListener);
         
         executor.setTimeout(timeout);
@@ -428,7 +428,7 @@ public class Service {
         LOGGER.entering(CLASS_NAME, "doObserve", new Object[]{selector, observeListener});
         
         ObserveResultProcessor processor = getCore().getObserveResultProsessor();
-        ObserveResult observeResult = new ObserveResult(selector, processor);
+        ObserveResult observeResult = new ObserveResult(selector, processor, core.getTimestampManager());
         observeResult.setObserveListener(observeListener);
         processor.addObserveResult(observeResult);
         
@@ -462,7 +462,7 @@ public class Service {
         LOGGER.entering(CLASS_NAME, "doCapture");
         
         CaptureResultObserver observer = getCore().getCaptureResultObserver();
-        CaptureResult captureResult = new CaptureResult(observer);
+        CaptureResult captureResult = new CaptureResult(observer, core.getTimestampManager());
         captureResult.setCaptureListener(captureListener);
         observer.addCaptureResult(captureResult);
         
@@ -654,7 +654,7 @@ public class Service {
     public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, boolean responseRequired, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties, timeout, responseRequired, notifyListener});
         
-        NotifyResult notifyResult = new NotifyResult(responseRequired);
+        NotifyResult notifyResult = new NotifyResult(responseRequired, core.getTimestampManager());
         notifyResult.setNotifyListener(notifyListener);
         
         AnnounceTransactionConfig transactionConfig = new AnnounceTransactionConfig();

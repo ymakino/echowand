@@ -10,6 +10,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.net.Subnet;
+import echowand.service.TimestampManager;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1401,7 +1402,7 @@ public class ResultBaseTest {
     public class ResultBaseImpl extends ResultBase<ResultBaseImpl> {
         
         public ResultBaseImpl() {
-            super(ResultBaseImpl.class);
+            super(ResultBaseImpl.class, new TimestampManager());
         }
 
         @Override

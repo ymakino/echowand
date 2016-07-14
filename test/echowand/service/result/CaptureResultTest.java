@@ -43,7 +43,7 @@ public class CaptureResultTest {
     @Before
     public void setUp() {
         CaptureResultObserver observer = new CaptureResultObserver();
-        result = new CaptureResult(observer);
+        result = new CaptureResult(observer, null);
     }
     
     @After

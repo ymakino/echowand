@@ -10,6 +10,7 @@ import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.ObserveResultProcessor;
+import echowand.service.TimestampManager;
 import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.HashMap;
@@ -34,10 +35,24 @@ public class ObserveResult {
     private boolean frameListEnabled = true;
     private boolean done;
     
-    private ObserveListener observeListener = null;
-    
-    public ObserveResult(ObserveListener observeListener) {
-        this.observeListener = observeListener;
+    private ObserveListener observeListener;
+    private TimestampManager timestampManager;
+
+    public ObserveResult(Selector<? super Frame> selector, ObserveResultProcessor processor, TimestampManager timestampManager) {
+        LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{selector, processor});
+
+        frameSelector = selector;
+        this.processor = processor;
+        this.timestampManager = timestampManager;
+        
+        dataList = new LinkedList<ResultData>();
+        frameList = new LinkedList<ResultFrame>();
+        dataFrameMap = new HashMap<ResultData, ResultFrame>();
+        done = false;
+        
+        observeListener = null;
+        
+        LOGGER.exiting(CLASS_NAME, "ObserveResult");
     }
     
     public synchronized void setObserveListener(ObserveListener observeListener) {
@@ -100,19 +115,6 @@ public class ObserveResult {
         
         LOGGER.exiting(CLASS_NAME, "isFrameListEnabled", frameListEnabled);
         return frameListEnabled;
-    }
-
-    public ObserveResult(Selector<? super Frame> selector, ObserveResultProcessor processor) {
-        LOGGER.entering(CLASS_NAME, "ObserveResult", new Object[]{selector, processor});
-
-        frameSelector = selector;
-        this.processor = processor;
-        dataList = new LinkedList<ResultData>();
-        frameList = new LinkedList<ResultFrame>();
-        dataFrameMap = new HashMap<ResultData, ResultFrame>();
-        done = false;
-        
-        LOGGER.exiting(CLASS_NAME, "ObserveResult");
     }
     
     public synchronized void stopObserve() {
@@ -230,8 +232,8 @@ public class ObserveResult {
     private synchronized ResultFrame createResultFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "createResultFrame", frame);
         
-        long time = System.currentTimeMillis();
-        ResultFrame resultFrame = new ResultFrame(frame, time);
+        long timestamp = timestampManager.get(frame, System.currentTimeMillis());
+        ResultFrame resultFrame = new ResultFrame(frame, timestamp);
         
         LOGGER.exiting(CLASS_NAME, "createResultFrame", resultFrame);
         return resultFrame;

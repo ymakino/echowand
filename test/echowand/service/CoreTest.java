@@ -199,10 +199,10 @@ public class CoreTest {
     }
 
     /**
-     * Test of getCaptureResultObserver method, of class Core.
+     * Test of getCaptureFrameObserver method, of class Core.
      */
     @Test
-    public void testGetCaptureResultObserver() throws TooManyObjectsException {
+    public void testGetCaptureFrameObserver() throws TooManyObjectsException {
         Core core = newCore();
         assertNull(core.getCaptureResultObserver());
         core.startService();

@@ -3,6 +3,7 @@ package echowand.service.result;
 import echowand.common.ESV;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
+import echowand.service.TimestampManager;
 import java.util.logging.Logger;
 
 /**
@@ -15,8 +16,8 @@ public class SetResult extends ResultBase<SetResult> {
     
     private boolean responseRequired = false;
     
-    public SetResult(boolean responseRequired) {
-        super(SetResult.class);
+    public SetResult(boolean responseRequired, TimestampManager timestampManager) {
+        super(SetResult.class, timestampManager);
         this.responseRequired = responseRequired;
     }
     

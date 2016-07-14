@@ -24,7 +24,7 @@ public class CaptureResultObserverTest {
         public Frame receivedFrame = null;
 
         public TestCaptureResult(CaptureResultObserver observer) {
-            super(observer);
+            super(observer, null);
         }
         
         @Override
@@ -41,7 +41,7 @@ public class CaptureResultObserverTest {
     }
     
     public CaptureResultObserverTest() {
-        subnet = new InternalSubnet("CaptureResultObserverTest");
+        subnet = new InternalSubnet("CaptureFrameObserverTest");
     }
     
     @Before

@@ -9,6 +9,7 @@ import echowand.net.Frame;
 import echowand.net.Node;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
+import echowand.service.TimestampManager;
 import echowand.util.Collector;
 import echowand.util.Selector;
 import java.util.HashMap;
@@ -118,14 +119,17 @@ public abstract class ResultBase<ResultType extends ResultBase> {
     private HashMap<ResultData, ResultFrame> dataFrameMap;
     
     private Class<ResultType> cls;
+    private TimestampManager timestampManager;
     private ResultListener<ResultType> listener;
     
-    public ResultBase(Class<ResultType> cls) {
-        LOGGER.entering(CLASS_NAME, "ResultBase");
+    public ResultBase(Class<ResultType> cls, TimestampManager timestampManager) {
+        LOGGER.entering(CLASS_NAME, "ResultBase", new Object[]{cls, timestampManager});
         
         done = false;
         
         this.cls = cls;
+        this.timestampManager = timestampManager;
+        listener = null;
         
         requestFrameManager = new ResultListManager<ResultFrame>();
         invalidRequestFrameList = new LinkedList<ResultFrame>();
@@ -472,8 +476,8 @@ public abstract class ResultBase<ResultType extends ResultBase> {
     private synchronized ResultFrame createResultFrame(Frame frame) {
         LOGGER.entering(CLASS_NAME, "createResultFrame", frame);
         
-        long time = System.currentTimeMillis();
-        ResultFrame resultFrame = new ResultFrame(frame, time);
+        long timestamp = timestampManager.get(frame, System.currentTimeMillis());
+        ResultFrame resultFrame = new ResultFrame(frame, timestamp);
         
         LOGGER.exiting(CLASS_NAME, "createResultFrame", resultFrame);
         return resultFrame;
