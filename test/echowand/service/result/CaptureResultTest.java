@@ -9,6 +9,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.service.CaptureResultObserver;
+import echowand.service.TimestampManager;
 import echowand.util.Selector;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class CaptureResultTest {
     @Before
     public void setUp() {
         CaptureResultObserver observer = new CaptureResultObserver();
-        result = new CaptureResult(observer, null);
+        result = new CaptureResult(observer, new TimestampManager());
     }
     
     @After
