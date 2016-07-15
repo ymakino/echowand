@@ -638,6 +638,29 @@ public class ServiceDoMethodsGenerator {
         return new MethodGenerator("doObserve", "ObserveResult", p0, p1, p2, p3).withFilter(new DoObserveFilter3());
     }
     
+    private class DoNotifyFilter1 implements Filter {
+
+        @Override
+        public boolean filter(List<Rule> rules) {
+            Rule r4 = rules.get(4);
+            Rule r5 = rules.get(5);
+            
+            if (r4.getParamName() == null && r5.getParamName() == null) {
+                return r5.getConverted().equals("false");
+            }
+            
+            if (r4.getParamName() == null && r5.getParamName() != null) {
+                return false;
+            }
+            
+            if (r4.getParamName() != null && r5.getParamName() == null) {
+                return r5.getConverted().equals("true");
+            }
+            
+            return true;
+        }
+    }
+    
     public MethodGenerator createDoNotifyGenerator1() {
         Parameter p0 = new Parameter()
             .with(new Rule("Node", "node", "node"))
@@ -656,17 +679,42 @@ public class ServiceDoMethodsGenerator {
             .with(new Rule("Data", "data", null));
         
         Parameter p4 = new Parameter()
-            .with(new Rule("int", "timeout", "timeout"));
+            .with(new Rule("int", "timeout", "timeout"))
+            .with(new Rule("int", null, "0"));
         
         Parameter p5 = new Parameter()
             .with(new Rule("boolean", "responseRequired", "responseRequired"))
+            .with(new Rule("boolean", null, "true"))
             .with(new Rule("boolean", null, "false"));
         
         Parameter p6 = new Parameter()
             .with(new Rule("NotifyListener", "notifyListener", "notifyListener"))
             .with(new Rule("NotifyListener", null, "null"));
         
-        return new MethodGenerator("doNotify", "NotifyResult", p0, p1, p2, p3, p4, p5, p6);
+        return new MethodGenerator("doNotify", "NotifyResult", p0, p1, p2, p3, p4, p5, p6).withFilter(new DoNotifyFilter1());
+    }
+    
+    private class DoNotifyFilter2 implements Filter {
+
+        @Override
+        public boolean filter(List<Rule> rules) {
+            Rule r3 = rules.get(3);
+            Rule r4 = rules.get(4);
+            
+            if (r3.getParamName() == null && r4.getParamName() == null) {
+                return r4.getConverted().equals("false");
+            }
+            
+            if (r3.getParamName() == null && r4.getParamName() != null) {
+                return false;
+            }
+            
+            if (r3.getParamName() != null && r4.getParamName() == null) {
+                return r4.getConverted().equals("true");
+            }
+            
+            return true;
+        }
     }
     
     public MethodGenerator createDoNotifyGenerator2() {
@@ -682,17 +730,42 @@ public class ServiceDoMethodsGenerator {
             .with(new Rule("List<Pair<EPC, Data>>", "properties", "properties"));
         
         Parameter p3 = new Parameter()
-            .with(new Rule("int", "timeout", "timeout"));
+            .with(new Rule("int", "timeout", "timeout"))
+            .with(new Rule("int", null, "0"));
         
         Parameter p4 = new Parameter()
             .with(new Rule("boolean", "responseRequired", "responseRequired"))
+            .with(new Rule("boolean", null, "true"))
             .with(new Rule("boolean", null, "false"));
         
         Parameter p5 = new Parameter()
             .with(new Rule("NotifyListener", "notifyListener", "notifyListener"))
             .with(new Rule("NotifyListener", null, "null"));
         
-        return new MethodGenerator("doNotify", "NotifyResult", p0, p1, p2, p3, p4, p5);
+        return new MethodGenerator("doNotify", "NotifyResult", p0, p1, p2, p3, p4, p5).withFilter(new DoNotifyFilter2());
+    }
+    
+    private class DoNotifyInstanceListFilter implements Filter {
+
+        @Override
+        public boolean filter(List<Rule> rules) {
+            Rule r1 = rules.get(1);
+            Rule r2 = rules.get(2);
+            
+            if (r1.getParamName() == null && r2.getParamName() == null) {
+                return r2.getConverted().equals("false");
+            }
+            
+            if (r1.getParamName() == null && r2.getParamName() != null) {
+                return false;
+            }
+            
+            if (r1.getParamName() != null && r2.getParamName() == null) {
+                return r2.getConverted().equals("true");
+            }
+            
+            return true;
+        }
     }
     
     public MethodGenerator createDoNotifyInstanceListGenerator() {
@@ -707,13 +780,14 @@ public class ServiceDoMethodsGenerator {
         
         Parameter p2 = new Parameter()
             .with(new Rule("boolean", "responseRequired", "responseRequired"))
+            .with(new Rule("boolean", null, "true"))
             .with(new Rule("boolean", null, "false"));
         
         Parameter p3 = new Parameter()
             .with(new Rule("NotifyListener", "notifyListener", "notifyListener"))
             .with(new Rule("NotifyListener", null, "null"));
         
-        return new MethodGenerator("doNotifyInstanceList", "NotifyResult", p0, p1, p2, p3);
+        return new MethodGenerator("doNotifyInstanceList", "NotifyResult", p0, p1, p2, p3).withFilter(new DoNotifyInstanceListFilter());
     }
     
     private List<MethodGenerator> createGenerators() {

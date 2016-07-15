@@ -698,6 +698,7 @@ public class Service {
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
     }
+    
     public GetResult doGet(Node node, EOJ eoj, EPC epc, int timeout, GetListener getListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, eoj, epc, timeout, getListener});
         
@@ -2159,7 +2160,7 @@ public class Service {
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2170,7 +2171,7 @@ public class Service {
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2181,7 +2182,40 @@ public class Service {
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, true, notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(Node node, EOJ eoj, EPC epc, Data data, NotifyListener notifyListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, epc, data, notifyListener});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify(node, eoj, properties, 0, false, notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, EPC epc, Data data, NotifyListener notifyListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, epc, data, notifyListener});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, 0, false, notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(EOJ eoj, EPC epc, Data data, NotifyListener notifyListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, epc, data, notifyListener});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, 0, false, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2225,7 +2259,7 @@ public class Service {
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, false, null);
+        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2236,7 +2270,7 @@ public class Service {
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, false, null);
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2247,7 +2281,40 @@ public class Service {
         
         LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
         properties.add(new Pair<EPC, Data>(epc, data));
-        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, false, null);
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, true, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(Node node, EOJ eoj, EPC epc, Data data) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, epc, data});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify(node, eoj, properties, 0, false, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, EPC epc, Data data) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, epc, data});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, 0, false, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(EOJ eoj, EPC epc, Data data) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, epc, data});
+        
+        LinkedList<Pair<EPC, Data>> properties = new LinkedList<Pair<EPC, Data>>();
+        properties.add(new Pair<EPC, Data>(epc, data));
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, 0, false, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2274,7 +2341,7 @@ public class Service {
     public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties, timeout, notifyListener});
         
-        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2283,7 +2350,7 @@ public class Service {
     public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, properties, timeout, notifyListener});
         
-        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2292,7 +2359,34 @@ public class Service {
     public NotifyResult doNotify(EOJ eoj, List<Pair<EPC, Data>> properties, int timeout, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, properties, timeout, notifyListener});
         
-        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, true, notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, NotifyListener notifyListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties, notifyListener});
+        
+        NotifyResult notifyResult = doNotify(node, eoj, properties, 0, false, notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, NotifyListener notifyListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, properties, notifyListener});
+        
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, 0, false, notifyListener);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(EOJ eoj, List<Pair<EPC, Data>> properties, NotifyListener notifyListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, properties, notifyListener});
+        
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, 0, false, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2328,7 +2422,7 @@ public class Service {
     public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties, timeout});
         
-        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, false, null);
+        NotifyResult notifyResult = doNotify(node, eoj, properties, timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2337,7 +2431,7 @@ public class Service {
     public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, properties, timeout});
         
-        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, false, null);
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2346,7 +2440,34 @@ public class Service {
     public NotifyResult doNotify(EOJ eoj, List<Pair<EPC, Data>> properties, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, properties, timeout});
         
-        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, false, null);
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, timeout, true, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(Node node, EOJ eoj, List<Pair<EPC, Data>> properties) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{node, eoj, properties});
+        
+        NotifyResult notifyResult = doNotify(node, eoj, properties, 0, false, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(NodeInfo nodeInfo, EOJ eoj, List<Pair<EPC, Data>> properties) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{nodeInfo, eoj, properties});
+        
+        NotifyResult notifyResult = doNotify(getRemoteNode(nodeInfo), eoj, properties, 0, false, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
+        return notifyResult;
+    }
+
+    public NotifyResult doNotify(EOJ eoj, List<Pair<EPC, Data>> properties) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doNotify", new Object[]{eoj, properties});
+        
+        NotifyResult notifyResult = doNotify((Node)null, eoj, properties, 0, false, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotify", notifyResult);
         return notifyResult;
@@ -2370,37 +2491,10 @@ public class Service {
         return notifyResult;
     }
 
-    public NotifyResult doNotifyInstanceList(Node node, boolean responseRequired, NotifyListener notifyListener) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{node, responseRequired, notifyListener});
-        
-        NotifyResult notifyResult = doNotifyInstanceList(node, 0, responseRequired, notifyListener);
-        
-        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
-        return notifyResult;
-    }
-
-    public NotifyResult doNotifyInstanceList(NodeInfo nodeInfo, boolean responseRequired, NotifyListener notifyListener) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{nodeInfo, responseRequired, notifyListener});
-        
-        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), 0, responseRequired, notifyListener);
-        
-        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
-        return notifyResult;
-    }
-
-    public NotifyResult doNotifyInstanceList(boolean responseRequired, NotifyListener notifyListener) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{responseRequired, notifyListener});
-        
-        NotifyResult notifyResult = doNotifyInstanceList((Node)null, 0, responseRequired, notifyListener);
-        
-        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
-        return notifyResult;
-    }
-
     public NotifyResult doNotifyInstanceList(Node node, int timeout, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{node, timeout, notifyListener});
         
-        NotifyResult notifyResult = doNotifyInstanceList(node, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotifyInstanceList(node, timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
@@ -2409,7 +2503,7 @@ public class Service {
     public NotifyResult doNotifyInstanceList(NodeInfo nodeInfo, int timeout, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{nodeInfo, timeout, notifyListener});
         
-        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
@@ -2418,7 +2512,7 @@ public class Service {
     public NotifyResult doNotifyInstanceList(int timeout, NotifyListener notifyListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{timeout, notifyListener});
         
-        NotifyResult notifyResult = doNotifyInstanceList((Node)null, timeout, false, notifyListener);
+        NotifyResult notifyResult = doNotifyInstanceList((Node)null, timeout, true, notifyListener);
         
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
@@ -2478,37 +2572,10 @@ public class Service {
         return notifyResult;
     }
 
-    public NotifyResult doNotifyInstanceList(Node node, boolean responseRequired) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{node, responseRequired});
-        
-        NotifyResult notifyResult = doNotifyInstanceList(node, 0, responseRequired, null);
-        
-        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
-        return notifyResult;
-    }
-
-    public NotifyResult doNotifyInstanceList(NodeInfo nodeInfo, boolean responseRequired) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{nodeInfo, responseRequired});
-        
-        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), 0, responseRequired, null);
-        
-        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
-        return notifyResult;
-    }
-
-    public NotifyResult doNotifyInstanceList(boolean responseRequired) throws SubnetException {
-        LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", responseRequired);
-        
-        NotifyResult notifyResult = doNotifyInstanceList((Node)null, 0, responseRequired, null);
-        
-        LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
-        return notifyResult;
-    }
-
     public NotifyResult doNotifyInstanceList(Node node, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{node, timeout});
         
-        NotifyResult notifyResult = doNotifyInstanceList(node, timeout, false, null);
+        NotifyResult notifyResult = doNotifyInstanceList(node, timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
@@ -2517,7 +2584,7 @@ public class Service {
     public NotifyResult doNotifyInstanceList(NodeInfo nodeInfo, int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", new Object[]{nodeInfo, timeout});
         
-        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), timeout, false, null);
+        NotifyResult notifyResult = doNotifyInstanceList(getRemoteNode(nodeInfo), timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
@@ -2526,7 +2593,7 @@ public class Service {
     public NotifyResult doNotifyInstanceList(int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doNotifyInstanceList", timeout);
         
-        NotifyResult notifyResult = doNotifyInstanceList((Node)null, timeout, false, null);
+        NotifyResult notifyResult = doNotifyInstanceList((Node)null, timeout, true, null);
         
         LOGGER.exiting(CLASS_NAME, "doNotifyInstanceList", notifyResult);
         return notifyResult;
