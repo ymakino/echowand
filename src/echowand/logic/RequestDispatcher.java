@@ -256,7 +256,6 @@ public class RequestDispatcher implements Listener {
         
         boolean processed = false;
         for (RequestProcessor processor : cloneProcessors()) {
-            System.out.println(processor + " " + processed);
             processed |= processor.processINF(subnet, frame, processed);
         }
         
