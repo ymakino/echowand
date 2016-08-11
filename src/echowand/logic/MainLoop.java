@@ -79,6 +79,15 @@ public class MainLoop implements Runnable {
     }
     
     /**
+     * 指定されたListenerを登録する
+     * @param index 登録するListenerのインデックス
+     * @param processor 登録するListener
+     */
+    public synchronized void addListener(int index, Listener listener) {
+        listeners.add(index, listener);
+    }
+    
+    /**
      * 指定されたListenerの登録を抹消する。
      * @param listener 登録を抹消するListener
      */
@@ -101,6 +110,20 @@ public class MainLoop implements Runnable {
         
         logger.exiting(className, "countListeners", count);
         return count;
+    }
+    
+    /**
+     * index番目に登録されているListenerを返す。
+     * @param index Listenerのインデックス
+     * @return 指定されたListener
+     */
+    public synchronized Listener getListener(int index) {
+        logger.entering(className, "getListener", index);
+        
+        Listener listener = listeners.get(index);
+        
+        logger.exiting(className, "getListener");
+        return listener;
     }
     
     private synchronized void invokeListeners(Frame frame) {

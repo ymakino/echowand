@@ -45,6 +45,19 @@ public class RequestDispatcher implements Listener {
     }
     
     /**
+     * 指定されたRequestProcessorがリクエスト処理を行なうように登録する。
+     * @param index 登録するRequestProcessorのインデックス
+     * @param processor リクエスト処理を実行するRequestProcessor
+     */
+    public synchronized void addRequestProcessor(int index, RequestProcessor processor) {
+        logger.entering(className, "addRequestProcessor", processor);
+        
+        processors.add(index, processor);
+        
+        logger.exiting(className, "addRequestProcessor");
+    }
+    
+    /**
      * 指定されたRequestProcessorがリクエスト処理を行なわないように登録を抹消する。
      * @param processor リクエスト処理を停止するRequestProcessor
      */
@@ -243,6 +256,7 @@ public class RequestDispatcher implements Listener {
         
         boolean processed = false;
         for (RequestProcessor processor : cloneProcessors()) {
+            System.out.println(processor + " " + processed);
             processed |= processor.processINF(subnet, frame, processed);
         }
         
