@@ -51,7 +51,7 @@ public class GetResult extends ResultBase<GetResult> {
     public boolean isValidProperty(Property property) {
         LOGGER.entering(CLASS_NAME, "isValidProperty", property);
         
-        boolean result = (property.getPDC() > 0);
+        boolean result = (property.getPDC() != 0);
         
         LOGGER.exiting(CLASS_NAME, "isValidProperty", result);
         return result;

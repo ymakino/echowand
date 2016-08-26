@@ -61,7 +61,7 @@ public class SetGetResult extends ResultBase<SetGetResult> {
     public boolean isValidSecondProperty(Property property) {
         LOGGER.entering(CLASS_NAME, "isValidProperty", property);
         
-        boolean result = (property.getPDC() > 0);
+        boolean result = (property.getPDC() != 0);
         
         LOGGER.exiting(CLASS_NAME, "isValidProperty", result);
         return result;
