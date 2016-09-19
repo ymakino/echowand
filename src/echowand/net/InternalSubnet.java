@@ -73,14 +73,13 @@ public class InternalSubnet implements Subnet {
      * このInternalSubnetのサブネットにフレームを転送する。
      * フレームの送信ノードや受信ノードがこのInternalSubnetに含まれない場合には例外が発生する。
      * @param frame 送信するフレーム
-     * @return 送信に成功した場合はtrue、そうでなければfalse
      * @throws SubnetException 送信に失敗した場合
      */
     @Override
-    public boolean send(Frame frame) throws SubnetException {
+    public void send(Frame frame) throws SubnetException {
         validateSender(frame);
         validateReceiver(frame);
-        return port.send(frame);
+        port.send(frame);
     }
 
     /**

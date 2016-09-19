@@ -255,7 +255,7 @@ public class Inet4SubnetTest {
     public void testStartServiceAfterStopService() throws SubnetException {
         try {
             subnet.startService();
-            assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
+            subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
         } catch (SubnetException e) {
             fail();
         }    
@@ -270,7 +270,7 @@ public class Inet4SubnetTest {
         subnet.startService();
 
         try {
-            assertTrue(subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame())));
+            subnet.send(new Frame(subnet.getLocalNode(), subnet.getLocalNode(), createFrame()));
         } catch (SubnetException e) {
             e.printStackTrace();
             fail();

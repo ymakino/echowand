@@ -4,6 +4,7 @@ import echowand.common.EOJ;
 import echowand.common.ESV;
 import echowand.net.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -233,7 +234,7 @@ public class Transaction {
         return payload;
     }
     
-    private boolean sendRequest() throws SubnetException {
+    private boolean sendRequest() {
         logger.entering(className, "sendRequest");
         
         int count = transactionConfig.getCountPayloads();
@@ -252,7 +253,15 @@ public class Transaction {
             cf.setEDATA(payload);
             cf.setTID(tid);
             Frame frame = new Frame(transactionConfig.getSenderNode(), transactionConfig.getReceiverNode(), cf);
-            boolean success = subnet.send(frame);
+            
+            boolean success = true;
+            
+            try {
+                subnet.send(frame);
+            } catch (SubnetException ex) {
+                success = false;
+                logger.logp(Level.INFO, className, "sendRequest", "catched exception", ex);
+            }
             
             doCallSentTransactionListeners(frame, success);
             
@@ -401,7 +410,7 @@ public class Transaction {
         
         transactionManager.addTransaction(this);
         
-        sendRequest();
+        boolean success = sendRequest();
         
         int timeout = getTimeout();
         
@@ -410,6 +419,10 @@ public class Transaction {
         } else if (timeout > 0) {
             timer = new Timer(true);
             timer.schedule(new TimeoutTimerTask(this), timeout);
+        }
+        
+        if (!success) {
+            throw new SubnetException("sendRequest failed");
         }
 
         logger.exiting(className, "execute");

@@ -48,10 +48,15 @@ public class CaptureSubnet implements ExtendedSubnet {
     }
 
     @Override
-    public boolean send(Frame frame) throws SubnetException {
-        boolean result = internalSubnet.send(frame);
-        notifySent(frame, result);
-        return result;
+    public void send(Frame frame) throws SubnetException {
+        boolean result = false;
+        
+        try {
+            internalSubnet.send(frame);
+            result = true;
+        } finally {
+            notifySent(frame, result);
+        }
     }
 
     @Override

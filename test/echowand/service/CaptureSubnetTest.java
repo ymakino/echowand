@@ -78,7 +78,7 @@ public class CaptureSubnetTest {
     public void testSend() throws Exception {
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), new CommonFrame());
         
-        assertTrue(subnet.send(frame));
+        subnet.send(frame);
         
         assertEquals(frame, observer.sentFrame);
     }
@@ -95,7 +95,7 @@ public class CaptureSubnetTest {
         commonFrame.setEDATA(payload);
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), commonFrame);
         
-        assertTrue(subnet.send(frame));
+        subnet.send(frame);
         
         Frame receivedFrame = subnet.receive();
         

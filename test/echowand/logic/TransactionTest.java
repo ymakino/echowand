@@ -77,9 +77,9 @@ public class TransactionTest {
         
         failSendSubnet = new InternalSubnet("failSendSubnet") {
             @Override
-            public boolean send(Frame frame) throws SubnetException {
+            public void send(Frame frame) throws SubnetException {
                 super.send(frame);
-                return false;
+                throw new SubnetException("failSendSubnet");
             }
         };
         failSendTransactionManager = new TransactionManager(failSendSubnet);
@@ -358,15 +358,20 @@ public class TransactionTest {
         };
         t.addTransactionListener(tl);
 
+        assertFalse(testCallbackBegan);
+        
+        boolean success = false;
+        
         try {
-            assertFalse(testCallbackBegan);
             t.execute();
-            assertTrue(testCallbackBegan);
-            assertFalse(testCallbackFinished);
+            success = true;
         } catch (SubnetException e) {
-            e.printStackTrace();
-            fail();
         }
+        
+        assertFalse(success);
+        
+        assertTrue(testCallbackBegan);
+        assertFalse(testCallbackFinished);
         
         try {
             Frame reqFrame = failSendSubnet.receive();

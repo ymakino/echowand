@@ -451,11 +451,10 @@ public class InetSubnet implements Subnet {
      * フレームの送信ノードや受信ノードがこのInetSubnetに含まれない場合には例外が発生する。
      *
      * @param frame 送信するフレーム
-     * @return 常にtrue
      * @throws SubnetException 送信に失敗した場合
      */
     @Override
-    public boolean send(Frame frame) throws SubnetException {
+    public void send(Frame frame) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "send", frame);
 
         if (!isInService()) {
@@ -496,14 +495,13 @@ public class InetSubnet implements Subnet {
                 }
                 getUDPNetwork().send((InetNodeInfo) remoteNodeInfo, frame.getCommonFrame());
             }
-
-            LOGGER.exiting(CLASS_NAME, "send", true);
-            return true;
         } catch (NetworkException ex) {
             SubnetException exception = new SubnetException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "send", exception);
             throw exception;
         }
+
+        LOGGER.exiting(CLASS_NAME, "send");
     }
 
     /**

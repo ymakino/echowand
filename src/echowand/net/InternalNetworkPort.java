@@ -64,15 +64,13 @@ public class InternalNetworkPort {
      * このポートを用いてフレームを送信する。
      * 指定されたフレームはこのポートが関連付けられたInternalNetworkを経由して他のポートに転送される。
      * @param frame 転送するフレーム
-     * @return  キューへの追加が成功した場合にはtrue、それ以外の場合はfalse
      * @throws SubnetException 転送に失敗した場合
      */
-    public synchronized boolean send(Frame frame) throws SubnetException {
+    public synchronized void send(Frame frame) throws SubnetException {
         try {
             if (network != null) {
                 network.broadcast(cloneFrame(frame));
             }
-            return true;
         } catch (InvalidDataException e) {
             throw new SubnetException("invalid frame", e);
         }
