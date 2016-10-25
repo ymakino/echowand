@@ -81,7 +81,7 @@ public class MainLoop implements Runnable {
     /**
      * 指定されたListenerを登録する
      * @param index 登録するListenerのインデックス
-     * @param processor 登録するListener
+     * @param listener 登録するListener
      */
     public synchronized void addListener(int index, Listener listener) {
         listeners.add(index, listener);
