@@ -4,7 +4,6 @@ import echowand.common.EPC;
 import echowand.info.NodeProfileInfo;
 import echowand.info.PropertyInfo;
 import echowand.object.LocalObjectDateTimeDelegate;
-import echowand.object.LocalObjectNotifyDelegate;
 import echowand.object.NodeProfileObjectDelegate;
 import echowand.util.Constraint;
 import java.util.logging.Logger;
@@ -21,7 +20,6 @@ public class NodeProfileObjectConfig extends LocalObjectConfig {
     
     private LazyConfiguration dateTimeConfiguration;
     private LazyConfiguration nodeProfileConfiguration;
-    private LazyConfiguration notifyConfiguration;
     
     /**
      * NodeProfileObjectConfigを生成する。
@@ -46,16 +44,8 @@ public class NodeProfileObjectConfig extends LocalObjectConfig {
             }
         };
         
-        notifyConfiguration = new LazyConfiguration() {
-            @Override
-            public void configure(LocalObjectConfig config, Core core) {
-                addDelegate(new LocalObjectNotifyDelegate(core.getSubnet(), core.getTransactionManager()));
-            }
-        };
-        
         addLazyConfiguration(dateTimeConfiguration);
         addLazyConfiguration(nodeProfileConfiguration);
-        addLazyConfiguration(notifyConfiguration);
     }
     
     /**
@@ -105,30 +95,6 @@ public class NodeProfileObjectConfig extends LocalObjectConfig {
      */
     public boolean isNodeProfileDelegateEnabled() {
         return containsLazyConfiguration(nodeProfileConfiguration);
-    }
-    
-    /**
-     * LocalObjectNotifyDelegateの利用を有効にする。
-     */
-    public void enableNotifyDelegate() {
-        if (!isNotifyDelegateEnabled()) {
-            addLazyConfiguration(notifyConfiguration);
-        }
-    }
-    
-    /**
-     * LocalObjectNotifyDelegateの利用を無効にする。
-     */
-    public void disableNotifyDelegate() {
-        removeLazyConfiguration(notifyConfiguration);
-    }
-    
-    /**
-     * LocalObjectNotifyDelegateを利用するかどうかを返す。
-     * @return LocalObjectNotifyDelegateを利用する場合にはtrue、そうでなければfalse
-     */
-    public boolean isNotifyDelegateEnabled() {
-        return containsLazyConfiguration(notifyConfiguration);
     }
     
     /**
