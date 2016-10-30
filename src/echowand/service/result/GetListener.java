@@ -15,7 +15,23 @@ public class GetListener implements ResultListener<GetResult> {
     }
 
     @Override
+    public void send(GetResult result, ResultFrame resultFrame, ResultData resultData, boolean success) {
+    }
+
+    @Override
+    public void send(GetResult result, ResultFrame resultFrame, ResultData resultData, boolean success, boolean isSecond) {
+    }
+
+    @Override
     public void receive(GetResult result, ResultFrame resultFrame) {
+    }
+
+    @Override
+    public void receive(GetResult result, ResultFrame resultFrame, ResultData resultData) {
+    }
+
+    @Override
+    public void receive(GetResult result, ResultFrame resultFrame, ResultData resultData, boolean isSecond) {
     }
 
     @Override

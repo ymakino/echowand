@@ -15,7 +15,23 @@ public class SetListener implements ResultListener<SetResult> {
     }
 
     @Override
+    public void send(SetResult result, ResultFrame resultFrame, ResultData resultData, boolean success) {
+    }
+
+    @Override
+    public void send(SetResult result, ResultFrame resultFrame, ResultData resultData, boolean success, boolean isSecond) {
+    }
+
+    @Override
     public void receive(SetResult result, ResultFrame resultFrame) {
+    }
+
+    @Override
+    public void receive(SetResult result, ResultFrame resultFrame, ResultData resultData) {
+    }
+
+    @Override
+    public void receive(SetResult result, ResultFrame resultFrame, ResultData resultData, boolean isSecond) {
     }
 
     @Override

@@ -195,12 +195,13 @@ public class ObserveResult {
         }
         
         boolean result = true;
+        int count = payload.getFirstOPC();
+        LinkedList<ResultData> frameDataList = new LinkedList<ResultData>();
         
         if (frameListEnabled) {
             result &= frameList.add(resultFrame);
         }
         
-        int count = payload.getFirstOPC();
         for (int i=0; i<count; i++) {
             Property property = payload.getFirstPropertyAt(i);
             
@@ -211,6 +212,8 @@ public class ObserveResult {
             Data data = property.getEDT();
             
             ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
+            
+            frameDataList.add(resultData);
             
             if (dataListEnabled) {
                 result &= dataList.add(resultData);
@@ -223,6 +226,10 @@ public class ObserveResult {
         
         if (observeListener != null) {
             observeListener.receive(this, resultFrame);
+            
+            for (ResultData resultData : frameDataList) {
+                observeListener.receive(this, resultFrame, resultData);
+            }
         }
         
         LOGGER.exiting(CLASS_NAME, "addFrame", result);

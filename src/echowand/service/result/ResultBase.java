@@ -395,6 +395,16 @@ public abstract class ResultBase<ResultType extends ResultBase> {
             
         if (listener != null) {
             listener.send(self(), resultFrame, success);
+            
+            for (ResultData resultData : requestDataManager.getKeyList(requestDataFrameMap, resultFrame)) {
+                listener.send(self(), resultFrame, resultData, success);
+                listener.send(self(), resultFrame, resultData, success, false);
+            }
+            
+            for (ResultData resultData : requestSecondDataManager.getKeyList(requestDataFrameMap, resultFrame)) {
+                listener.send(self(), resultFrame, resultData, success);
+                listener.send(self(), resultFrame, resultData, success, true);
+            }
         }
         
         LOGGER.exiting(CLASS_NAME, "addRequestFrame", result);
@@ -463,6 +473,16 @@ public abstract class ResultBase<ResultType extends ResultBase> {
             
             if (listener != null) {
                 listener.receive(self(), resultFrame);
+            
+                for (ResultData resultData : responseDataManager.getKeyList(dataFrameMap, resultFrame)) {
+                    listener.receive(self(), resultFrame, resultData);
+                    listener.receive(self(), resultFrame, resultData, false);
+                }
+            
+                for (ResultData resultData : responseSecondDataManager.getKeyList(dataFrameMap, resultFrame)) {
+                    listener.receive(self(), resultFrame, resultData);
+                    listener.receive(self(), resultFrame, resultData, true);
+                }
             }
 
             LOGGER.exiting(CLASS_NAME, "addFrame", result);

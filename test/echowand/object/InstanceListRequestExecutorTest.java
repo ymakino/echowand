@@ -6,6 +6,7 @@ import echowand.common.ESV;
 import echowand.logic.TransactionManager;
 import echowand.net.*;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.AfterClass;
@@ -95,6 +96,62 @@ public class InstanceListRequestExecutorTest {
         assertEquals((byte) 0x01, payload.getFirstOPC());
         assertEquals(EPC.xD6, payload.getFirstPropertyAt(0).getEPC());
         assertEquals((byte) 0x00, payload.getFirstPropertyAt(0).getPDC());
+    }
+    
+    public void doTestExecutorReceive(boolean shouldReceive) throws SubnetException, InterruptedException {
+        assertTrue(executor.execute());
+        
+        StandardPayload payload = new StandardPayload(new EOJ("0ef001"), new EOJ("0ef001"), ESV.Get);
+        payload.addFirstProperty(new Property(EPC.x80));
+        CommonFrame commonFrame = new CommonFrame();
+        commonFrame.setEDATA(payload);
+        Frame frame = new Frame(subnet.getLocalNode(), subnet.getGroupNode(), commonFrame);
+        
+        subnet.send(frame);
+        
+        Thread.sleep(200);
+        
+        assertTrue(executor.join());
+        
+        if (shouldReceive) {
+            assertNotEquals(frame.toString(), subnet.receive().toString());
+        } else {
+            assertEquals(frame.toString(), subnet.receive().toString());
+        }
+    }
+    
+    @Test
+    public void testExecutorReceiveWithDummyNode() throws SubnetException, InterruptedException {
+        executor.setTimeout(500);
+        executor.setNode(subnet.getRemoteNode("dummy"));
+        doTestExecutorReceive(false);
+    }
+    
+    @Test
+    public void testExecutorReceiveWithLocalNode() throws SubnetException, InterruptedException {
+        executor.setTimeout(500);
+        executor.setNode(subnet.getLocalNode());
+        doTestExecutorReceive(true);
+    }
+    
+    @Test
+    public void testExecutorReceiveWithGroupNode() throws SubnetException, InterruptedException {
+        executor.setTimeout(500);
+        executor.setNode(subnet.getGroupNode());
+        doTestExecutorReceive(true);
+    }
+    
+    @Test
+    public void testExecutorReceiveWithNullNode() throws SubnetException, InterruptedException {
+        executor.setTimeout(500);
+        executor.setNode(null);
+        doTestExecutorReceive(true);
+    }
+    
+    @Test
+    public void testExecutorReceiveWithDefaultNode() throws SubnetException, InterruptedException {
+        executor.setTimeout(500);
+        doTestExecutorReceive(true);
     }
     
     @Test

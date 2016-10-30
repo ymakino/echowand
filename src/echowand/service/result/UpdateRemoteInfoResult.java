@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 public class UpdateRemoteInfoResult {
     private static final Logger LOGGER = Logger.getLogger(UpdateRemoteInfoResult.class.getName());
     private static final String CLASS_NAME = UpdateRemoteInfoResult.class.getName();
+    
+    private final EPC INSTANCE_LIST_S = EPC.xD6;
 
     private InstanceListRequestExecutor executor;
     private TimestampManager timestampManager;
@@ -98,22 +100,21 @@ public class UpdateRemoteInfoResult {
 
         LOGGER.exiting(CLASS_NAME, "finish");
     }
-
-
-    private int addEOJs(Node node, StandardPayload payload) {
-        LOGGER.entering(CLASS_NAME, "addEOJs", new Object[]{node, payload});
+    
+    private LinkedList<EOJ> takeEOJs(StandardPayload payload) {
+        LOGGER.entering(CLASS_NAME, "takeEOJs", payload);
         
-        int count = 0;
-
+        LinkedList<EOJ> eojs = new LinkedList<EOJ>();
+        
         if (payload.getESV() != ESV.Get_Res || !payload.getSEOJ().isNodeProfileObject()) {
-            LOGGER.exiting(CLASS_NAME, "addEOJs", count);
-            return count;
+            LOGGER.exiting(CLASS_NAME, "takeEOJs", eojs);
+            return eojs;
         }
-
-        addEOJ(node, payload.getSEOJ());
+        
+        eojs.add(payload.getSEOJ());
 
         for (int i = 0; i < payload.getFirstOPC(); i++) {
-            if (payload.getFirstPropertyAt(i).getEPC() == EPC.xD6) {
+            if (payload.getFirstPropertyAt(i).getEPC() == INSTANCE_LIST_S) {
                 Data data = payload.getFirstPropertyAt(i).getEDT();
 
                 if (data.isEmpty()) {
@@ -132,15 +133,14 @@ public class UpdateRemoteInfoResult {
                     byte classGroupCode = data.get(offset);
                     byte classCode = data.get(offset + 1);
                     byte instanceCode = data.get(offset + 2);
-
-                    addEOJ(node, new EOJ(classGroupCode, classCode, instanceCode));
-                    count++;
+                    
+                    eojs.add(new EOJ(classGroupCode, classCode, instanceCode));
                 }
             }
         }
-
-        LOGGER.exiting(CLASS_NAME, "addEOJs", count);
-        return count;
+        
+        LOGGER.exiting(CLASS_NAME, "takeEOJs", eojs);
+        return eojs;
     }
 
     private void addEOJ(Node node, EOJ eoj) {
@@ -244,16 +244,24 @@ public class UpdateRemoteInfoResult {
             return false;
         }
 
-        addEOJs(node, payload);
-
         if (payload.getESV() == ESV.Get_SNA) {
             errorFrameList.add(resultFrame);
         }
 
         boolean result = frameList.add(resultFrame);
+
+        LinkedList<EOJ> eojs = takeEOJs(payload);
+        
+        for (EOJ eoj : eojs) {
+            addEOJ(node, eoj);
+        }
         
         if (updateRemoteInfoListener != null) {
             updateRemoteInfoListener.receive(this, resultFrame);
+            
+            if (!eojs.isEmpty()) {
+                updateRemoteInfoListener.receive(this, resultFrame, node, eojs);
+            }
         }
         
         LOGGER.exiting(CLASS_NAME, "addFrame", result);

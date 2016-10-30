@@ -342,10 +342,61 @@ public class Service {
         return setGetResult;
     }
     
+    public UpdateRemoteInfoResult doUpdateRemoteInfo(Node node, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", new Object[]{node, timeout});
+        
+        UpdateRemoteInfoResult updateRemoteInfoResult = doUpdateRemoteInfo(node, timeout, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
+        return updateRemoteInfoResult;
+    }
+    
+    public UpdateRemoteInfoResult doUpdateRemoteInfo(NodeInfo nodeInfo, int timeout) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", new Object[]{nodeInfo, timeout});
+        
+        UpdateRemoteInfoResult updateRemoteInfoResult = doUpdateRemoteInfo(getRemoteNode(nodeInfo), timeout, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
+        return updateRemoteInfoResult;
+    }
+    
     public UpdateRemoteInfoResult doUpdateRemoteInfo(int timeout) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", timeout);
         
-        UpdateRemoteInfoResult updateRemoteInfoResult = doUpdateRemoteInfo(timeout, null);
+        UpdateRemoteInfoResult updateRemoteInfoResult = doUpdateRemoteInfo(getGroupNode(), timeout, null);
+        
+        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
+        return updateRemoteInfoResult;
+    }
+    
+    public UpdateRemoteInfoResult doUpdateRemoteInfo(Node node, int timeout, UpdateRemoteInfoListener updateRemoteInfoListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", new Object[]{node, timeout, updateRemoteInfoListener});
+        
+        InstanceListRequestExecutor executor = new InstanceListRequestExecutor(
+                getSubnet(), getTransactionManager(), getRemoteObjectManager());
+        
+        executor.setNode(node);
+        
+        UpdateRemoteInfoResult updateRemoteInfoResult = new UpdateRemoteInfoResult(executor, core.getTimestampManager());
+        
+        if (updateRemoteInfoListener != null) {
+            updateRemoteInfoResult.setUpdateRemoteInfoListener(updateRemoteInfoListener);
+        }
+        
+        executor.setTimeout(timeout);
+        ResultUpdateTransactionListener resultUpdateTransactionListener = new ResultUpdateTransactionListener(updateRemoteInfoResult);
+        executor.addTransactionListener(resultUpdateTransactionListener);
+        
+        executor.execute();
+        
+        LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
+        return updateRemoteInfoResult;
+    }
+    
+    public UpdateRemoteInfoResult doUpdateRemoteInfo(NodeInfo nodeInfo, int timeout, UpdateRemoteInfoListener updateRemoteInfoListener) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", new Object[]{nodeInfo, timeout, updateRemoteInfoListener});
+        
+        UpdateRemoteInfoResult updateRemoteInfoResult = doUpdateRemoteInfo(getRemoteNode(nodeInfo), timeout, null);
         
         LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
         return updateRemoteInfoResult;
@@ -354,17 +405,7 @@ public class Service {
     public UpdateRemoteInfoResult doUpdateRemoteInfo(int timeout, UpdateRemoteInfoListener updateRemoteInfoListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doUpdateRemoteInfo", new Object[]{timeout, updateRemoteInfoListener});
         
-        InstanceListRequestExecutor executor = new InstanceListRequestExecutor(
-                getSubnet(), getTransactionManager(), getRemoteObjectManager());
-        
-        UpdateRemoteInfoResult updateRemoteInfoResult = new UpdateRemoteInfoResult(executor, core.getTimestampManager());
-        updateRemoteInfoResult.setUpdateRemoteInfoListener(updateRemoteInfoListener);
-        
-        executor.setTimeout(timeout);
-        ResultUpdateTransactionListener resultUpdateTransactionListener = new ResultUpdateTransactionListener(updateRemoteInfoResult);
-        executor.addTransactionListener(resultUpdateTransactionListener);
-        
-        executor.execute();
+        UpdateRemoteInfoResult updateRemoteInfoResult = doUpdateRemoteInfo(getGroupNode(), timeout, null);
         
         LOGGER.exiting(CLASS_NAME, "doUpdateRemoteInfo", updateRemoteInfoResult);
         return updateRemoteInfoResult;

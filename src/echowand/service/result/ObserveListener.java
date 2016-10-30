@@ -4,12 +4,17 @@ package echowand.service.result;
  *
  * @author ymakino
  */
-public interface ObserveListener {
+public class ObserveListener {
 
-    public void begin(ObserveResult result);
+    public void begin(ObserveResult result) {
+    }
 
-    public void receive(ObserveResult result, ResultFrame resultFrame);
+    public void receive(ObserveResult result, ResultFrame resultFrame) {
+    }
+
+    public void receive(ObserveResult result, ResultFrame resultFrame, ResultData resultData) {
+    }
     
-    public void finish(ObserveResult result);
-    
+    public void finish(ObserveResult result) {
+    }
 }
