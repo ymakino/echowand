@@ -6,6 +6,7 @@ import echowand.logic.SetGetTransactionConfig;
 import echowand.logic.Transaction;
 import echowand.logic.TransactionListener;
 import echowand.logic.TransactionManager;
+import echowand.net.Node;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ public class InstanceListRequestExecutor {
     private TransactionManager transactionManager;
     private RemoteObjectManager remoteManager;
     private Transaction transaction;
+    private Node node;
     private int timeout;
     private boolean done;
     
@@ -41,6 +43,7 @@ public class InstanceListRequestExecutor {
         this.transactionManager = transactionManager;
         this.remoteManager = remoteManager;
         this.transaction = null;
+        this.node = null;
         this.timeout = 2000;
         this.done = false;
         this.listeners = new LinkedList<TransactionListener>();
@@ -54,6 +57,14 @@ public class InstanceListRequestExecutor {
     
     public int getTimeout() {
         return timeout;
+    }
+    
+    public void setNode(Node node) {
+        this.node = node;
+    }
+    
+    public Node getNode() {
+        return node;
     }
     
     public boolean isDone() {
@@ -81,7 +92,13 @@ public class InstanceListRequestExecutor {
         
         SetGetTransactionConfig transactionConfig = new SetGetTransactionConfig();
         transactionConfig.setSenderNode(subnet.getLocalNode());
-        transactionConfig.setReceiverNode(subnet.getGroupNode());
+        
+        if (node == null) {
+            transactionConfig.setReceiverNode(subnet.getGroupNode());
+        } else {
+            transactionConfig.setReceiverNode(node);
+        }
+        
         transactionConfig.setSourceEOJ(new EOJ("0ef001"));
         transactionConfig.setDestinationEOJ(new EOJ("0ef001"));
         transactionConfig.addGet(EPC.xD6);
