@@ -1,7 +1,7 @@
 echowand - Yet Another ECHONET Lite Library for Java
 ============================
 
-Copyright (c) 2012-2015 Yoshiki Makino
+Copyright (c) 2012-2017 Yoshiki Makino
 
 echowand について
 ---------------
