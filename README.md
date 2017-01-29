@@ -71,6 +71,15 @@ NetworkInterface nif = NetworkInterface.getByName("eth0");
 Core core = new Core(Inet4Subnet.startSubnet(nif));
 ```
 
+_Mac OS Xでは、ネットワークインターフェースを指定しても正常に動作しないことがあります。_
+_Mac OS XでIPv4を利用する際には、実行時に以下のオプションを指定することでこの問題を回避できるようです。_
+
+```
+-Djava.net.preferIPv4Stack=true
+```
+
+_Netbeansのプロジェクトを利用し、プロジェクト実行時にこのオプションを指定したい場合には、`プロジェクト・プロパティウィンドウ`の`カテゴリ`から`実行`を選択し、上記の行を`VMオプション`に記述しておきます。_
+
 ###ローカルオブジェクト情報の作成###
 ECHONET Liteのローカルオブジェクト情報の作成を行います。ここで設定した情報に基づき
 ローカルオブジェクトが生成されます。
@@ -143,7 +152,7 @@ _scpを利用する場合には、例えば以下のようなコマンドをNetB
 _コマンドを実行後、パスワードを聞かれますのでRaspberry Piのパスワードを入力しEnterキーを押します。_
 _この操作例では、Raspberry PiのIPアドレスが192.168.0.1だと仮定しています。_
 
-```sh
+```bash
 [myname@localhost ~]$ scp Documents/NetBeansProjects/echowand/dist/echowand.jar pi@192.168.0.1:
 ```
 
@@ -153,7 +162,7 @@ _必要であれば、cdコマンドを利用してコピーしたファイル�
 _その後、以下の通りコマンドを実行することで温度センサとして動作を開始します。_
 _また、`Ctrl-C`(Controlキーを押しながらCキーを押す)でプログラムは停止します。_
 
- ```sh
+ ```bash
 pi@raspberrypi ~ $ java -cp echowand.jar echowand.sample.SampleLocalObject
  ```
 
@@ -170,7 +179,7 @@ _[echowand.sample.SampleLEDLocalObject.java](https://github.com/ymakino/echowand
 _にあります。この例では一般照明(EOJは029001)を実装しRaspberry Pi上のLEDを制御します。_
 _EPCが80であるプロパティの値を30に設定すると点灯、31に設定すると消灯します。_
 
- ```sh
+ ```bash
 pi@raspberrypi ~ $ java -cp echowand.jar echowand.sample.SampleLEDLocalObject
  ```
 
@@ -425,6 +434,13 @@ ECHONET Lite ネットワークに接続し、`echowand.app.ObjectViewer`を起�
 * 選択されたEOJオブジェクトの情報を下部のテーブルに表示
 * 右上のEOJをダブルクリックすると、指定されたEOJの情報を新規ウィンドウで表示
 * Set可能なプロパティは、テーブルのセルをダブルクリックすることで編集可能(16進数で記述)
+
+_先に説明した通り、Mac OS Xではネットワークインターフェースを指定しても正常に動作しないことがあります。_
+_その場合には、ターミナルでechowandプロジェクトのディレクトリに移動してから、以下のように`echowand.app.ObjectViewer`を実行してみてください。_
+
+```bash
+$ java -Djava.net.preferIPv4Stack=true -cp dist/echowand.jar echowand.app.ObjectViewer
+```
 
 注意点
 -----
