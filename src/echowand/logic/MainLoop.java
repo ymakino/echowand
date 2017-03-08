@@ -61,8 +61,7 @@ public class MainLoop implements Runnable {
         
         Frame frame = subnet.receive();
         
-        logger.exiting(className, "receiveFrame");
-        
+        logger.exiting(className, "receiveFrame", frame);
         return frame;
     }
     
@@ -84,7 +83,11 @@ public class MainLoop implements Runnable {
      * @param listener 登録するListener
      */
     public synchronized void addListener(int index, Listener listener) {
+        logger.entering(className, "addListener", new Object[]{index, listener});
+        
         listeners.add(index, listener);
+        
+        logger.exiting(className, "addListener");
     }
     
     /**
