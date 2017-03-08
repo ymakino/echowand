@@ -22,7 +22,7 @@ public class TimestampManager {
         LOGGER.exiting(CLASS_NAME, "TimestampManager");
     }
     
-    public long put(Frame frame, long timestamp) {
+    public synchronized long put(Frame frame, long timestamp) {
         LOGGER.entering(CLASS_NAME, "put", new Object[]{frame, timestamp});
         
         Long prev = timestampMap.put(frame, timestamp);
@@ -35,7 +35,7 @@ public class TimestampManager {
         return prev;
     }
     
-    public long get(Frame frame) {
+    public synchronized long get(Frame frame) {
         LOGGER.entering(CLASS_NAME, "get",  frame);
         
         Long timestamp = timestampMap.get(frame);
@@ -48,7 +48,7 @@ public class TimestampManager {
         return timestamp;
     }
     
-    public long get(Frame frame, long defaultValue) {
+    public synchronized long get(Frame frame, long defaultValue) {
         LOGGER.entering(CLASS_NAME, "get",  new Object[]{frame, defaultValue});
         
         Long timestamp = timestampMap.get(frame);
@@ -61,7 +61,7 @@ public class TimestampManager {
         return timestamp;
     }
     
-    public long remove(Frame frame) {
+    public synchronized long remove(Frame frame) {
         LOGGER.entering(CLASS_NAME, "remove",  frame);
         
         Long timestamp = timestampMap.remove(frame);
