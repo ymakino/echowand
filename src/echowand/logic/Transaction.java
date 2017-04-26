@@ -37,7 +37,7 @@ public class Transaction {
     
     private static EnumMap<ESV, LinkedList<ESV>> responseESVMap = new EnumMap<ESV, LinkedList<ESV>>(ESV.class);
     
-    private static short getNextTID() {
+    private synchronized static short getNextTID() {
         if (nextTID == 0) {
             nextTID = 1;
         }

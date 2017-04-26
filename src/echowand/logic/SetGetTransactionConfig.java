@@ -20,7 +20,7 @@ public class SetGetTransactionConfig extends TransactionConfig {
     private LinkedList<Pair<EPC, Data>> setProperties;
     private LinkedList<EPC> getProperties;
     private boolean responseRequired;
-    private boolean announcePreffered;
+    private boolean announcePreferred;
     
     /**
      * リクエストのESVを返す。
@@ -29,7 +29,7 @@ public class SetGetTransactionConfig extends TransactionConfig {
     @Override
     public ESV getESV() {
         if (setProperties.isEmpty()) {
-            if (announcePreffered) {
+            if (announcePreferred) {
                 return ESV.INF_REQ;
             } else {
                 return ESV.Get;
@@ -120,17 +120,17 @@ public class SetGetTransactionConfig extends TransactionConfig {
      * @return Getの代わりにINF_REQを使うのであればtrue、そうでなければfalse
      */
     public boolean isAnnouncePreferred() {
-        return announcePreffered;
+        return announcePreferred;
     }
     
     /**
      * Getの代わりにINF_REQを使うかどうかの設定を行う。
-     * @param announcePreffered Getの代わりにINF_REQを使うのであればtrue、そうでなければfalse
+     * @param announcePreferred Getの代わりにINF_REQを使うのであればtrue、そうでなければfalse
      */
-    public void setAnnouncePreferred(boolean announcePreffered) {
-        logger.entering(className, "setAnnouncePreferred", announcePreffered);
+    public void setAnnouncePreferred(boolean announcePreferred) {
+        logger.entering(className, "setAnnouncePreferred", announcePreferred);
         
-        this.announcePreffered = announcePreffered;
+        this.announcePreferred = announcePreferred;
         
         logger.exiting(className, "setAnnouncePreferred");
     }
