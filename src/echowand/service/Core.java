@@ -48,6 +48,10 @@ public class Core {
     private boolean inService = false;
     private boolean captureEnabled = false;
     
+    private Thread mainLoopThread;
+    
+    private boolean managedSubnet;
+    
     /**
      * Inet4Subnetを利用するCoreを作成する。
      * startServiceメソッドを呼び出すまでは、特に処理を行なわない。
@@ -56,7 +60,8 @@ public class Core {
     public Core() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "Core");
         
-        this.subnet = new CaptureSubnet(Inet4Subnet.startSubnet());
+        subnet = new CaptureSubnet(new Inet4Subnet());
+        managedSubnet = true;
         nodeProfileObjectConfig = new NodeProfileObjectConfig();
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
@@ -67,12 +72,34 @@ public class Core {
     /**
      * 指定されたSubnetを利用するCoreを作成する。
      * startServiceメソッドを呼び出すまでは、特に処理を行なわない。
+     * sunbetはこのCoreで管理され、startServiceとstopServiceが自動的に呼び出される。
      * @param subnet 構築するCoreが利用するsubnet
      */
     public Core(Subnet subnet) {
         LOGGER.entering(CLASS_NAME, "Core", subnet);
         
         this.subnet = subnet;
+        managedSubnet = true;
+        nodeProfileObjectConfig = new NodeProfileObjectConfig();
+        localObjectConfigs = new LinkedList<LocalObjectConfig>();
+        localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
+        
+        LOGGER.exiting(CLASS_NAME, "Core");
+    }
+    
+    /**
+     * 指定されたSubnetを利用するCoreを作成する。
+     * startServiceメソッドを呼び出すまでは、特に処理を行なわない。
+     * このCoreがSubnetの管理を行う場合にはmanagedSubnetにtrueを指定する。
+     * @param subnet 構築するCoreが利用するSubnet
+     * @param managedSubnet 指定されたSubnetを管理する場合にはtrue、そうでなければfalse
+     */
+    public Core(Subnet subnet, boolean managedSubnet) {
+        LOGGER.entering(CLASS_NAME, "Core", new Object[]{subnet, managedSubnet});
+        
+        this.subnet = subnet;
+        this.managedSubnet = managedSubnet;
+        
         nodeProfileObjectConfig = new NodeProfileObjectConfig();
         localObjectConfigs = new LinkedList<LocalObjectConfig>();
         localObjectUpdaters = new LinkedList<LocalObjectUpdater>();
@@ -352,7 +379,7 @@ public class Core {
             LOGGER.exiting(CLASS_NAME, "initialize", false);
             return false;
         }
-
+        
         transactionManager = createTransactionManager(subnet);
         remoteManager = createRemoteObjectManager();
         localManager = createLocalObjectManager();
@@ -394,14 +421,42 @@ public class Core {
     }
     
     private void startUpdateThreads() {
+        LOGGER.entering(CLASS_NAME, "startUpdateThreads");
+        
         for (LocalObjectUpdater updater : localObjectUpdaters) {
-            new Thread(updater).start();
+            updater.start();
         }
+        
+        LOGGER.exiting(CLASS_NAME, "startUpdateThreads");
+    }
+    
+    
+    private void stopUpdateThreads() {
+        LOGGER.entering(CLASS_NAME, "stopUpdateThreads");
+        
+        for (LocalObjectUpdater updater : localObjectUpdaters) {
+            updater.terminate();
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "stopUpdateThreads");
     }
     
     private void startMainLoopThread() {
+        LOGGER.entering(CLASS_NAME, "startMainLoopThread");
+        
         mainLoop = createMainLoop(subnet, requestDispatcher, transactionManager);
-        new Thread(mainLoop).start();
+        mainLoopThread = new Thread(mainLoop);
+        mainLoopThread.start();
+        
+        LOGGER.exiting(CLASS_NAME, "startMainLoopThread");
+    }
+    
+    private void stopMainLoopThread() {
+        LOGGER.entering(CLASS_NAME, "stopMainLoopThread");
+        
+        mainLoopThread.interrupt();
+        
+        LOGGER.exiting(CLASS_NAME, "stopMainLoopThread");
     }
     
     private boolean startThreads() {
@@ -433,8 +488,9 @@ public class Core {
      * addLocalObjectConfigで登録されたローカルオブジェクトの生成と登録を行い、実行に必要なスレッドを開始する。
      * @return 実行が成功すればtrue、すでに実行済みであればfalse
      * @throws TooManyObjectsException ローカルオブジェクトの数が多すぎる場合
+     * @throws SubnetException 実行に失敗した場合
      */
-    public synchronized boolean startService() throws TooManyObjectsException {
+    public synchronized boolean startService() throws TooManyObjectsException, SubnetException {
         LOGGER.entering(CLASS_NAME, "startService");
         
         if (inService) {
@@ -451,9 +507,41 @@ public class Core {
 
         createLocalObjects();
         
+        if (managedSubnet) {
+            if (!subnet.startService()) {
+                LOGGER.logp(Level.WARNING, CLASS_NAME, "startService", "subnet has already started");
+            }
+        }
+        
         startThreads();
 
         LOGGER.exiting(CLASS_NAME, "startService", true);
+        return true;
+    }
+    
+    /**
+     * Coreを停止する。
+     * @return 停止に成功した場合にはtrue、すでに停止していた場合にはfalse
+     * @throws SubnetException 停止に失敗した場合
+     */
+    public synchronized boolean stopService() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "stopService");
+        
+        if (!inService) {
+            LOGGER.exiting(CLASS_NAME, "stopService", false);
+            return false;
+        }
+        
+        stopUpdateThreads();
+        stopMainLoopThread();
+        
+        if (managedSubnet) {
+            if (!subnet.stopService()) {
+                LOGGER.logp(Level.WARNING, CLASS_NAME, "startService", "has already stopped");
+            }
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "stopService", true);
         return true;
     }
 }

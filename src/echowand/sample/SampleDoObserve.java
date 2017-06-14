@@ -1,6 +1,5 @@
 package echowand.sample;
 
-import echowand.common.Data;
 import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.logic.TooManyObjectsException;
@@ -20,10 +19,10 @@ import java.net.SocketException;
 public class SampleDoObserve {
     public static void main(String[] args) throws InterruptedException, SubnetException, TooManyObjectsException, SocketException {
         
-        Core core = new Core(Inet4Subnet.startSubnet());
+        Core core = new Core(new Inet4Subnet());
         
         // NetworkInterface nif = NetworkInterface.getByName("eth0");
-        // Core core = new Core(Inet4Subnet.startSubnet(nif));
+        // Core core = new Core(new Inet4Subnet(nif));
         
         core.startService();
         
@@ -42,6 +41,6 @@ public class SampleDoObserve {
         
         result.stopObserve();
         
-        System.exit(0);
+        core.stopService();
     }
 }

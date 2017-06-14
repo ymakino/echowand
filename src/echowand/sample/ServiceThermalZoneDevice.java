@@ -95,10 +95,10 @@ public class ServiceThermalZoneDevice {
         Core core;
         
         if (args.length == 0) {
-            core = new Core(Inet4Subnet.startSubnet());
+            core = new Core(new Inet4Subnet());
         } else {
             NetworkInterface nif = NetworkInterface.getByName(args[0]);
-            core = new Core(Inet4Subnet.startSubnet(nif));
+            core = new Core(new Inet4Subnet(nif));
         }
         
         int count = countSensors();

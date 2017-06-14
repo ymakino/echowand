@@ -4,6 +4,7 @@ import echowand.common.EOJ;
 import echowand.info.TemperatureSensorInfo;
 import echowand.logic.TooManyObjectsException;
 import echowand.net.InternalSubnet;
+import echowand.net.SubnetException;
 import echowand.object.LocalObject;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -104,7 +105,7 @@ public class PropertyUpdaterTest {
      * Test of doLoopOnce method, of class PropertyUpdater.
      */
     @Test
-    public void testDoLoopOnce() throws TooManyObjectsException {
+    public void testDoLoopOnce() throws TooManyObjectsException, SubnetException {
         PropertyUpdaterImpl updater = new PropertyUpdaterImpl();
         Core core = new Core(new InternalSubnet("PropertyUpdaterTest"));
         LocalObjectConfig conf = new LocalObjectConfig(new TemperatureSensorInfo());

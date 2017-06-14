@@ -36,14 +36,13 @@ public class PropertyUpdaterThreadTest {
         
         updater.finish();
         int count1 = updater.count;
+        System.out.println("Count1: " + count1);
         
-        assertTrue(count1 >= mincount);
-        assertTrue(count1 <= maxcount);
+        assertTrue("count1 >= " + mincount, count1 >= mincount);
+        assertTrue("count1 <= " + maxcount, count1 <= maxcount);
         
         Thread.sleep(sleep2);
         int count2 = updater.count;
-        
-        System.out.println("Count1: " + count1);
         System.out.println("Count2: " + count2);
         
         assertTrue(count1 == count2);
@@ -55,14 +54,14 @@ public class PropertyUpdaterThreadTest {
     @Test
     public void testRunWithoutDelay() throws InterruptedException {
         testRun1(0, 0, 1000, 500, 10000, Integer.MAX_VALUE);
-        testRun1(0, 1, 1000, 500, 500, 1000);
+        testRun1(0, 1, 1000, 500, 980, 1020);
         testRun1(0, 700, 1000, 1000, 2, 2);
     }
     
     @Test
     public void testRunWithDelay() throws InterruptedException {
         testRun1(500, 0, 1000, 500, 10000, Integer.MAX_VALUE);
-        testRun1(500, 1, 1000, 500, 250, 1000);
+        testRun1(500, 1, 1000, 500, 480, 520);
         testRun1(500, 700, 1000, 1000, 1, 1);
     }
 }

@@ -6,12 +6,15 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * IPv6ネットワークのサブネット
  * @author Yoshiki Makino
  */
 public class Inet6Subnet extends InetSubnet {
+    private static final Logger LOGGER = Logger.getLogger(Inet6Subnet.class.getName());
+    private static final String CLASS_NAME = Inet6Subnet.class.getName();
     
     /**
      * IPv6ループバックアドレス
@@ -29,14 +32,20 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "Inet6Subnet");
+        
         try {
             Inet6Address loopbackAddress = (Inet6Address)Inet6Address.getByName(LOOPBACK_ADDRESS);
             Inet6Address multicastAddress = (Inet6Address)Inet6Address.getByName(MULTICAST_ADDRESS);
             
             initialize(loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
-            throw new SubnetException("catched exception", ex);
+            SubnetException exception = new SubnetException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
+        
+        LOGGER.exiting(CLASS_NAME, "Inet6Subnet");
     }
 
     /**
@@ -46,8 +55,12 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(Inet6Address localAddress) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "Inet6Subnet", localAddress);
+        
         if (localAddress == null) {
-            throw new SubnetException("invalid address: " + localAddress);
+            SubnetException exception = new SubnetException("invalid address: " + localAddress);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
         
         try {
@@ -56,8 +69,12 @@ public class Inet6Subnet extends InetSubnet {
             
             initialize(localAddress, new LinkedList<NetworkInterface>(), loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
-            throw new SubnetException("catched exception", ex);
+            SubnetException exception = new SubnetException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
+        
+        LOGGER.exiting(CLASS_NAME, "Inet6Subnet");
     }
 
     /**
@@ -69,8 +86,12 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(Inet6Address localAddress, NetworkInterface... receiverInterfaces) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "Inet6Subnet", new Object[]{localAddress, receiverInterfaces});
+        
         if (localAddress == null) {
-            throw new SubnetException("invalid address: " + localAddress);
+            SubnetException exception = new SubnetException("invalid address: " + localAddress);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
         
         try {
@@ -79,8 +100,12 @@ public class Inet6Subnet extends InetSubnet {
             
             initialize(localAddress, Arrays.asList(receiverInterfaces), loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
-            throw new SubnetException("catched exception", ex);
+            SubnetException exception = new SubnetException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
+        
+        LOGGER.exiting(CLASS_NAME, "Inet6Subnet");
     }
     
     /**
@@ -90,8 +115,12 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(NetworkInterface networkInterface) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "Inet6Subnet", networkInterface);
+        
         if (networkInterface == null) {
-            throw new SubnetException("invalid network interface: " + networkInterface);
+            SubnetException exception = new SubnetException("invalid network interface: " + networkInterface);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
         
         try {
@@ -100,8 +129,12 @@ public class Inet6Subnet extends InetSubnet {
             
             initialize(networkInterface, new LinkedList<NetworkInterface>(), loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
-            throw new SubnetException("catched exception", ex);
+            SubnetException exception = new SubnetException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
+        
+        LOGGER.exiting(CLASS_NAME, "Inet6Subnet");
     }
     
     /**
@@ -113,8 +146,12 @@ public class Inet6Subnet extends InetSubnet {
      * @throws SubnetException 生成に失敗した場合
      */
     public Inet6Subnet(NetworkInterface networkInterface, NetworkInterface... receiverInterfaces) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "Inet6Subnet", new Object[]{networkInterface, receiverInterfaces});
+        
         if (networkInterface == null) {
-            throw new SubnetException("invalid network interface: " + networkInterface);
+            SubnetException exception = new SubnetException("invalid network interface: " + networkInterface);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
         
         try {
@@ -123,8 +160,12 @@ public class Inet6Subnet extends InetSubnet {
             
             initialize(networkInterface, Arrays.asList(receiverInterfaces), loopbackAddress, multicastAddress, DEFAULT_PORT_NUMBER);
         } catch (UnknownHostException ex) {
-            throw new SubnetException("catched exception", ex);
+            SubnetException exception = new SubnetException("catched exception", ex);
+            LOGGER.throwing(CLASS_NAME, "Inet6Subnet", exception);
+            throw exception;
         }
+        
+        LOGGER.exiting(CLASS_NAME, "Inet6Subnet");
     }
     
     /**

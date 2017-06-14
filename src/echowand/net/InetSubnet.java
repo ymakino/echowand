@@ -1,12 +1,12 @@
 package echowand.net;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +38,7 @@ public class InetSubnet implements Subnet {
     private InetNode groupNode;
     private InetNode localNode;
 
-    private SynchronousQueue<Frame> receiveQueue = null;
+    private SimpleSynchronousQueue<Frame> receiveQueue = null;
 
     private InetSubnetUDPReceiverThread udpReceiverThread;
     private InetSubnetTCPReceiverThread tcpReceiverThread;
@@ -128,7 +128,7 @@ public class InetSubnet implements Subnet {
      * @param portNumber ポート番号の指定
      * @throws SubnetException 生成に失敗した場合
      */
-    protected void initialize(InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
+    protected final void initialize(InetAddress loopbackAddress, InetAddress multicastAddress, int portNumber) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "initialize", new Object[]{loopbackAddress, multicastAddress, portNumber});
 
         if (!isValidAddress(loopbackAddress)) {
@@ -250,10 +250,11 @@ public class InetSubnet implements Subnet {
     }
 
     /**
-     * このInetSubnetが実行中であるか返す。
+     * このInetSubnetが処理を行っているか返す。
      *
-     * @return 実行中であればtrue、そうでなければfalse
+     * @return 処理を行っていればtrue、そうでなければfalse
      */
+    @Override
     public synchronized boolean isInService() {
         UDPNetwork network = getUDPNetwork();
 
@@ -267,7 +268,7 @@ public class InetSubnet implements Subnet {
     private synchronized void startThreads() {
         LOGGER.entering(CLASS_NAME, "startThreads");
 
-        receiveQueue = new SynchronousQueue<Frame>();
+        receiveQueue = new SimpleSynchronousQueue<Frame>();
 
         udpReceiverThread = new InetSubnetUDPReceiverThread(this, getUDPNetwork(), receiveQueue);
         udpReceiverThread.start();
@@ -287,17 +288,17 @@ public class InetSubnet implements Subnet {
         LOGGER.entering(CLASS_NAME, "stopThreads");
 
         if (udpReceiverThread != null) {
-            udpReceiverThread.terminate();
+            udpReceiverThread.interrupt();
             udpReceiverThread = null;
         }
 
         if (tcpReceiverThread != null) {
-            tcpReceiverThread.terminate();
+            tcpReceiverThread.interrupt();
             tcpReceiverThread = null;
         }
 
         if (tcpAcceptorThread != null) {
-            tcpAcceptorThread.terminate();
+            tcpAcceptorThread.interrupt();
             tcpAcceptorThread = null;
         }
 
@@ -305,11 +306,12 @@ public class InetSubnet implements Subnet {
     }
 
     /**
-     * このInetSubnetを実行する。
+     * このInetSubnetの処理を開始する。
      *
-     * @return 停止から実行中に変更した場合はtrue、そうでなければfalse
-     * @throws SubnetException 実行に失敗した場合
+     * @return 処理の開始に成功した場合はtrue、すでに処理が開始していた場合にはfalse
+     * @throws SubnetException 処理の開始に失敗した場合
      */
+    @Override
     public synchronized boolean startService() throws SubnetException {
         LOGGER.entering(CLASS_NAME, "startService");
 
@@ -321,37 +323,72 @@ public class InetSubnet implements Subnet {
         try {
             boolean result = getUDPNetwork().startService();
             if (result == false) {
-                LOGGER.exiting(CLASS_NAME, "startService", false);
-                return false;
+                SubnetException exception = new SubnetException("cannot start UDPNetwork");
+                LOGGER.throwing(CLASS_NAME, "startService", exception);
+                throw exception;
             }
 
             result = getTCPReceiver().startService();
             if (result == false) {
                 getUDPNetwork().stopService();
-                LOGGER.exiting(CLASS_NAME, "startService", false);
-                return false;
+                
+                SubnetException exception = new SubnetException("cannot start TCPReceiver");
+                LOGGER.throwing(CLASS_NAME, "startService", exception);
+                throw exception;
             }
 
             if (tcpAcceptorEnabled) {
                 result = getTCPAcceptor().startService();
+                if (result == false) {
+                    getTCPReceiver().stopService();
+                    getUDPNetwork().stopService();
+                    
+                    SubnetException exception = new SubnetException("cannot start TCPAcceptor");
+                    LOGGER.throwing(CLASS_NAME, "startService", exception);
+                    throw exception;
+                }
             }
 
             startThreads();
 
-            LOGGER.exiting(CLASS_NAME, "startService", result);
+            LOGGER.exiting(CLASS_NAME, "startService", true);
             return true;
         } catch (NetworkException ex) {
+            getTCPAcceptor().stopService();
+            getTCPReceiver().stopService();
+            getUDPNetwork().stopService();
+            
             SubnetException exception = new SubnetException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "startService", exception);
             throw exception;
         }
     }
+    
+    private String concatString(List<String> list, String sep1, String sep2) {
+        int size = list.size();
+        StringBuilder builder = new StringBuilder();
+        
+        for (int i=0; i<size; i++) {
+            if (i != 0) {
+                if (i == size - 1) { 
+                    builder.append(sep2);
+                } else {
+                    builder.append(sep1);
+                }
+            }
+            
+            builder.append(list.get(i));
+        }
+        
+        return builder.toString();
+    }
 
     /**
-     * このInetSubnetを停止する。
+     * このInetSubnetの処理を停止する。
      *
-     * @return 実行中から停止に変更した場合はtrue、そうでなければfalse
+     * @return 処理の停止に成功した場合はtrue、すでに処理が停止していた場合にはfalse
      */
+    @Override
     public synchronized boolean stopService() {
         LOGGER.entering(CLASS_NAME, "stopService");
 
@@ -363,16 +400,34 @@ public class InetSubnet implements Subnet {
         }
 
         stopThreads();
+        
+        receiveQueue.disable();
+        
+        LinkedList<String> failed = new LinkedList<String>();
 
         if (tcpAcceptorEnabled) {
-            result &= getTCPAcceptor().stopService();
+            result = getTCPAcceptor().stopService();
+            if (result == false) {
+                failed.add("TCPAcceptor");
+            }
         }
 
-        result &= getTCPReceiver().stopService();
-        result &= getUDPNetwork().stopService();
+        result = getTCPReceiver().stopService();
+        if (result == false) {
+            failed.add("TCPReceiver");
+        }
+            
+        result = getUDPNetwork().stopService();
+        if (result == false) {
+            failed.add("UDPNetwork");
+        }
+        
+        if (failed.size() > 0) {
+            LOGGER.logp(Level.WARNING, CLASS_NAME, "stopService", "cannot stop " + concatString(failed, ", ", " and "));
+        }
 
-        LOGGER.exiting(CLASS_NAME, "stopService", result);
-        return result;
+        LOGGER.exiting(CLASS_NAME, "stopService", true);
+        return true;
     }
 
     /**
@@ -499,6 +554,10 @@ public class InetSubnet implements Subnet {
             SubnetException exception = new SubnetException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "send", exception);
             throw exception;
+        } catch (IOException ex) {
+            SubnetException exception = new SubnetException("I/O error", ex);
+            LOGGER.throwing(CLASS_NAME, "send", exception);
+            throw exception;
         }
 
         LOGGER.exiting(CLASS_NAME, "send");
@@ -508,7 +567,7 @@ public class InetSubnet implements Subnet {
      * このInetSubnetのサブネットからフレームを受信する。 少なくとも1つのフレームの受信を行うまで待機する。
      *
      * @return 受信したFrame
-     * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
+     * @throws SubnetException 受信に失敗した場合
      */
     @Override
     public Frame receive() throws SubnetException {
@@ -519,13 +578,18 @@ public class InetSubnet implements Subnet {
             LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
         }
-
+            
         try {
             Frame frame = receiveQueue.take();
             LOGGER.exiting(CLASS_NAME, "receive", frame);
             return frame;
         } catch (InterruptedException ex) {
-            SubnetException exception = new SubnetException("catched exception", ex);
+            Thread.currentThread().interrupt();
+            SubnetException exception = new SubnetException("interrupted", ex);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
+            throw exception;
+        } catch (SimpleSynchronousQueueException ex) {
+            SubnetException exception = new SubnetException("invalid queue", ex);
             LOGGER.throwing(CLASS_NAME, "receive", exception);
             throw exception;
         }

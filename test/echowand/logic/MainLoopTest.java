@@ -6,6 +6,7 @@ import echowand.object.LocalObjectManager;
 import echowand.net.Frame;
 import echowand.net.InternalSubnet;
 import echowand.net.Subnet;
+import echowand.net.SubnetException;
 import static org.junit.Assert.assertEquals;
 import org.junit.*;
 
@@ -22,9 +23,9 @@ class DummyListener implements Listener {
 public class MainLoopTest {
     
     @Test
-    public void testCreation() {
+    public void testCreation() throws SubnetException {
         MainLoop echonet = new MainLoop();
-        InternalSubnet subnet = new InternalSubnet();
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         echonet.setSubnet(subnet);
         assertEquals(subnet, echonet.getSubnet());
         

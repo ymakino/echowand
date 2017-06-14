@@ -123,10 +123,10 @@ public class SampleLEDLocalObject {
         
         initializeLED();
         
-        Core core = new Core(Inet4Subnet.startSubnet());
+        Core core = new Core(new Inet4Subnet());
         
         // NetworkInterface nif = NetworkInterface.getByName("eth0");
-        // Core core = new Core(Inet4Subnet.startSubnet(nif));
+        // Core core = new Core(new Inet4Subnet(nif));
         
         GeneralLightingInfo info = new GeneralLightingInfo();
         LocalObjectConfig config = new LocalObjectConfig(info);

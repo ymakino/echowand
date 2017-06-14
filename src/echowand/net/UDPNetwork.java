@@ -284,8 +284,9 @@ public class UDPNetwork {
      * @param remoteNodeInfo 送信先のノード情報
      * @param commonFrame 送信する共通フレーム
      * @throws NetworkException 送信に失敗した場合
+     * @throws IOException I/Oエラーが発生した場合
      */
-    public synchronized void send(InetNodeInfo remoteNodeInfo, CommonFrame commonFrame) throws NetworkException {
+    public synchronized void send(InetNodeInfo remoteNodeInfo, CommonFrame commonFrame) throws NetworkException, IOException {
         LOGGER.entering(CLASS_NAME, "send", new Object[]{remoteNodeInfo, commonFrame});
         
         if (!isInService()) {
@@ -296,22 +297,16 @@ public class UDPNetwork {
         
         byte[] data = commonFrame.toBytes();
 
-        try {
-            InetAddress receiver = remoteNodeInfo.getAddress();
-            int port = getPortNumber();
-            
-            if (remoteNodeInfo.hasPortNumber()) {
-                port = remoteNodeInfo.getPortNumber();
-            }
-            
-            DatagramPacket packet = new DatagramPacket(data, data.length, receiver, port);
-            
-            multicastSocket.send(packet);
-        } catch (IOException ex) {
-            NetworkException exception = new NetworkException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "send", exception);
-            throw exception;
+        InetAddress receiver = remoteNodeInfo.getAddress();
+        int port = getPortNumber();
+
+        if (remoteNodeInfo.hasPortNumber()) {
+            port = remoteNodeInfo.getPortNumber();
         }
+
+        DatagramPacket packet = new DatagramPacket(data, data.length, receiver, port);
+
+        multicastSocket.send(packet);
         
         LOGGER.exiting(CLASS_NAME, "send");
     }
@@ -338,41 +333,34 @@ public class UDPNetwork {
      * このUDPNetworkのサブネットからフレームを受信する。
      * 受信を行うまで待機する。
      * @return 受信したFrame
-     * @throws NetworkException 無効なフレームを受信、あるいは受信に失敗した場合
+     * @throws NetworkException 受信に失敗した場合
+     * @throws InvalidDataException 不正なフレームを受信した場合
+     * @throws IOException I/Oエラーが発生した場合
      */
-    public Pair<InetNodeInfo, CommonFrame> receive()  throws NetworkException {
+    public Pair<InetNodeInfo, CommonFrame> receive() throws NetworkException, InvalidDataException, IOException {
         LOGGER.entering(CLASS_NAME, "receive");
         
         if (!isInService()) {
             throw new NetworkException("not working");
         }
         
-        try {
-            DatagramPacket packet = receivePacket();
-            byte[] data = getData(packet);
+        DatagramPacket packet = receivePacket();
+        byte[] data = getData(packet);
 
-            CommonFrame commonFrame = new CommonFrame(data);
-            
-            InetAddress addr = packet.getAddress();
-            
-            Pair<InetNodeInfo, CommonFrame> pair;
-            
-            if (isRemotePortNumberEnabled()) {
-                int port = packet.getPort();
-                pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr, port), commonFrame);
-            } else {
-                pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr), commonFrame);
-            }
-            LOGGER.exiting(CLASS_NAME, "receive", pair);
-            return pair;
-        } catch (IOException ex) {
-            NetworkException exception = new NetworkException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "receive", exception);
-            throw exception;
-        } catch (InvalidDataException ex) {
-            NetworkException exception = new NetworkException("invalid frame", ex);
-            LOGGER.throwing(CLASS_NAME, "receive", exception);
-            throw exception;
+        CommonFrame commonFrame = new CommonFrame(data);
+
+        InetAddress addr = packet.getAddress();
+
+        Pair<InetNodeInfo, CommonFrame> pair;
+
+        if (isRemotePortNumberEnabled()) {
+            int port = packet.getPort();
+            pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr, port), commonFrame);
+        } else {
+            pair = new Pair<InetNodeInfo, CommonFrame>(new InetNodeInfo(addr), commonFrame);
         }
+        
+        LOGGER.exiting(CLASS_NAME, "receive", pair);
+        return pair;
     }
 }

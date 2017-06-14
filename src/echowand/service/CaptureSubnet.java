@@ -213,4 +213,34 @@ public class CaptureSubnet implements ExtendedSubnet {
         
         LOGGER.exiting(CLASS_NAME, "notifyReceived");
     }
+
+    @Override
+    public boolean startService() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "startService");
+        
+        boolean result = internalSubnet.startService();
+        
+        LOGGER.exiting(CLASS_NAME, "startService", result);
+        return result;
+    }
+
+    @Override
+    public boolean stopService() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "stopService");
+        
+        boolean result = internalSubnet.stopService();
+        
+        LOGGER.exiting(CLASS_NAME, "stopService", result);
+        return result;
+    }
+
+    @Override
+    public boolean isInService() {
+        LOGGER.entering(CLASS_NAME, "isInService");
+        
+        boolean result = internalSubnet.isInService();
+        
+        LOGGER.exiting(CLASS_NAME, "isInService", result);
+        return result;
+    }
 }

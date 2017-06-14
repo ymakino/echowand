@@ -68,6 +68,6 @@ public class ServiceDoSetGetSample {
             System.out.println(frame);
         }
 
-        System.exit(0);
+        core.stopService();
     }
 }

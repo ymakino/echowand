@@ -24,7 +24,7 @@ public class LocalObjectNotifyDelegateTest {
     
     @Test
     public void testAnnounce() throws SubnetException {
-        InternalSubnet subnet = new InternalSubnet();
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
         DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
@@ -55,7 +55,7 @@ public class LocalObjectNotifyDelegateTest {
     
     @Test
     public void testNoAnnounceWithoutChanges() throws SubnetException {
-        InternalSubnet subnet = new InternalSubnet();
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
         DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
@@ -73,7 +73,7 @@ public class LocalObjectNotifyDelegateTest {
     
     @Test
     public void testNotAnnounce() throws SubnetException {
-        InternalSubnet subnet = new InternalSubnet();
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         LocalObjectNotifyDelegate delegate = new LocalObjectNotifyDelegate(subnet, transactionManager);
         DeviceObjectInfo objectInfo = new TemperatureSensorInfo();

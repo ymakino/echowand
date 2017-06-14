@@ -1,5 +1,8 @@
 package echowand.net;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author ymakino
@@ -20,7 +23,9 @@ class FrameReceiver extends Thread {
                     break;
                 }
             }
-            this.stop();
+            
+            interrupt();
+            join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

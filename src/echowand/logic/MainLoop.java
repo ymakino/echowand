@@ -5,6 +5,7 @@ import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -150,15 +151,19 @@ public class MainLoop implements Runnable {
 
         try {
             for (;;) {
-                try {
-                    Frame frame = receiveFrame();
-                    invokeListeners(frame);
-                } catch (SubnetException e) {
-                    e.printStackTrace();
+                
+                if (Thread.currentThread().isInterrupted()) {
+                    logger.logp(Level.INFO, className, "run", "interrupted");
+                    break;
                 }
+                
+                Frame frame = receiveFrame();
+                invokeListeners(frame);
             }
-        } finally {
-            logger.exiting(className, "run");
+        } catch (SubnetException ex) {
+            logger.logp(Level.INFO, className, "run", "cannot receive frames", ex);
         }
+        
+        logger.exiting(className, "run");
     }
 }

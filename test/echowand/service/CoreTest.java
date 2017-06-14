@@ -36,7 +36,7 @@ public class CoreTest {
      * Test of addLocalObjectConfig method, of class Core.
      */
     @Test
-    public void testAddLocalObjectConfig() throws TooManyObjectsException {
+    public void testAddLocalObjectConfig() throws TooManyObjectsException, SubnetException {
         ObjectInfo info = new TemperatureSensorInfo();
         LocalObjectConfig config = new LocalObjectConfig(info);
         Core core = newCore();
@@ -103,7 +103,7 @@ public class CoreTest {
      * Test of getTransactionManager method, of class Core.
      */
     @Test
-    public void testGetTransactionManager() throws TooManyObjectsException {
+    public void testGetTransactionManager() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getTransactionManager());
         core.startService();
@@ -114,7 +114,7 @@ public class CoreTest {
      * Test of getRemoteObjectManager method, of class Core.
      */
     @Test
-    public void testGetRemoteObjectManager() throws TooManyObjectsException {
+    public void testGetRemoteObjectManager() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getRemoteObjectManager());
         core.startService();
@@ -125,7 +125,7 @@ public class CoreTest {
      * Test of getLocalObjectManager method, of class Core.
      */
     @Test
-    public void testGetLocalObjectManager() throws TooManyObjectsException {
+    public void testGetLocalObjectManager() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getLocalObjectManager());
         core.startService();
@@ -147,7 +147,7 @@ public class CoreTest {
      * Test of getRequestDispatcher method, of class Core.
      */
     @Test
-    public void testGetRequestDispatcher() throws TooManyObjectsException {
+    public void testGetRequestDispatcher() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getRequestDispatcher());
         core.startService();
@@ -158,7 +158,7 @@ public class CoreTest {
      * Test of getMainLoop method, of class Core.
      */
     @Test
-    public void testGetMainLoop() throws TooManyObjectsException {
+    public void testGetMainLoop() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getMainLoop());
         core.startService();
@@ -169,7 +169,7 @@ public class CoreTest {
      * Test of getSetGetRequestProcessor method, of class Core.
      */
     @Test
-    public void testGetSetGetRequestProcessor() throws TooManyObjectsException {
+    public void testGetSetGetRequestProcessor() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getSetGetRequestProcessor());
         core.startService();
@@ -180,7 +180,7 @@ public class CoreTest {
      * Test of getAnnounceRequestProcessor method, of class Core.
      */
     @Test
-    public void testGetAnnounceRequestProcessor() throws TooManyObjectsException {
+    public void testGetAnnounceRequestProcessor() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getAnnounceRequestProcessor());
         core.startService();
@@ -191,7 +191,7 @@ public class CoreTest {
      * Test of getObserveResultProsessor method, of class Core.
      */
     @Test
-    public void testGetObserveResultProsessor() throws TooManyObjectsException {
+    public void testGetObserveResultProsessor() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getObserveResultProsessor());
         core.startService();
@@ -202,7 +202,7 @@ public class CoreTest {
      * Test of getCaptureFrameObserver method, of class Core.
      */
     @Test
-    public void testGetCaptureFrameObserver() throws TooManyObjectsException {
+    public void testGetCaptureFrameObserver() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertNull(core.getCaptureResultObserver());
         core.startService();
@@ -224,7 +224,7 @@ public class CoreTest {
      * Test of isInService method, of class Core.
      */
     @Test
-    public void testIsInService() throws TooManyObjectsException {
+    public void testIsInService() throws TooManyObjectsException, SubnetException {
         Core core = newCore();
         assertFalse(core.isInService());
         core.initialize();

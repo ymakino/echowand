@@ -11,6 +11,8 @@ import echowand.service.Service;
 import echowand.service.result.GetResult;
 import echowand.service.result.ResultFrame;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
@@ -19,9 +21,9 @@ import java.net.UnknownHostException;
  */
 public class SampleEnableRemotePort {
     
-    public static Service createService(int portNumber) throws SubnetException, TooManyObjectsException {
+    public static Service createService(int portNumber) throws SubnetException, TooManyObjectsException, SocketException {
         Inet4Subnet subnet = new Inet4Subnet();
-        subnet.setPortNumber(3610);
+        subnet.setPortNumber(portNumber);
         subnet.enableRemotePortNumber();
         subnet.startService();
         Core core = new Core(subnet);
@@ -29,7 +31,7 @@ public class SampleEnableRemotePort {
         return new Service(core);
     }
     
-    public static void main(String[] args) throws SubnetException, UnknownHostException, TooManyObjectsException, InterruptedException {
+    public static void main(String[] args) throws SubnetException, UnknownHostException, TooManyObjectsException, InterruptedException, SocketException {
         Service service1 = createService(3610);
         Service service2 = createService(3611);
         
@@ -49,6 +51,7 @@ public class SampleEnableRemotePort {
             System.out.println(frame);
         }
         
-        System.exit(0);
+        service1.getCore().stopService();
+        service2.getCore().stopService();
     }
 }

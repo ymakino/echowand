@@ -3,6 +3,7 @@ package echowand.service;
 import echowand.net.CommonFrame;
 import echowand.net.Frame;
 import echowand.net.InternalSubnet;
+import echowand.net.SubnetException;
 import echowand.service.result.CaptureResult;
 import org.junit.After;
 import org.junit.Before;
@@ -40,8 +41,8 @@ public class CaptureResultObserverTest {
         }
     }
     
-    public CaptureResultObserverTest() {
-        subnet = new InternalSubnet("CaptureFrameObserverTest");
+    public CaptureResultObserverTest() throws SubnetException {
+        subnet = InternalSubnet.startSubnet("CaptureFrameObserverTest");
     }
     
     @Before

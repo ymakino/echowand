@@ -5,6 +5,7 @@ import echowand.logic.TransactionConfig;
 import echowand.common.ESV;
 import echowand.net.InternalSubnet;
 import echowand.net.StandardPayload;
+import echowand.net.SubnetException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -33,8 +34,8 @@ class TestTransactionConfig extends TransactionConfig {
 public class TransactionConfigTest {
     
     @Test
-    public void testSetSenderAndReceiver() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testSetSenderAndReceiver() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TestTransactionConfig config = new TestTransactionConfig();
         assertEquals(null, config.getSenderNode());
         assertEquals(null, config.getReceiverNode());
@@ -45,8 +46,8 @@ public class TransactionConfigTest {
     }
     
     @Test
-    public void testSetSourceAndDestination() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testSetSourceAndDestination() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TestTransactionConfig config = new TestTransactionConfig();
         assertEquals(null, config.getSourceEOJ());
         assertEquals(null, config.getDestinationEOJ());

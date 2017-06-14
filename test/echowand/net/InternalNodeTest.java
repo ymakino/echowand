@@ -33,9 +33,9 @@ public class InternalNodeTest {
     }
     
     @Test
-    public void testCreation() {
-        InternalSubnet subnet1 = new InternalSubnet();
-        InternalSubnet subnet2 = new InternalSubnet();
+    public void testCreation() throws SubnetException {
+        InternalSubnet subnet1 = InternalSubnet.startSubnet();
+        InternalSubnet subnet2 = InternalSubnet.startSubnet();
         
         InternalNode node1 = new InternalNode(subnet1, "node1");
         InternalNode node2 = new InternalNode(subnet2, "node2");

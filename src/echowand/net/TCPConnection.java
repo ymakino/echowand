@@ -79,17 +79,18 @@ public class TCPConnection implements Connection {
                 socket.connect(remoteSocketAddress);
             }
         } catch (IOException ex) {
-            try {
-                socket.close();
-            } catch (IOException ex1) {
-                Logger.getLogger(TCPConnection.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            throw new NetworkException("catched exception", ex);
+            throw new NetworkException("I/O error", ex);
         }
 
         this.localNodeInfo = localNodeInfo;
         this.remoteNodeInfo = remoteNodeInfo;
-        receiver = new CommonFrameReceiver();
+        
+        try {
+            receiver = new CommonFrameReceiver();
+        } catch (IOException ex) {
+            throw new NetworkException("I/O error", ex);
+        }
+        
         observers = new LinkedList<TCPConnectionObserver>();
     }
 
@@ -104,7 +105,13 @@ public class TCPConnection implements Connection {
         this.socket = socket;
         this.localNodeInfo = localNodeInfo;
         this.remoteNodeInfo = remoteNodeInfo;
-        receiver = new CommonFrameReceiver();
+        
+        try {
+            receiver = new CommonFrameReceiver();
+        } catch (IOException ex) {
+            throw new NetworkException("I/O error", ex);
+        }
+        
         observers = new LinkedList<TCPConnectionObserver>();
     }
 
@@ -284,8 +291,7 @@ public class TCPConnection implements Connection {
             os.write(commonFrame.toBytes());
             os.flush();
         } catch (IOException ex) {
-            close();
-            NetworkException exception = new NetworkException("catched exception", ex);
+            NetworkException exception = new NetworkException("I/O error", ex);
             LOGGER.throwing(CLASS_NAME, "send", exception);
             throw exception;
         }
@@ -300,6 +306,7 @@ public class TCPConnection implements Connection {
      *
      * @return 受信したフレーム
      * @throws NetworkException 受信に失敗した場合
+     * @throws IOException IOエラーが発生した場合
      */
     @Override
     public CommonFrame receive() throws NetworkException {
@@ -314,6 +321,14 @@ public class TCPConnection implements Connection {
         CommonFrame commonFrame = null;
         try {
             commonFrame = receiver.receiveCommonFrame();
+        } catch (IOException ex) {
+            NetworkException exception = new NetworkException("I/O error", ex);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
+            throw exception;
+        } catch (InvalidDataException ex) {
+            NetworkException exception = new NetworkException("invalid frame", ex);
+            LOGGER.throwing(CLASS_NAME, "receive", exception);
+            throw exception;
         } finally {
             if (commonFrame == null) {
                 closeInput();
@@ -339,18 +354,12 @@ public class TCPConnection implements Connection {
         private int offset;
         private InputStream is;
 
-        private CommonFrameReceiver() throws NetworkException {
+        private CommonFrameReceiver() throws NetworkException, IOException {
             LOGGER.entering(CLASS_NAME, "CommonFrameReceiver");
 
             resetBuffer();
-
-            try {
-                is = socket.getInputStream();
-            } catch (IOException ex) {
-                NetworkException exception = new NetworkException("catched exception", ex);
-                LOGGER.throwing(CLASS_NAME, "CommonFrameReceiver", exception);
-                throw exception;
-            }
+            
+            is = socket.getInputStream();
 
             LOGGER.exiting(CLASS_NAME, "CommonFrameReceiver");
         }
@@ -475,7 +484,7 @@ public class TCPConnection implements Connection {
             }
         }
 
-        private CommonFrame parseFrame() throws NetworkException {
+        private CommonFrame parseFrame() throws InvalidDataException, NetworkException {
             LOGGER.entering(CLASS_NAME, "parseNextFrame");
 
             CommonFrame commonFrame;
@@ -485,19 +494,19 @@ public class TCPConnection implements Connection {
                 commonFrame = new CommonFrame(currentBuffer);
                 
                 if (!hasStandardPayloadHeader(commonFrame)) {
-                    NetworkException exception = new NetworkException("invalid header: " + commonFrame);
+                    InvalidDataException exception = new InvalidDataException("invalid header: " + commonFrame);
                     LOGGER.throwing(CLASS_NAME, "consumeBuffer", exception);
                     throw exception;
                 }
                 
                 if (!hasValidESV(commonFrame.getEDATA())) {
-                    NetworkException exception = new NetworkException("invalid esv: " + commonFrame);
+                    InvalidDataException exception = new InvalidDataException("invalid esv: " + commonFrame);
                     LOGGER.throwing(CLASS_NAME, "consumeBuffer", exception);
                     throw exception;
                 }
                 
                 if (!hasValidEPCsEach(commonFrame.getEDATA())) {
-                    NetworkException exception = new NetworkException("invalid epcs: " + commonFrame);
+                    InvalidDataException exception = new InvalidDataException("invalid epcs: " + commonFrame);
                     LOGGER.throwing(CLASS_NAME, "consumeBuffer", exception);
                     throw exception;
                 }
@@ -515,18 +524,10 @@ public class TCPConnection implements Connection {
             return commonFrame;
         }
 
-        private int readBytes() throws NetworkException {
+        private int readBytes() throws IOException {
             LOGGER.entering(CLASS_NAME, "readBytes");
 
-            int count;
-
-            try {
-                count = is.read(buffer, offset, getRemain());
-            } catch (IOException ex) {
-                NetworkException exception = new NetworkException("catched exception", ex);
-                LOGGER.throwing(CLASS_NAME, "receiveCommonFrame", exception);
-                throw exception;
-            }
+            int count = is.read(buffer, offset, getRemain());
 
             if (count != -1) {
                 offset += count;
@@ -553,7 +554,7 @@ public class TCPConnection implements Connection {
             LOGGER.exiting(CLASS_NAME, "validateBufferSize");
         }
 
-        public synchronized CommonFrame receiveCommonFrame() throws NetworkException {
+        public synchronized CommonFrame receiveCommonFrame() throws NetworkException, IOException, InvalidDataException {
             LOGGER.entering(CLASS_NAME, "receiveCommonFrame");
 
             CommonFrame commonFrame = parseFrame();

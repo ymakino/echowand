@@ -137,7 +137,7 @@ public class LocalObjectUpdaterTest {
         updater.addPropertyUpdater(propertyUpdater1);
         updater.addPropertyUpdater(propertyUpdater2);
         
-        new Thread(updater).start();
+        updater.start();
         
         Thread.sleep(2000);
         
@@ -150,8 +150,8 @@ public class LocalObjectUpdaterTest {
         System.out.println("Count1: " + count1);
         System.out.println("Count2: " + count2);
         
-        assertTrue(count1 <= 5);
-        assertTrue(count2 <= 10);
+        assertTrue(count1 <= 6);
+        assertTrue(count2 <= 11);
         
         assertTrue(count1 * 2 <= count2);
     }

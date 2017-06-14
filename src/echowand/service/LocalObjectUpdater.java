@@ -9,13 +9,14 @@ import java.util.logging.Logger;
  * 登録されたPropertyUpdaterを定期的に実行
  * @author ymakino
  */
-public class LocalObjectUpdater implements Runnable {
+public class LocalObjectUpdater {
     private static final Logger LOGGER = Logger.getLogger(LocalObjectUpdater.class.getName());
     private static final String CLASS_NAME = LocalObjectUpdater.class.getName();
     
     private LocalObject localObject;
     private Core core;
     private LinkedList<PropertyUpdater> propertyUpdaters;
+    LinkedList<PropertyUpdaterThread> threads;
     
     /**
      * 利用するローカルオブジェクトとCoreを指定してLocalObjectUpdaterを生成する。
@@ -106,16 +107,20 @@ public class LocalObjectUpdater implements Runnable {
         return updater;
     }
     
+    public void terminate() {
+        for (PropertyUpdaterThread thread : threads) {
+            thread.interrupt();
+        }
+    }
+    
     /**
      * アップデート処理を開始する。
      * 登録されたPropertyUpdaterについてPropertyUpdaterThreadを生成して実行を行う。
-     * 全PropertyUpdaterThreadが終了するまで停止する。
      */
-    @Override
-    public void run() {
+    public void start() {
         LOGGER.entering(CLASS_NAME, "run");
         
-        LinkedList<PropertyUpdaterThread> threads = new LinkedList<PropertyUpdaterThread>();
+        threads = new LinkedList<PropertyUpdaterThread>();
         
         for (PropertyUpdater propertyUpdater : propertyUpdaters) {
             propertyUpdater.setCore(core);
@@ -125,14 +130,6 @@ public class LocalObjectUpdater implements Runnable {
 
         for (PropertyUpdaterThread thread : threads) {
             thread.start();
-        }
-
-        for (PropertyUpdaterThread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(LocalObjectUpdater.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
         
         LOGGER.exiting(CLASS_NAME, "run");

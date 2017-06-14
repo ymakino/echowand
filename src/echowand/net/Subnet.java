@@ -10,21 +10,21 @@ public interface Subnet {
      * @param frame 送信するフレーム
      * @throws SubnetException 送信に失敗した場合
      */
-    public void send(Frame frame) throws SubnetException;
+    void send(Frame frame) throws SubnetException;
     
     /**
      * このサブネットからフレームを受信する。
      * 受信を行うまで待機する。
-     * @return 受信したFrame
-     * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
+     * @return 受信したフレーム
+     * @throws SubnetException 受信に失敗した場合
      */
-    public Frame receive() throws SubnetException;
+    Frame receive() throws SubnetException;
     
     /**
      * このサブネットに含まれるローカルノードを表すNodeを返す。
      * @return ローカルノードのNode
      */
-    public Node getLocalNode();
+    Node getLocalNode();
     
     /**
      * このサブネットに含まれるリモートノードを表すNodeを返す。
@@ -32,7 +32,7 @@ public interface Subnet {
      * @return リモートノードのNode
      * @throws SubnetException 適切な名前が指定されなかった場合
      */
-    public Node getRemoteNode(String name) throws SubnetException;
+    Node getRemoteNode(String name) throws SubnetException;
     
     /**
      * このサブネットに含まれるリモートノードを表すNodeを返す。
@@ -40,11 +40,31 @@ public interface Subnet {
      * @return リモートノードのNode
      * @throws SubnetException 適切なNodeInfoが指定されなかった場合
      */
-    public Node getRemoteNode(NodeInfo nodeInfo) throws SubnetException;
+    Node getRemoteNode(NodeInfo nodeInfo) throws SubnetException;
     
     /**
      * このサブネットに含まれるグループを表すNodeを返す。
      * @return グループのNode
      */
-    public Node getGroupNode();
+    Node getGroupNode();
+    
+    /**
+     * このSubnetの処理を開始する。
+     * @return 処理の開始に成功した場合はtrue、すでに処理が開始していた場合にはfalse
+     * @throws SubnetException 処理の開始に失敗した場合
+     */
+    boolean startService() throws SubnetException;
+    
+    /**
+     * このSubnetの処理を停止する。
+     * @return 処理の停止に成功した場合はtrue、すでに処理が停止していた場合にはfalse
+     * @throws SubnetException 処理の停止に失敗した場合
+     */
+    boolean stopService() throws SubnetException;
+    
+    /**
+     * このSubnetが処理中であるかを返す。
+     * @return 処理中であればtrue、そうでなければfalse
+     */
+    boolean isInService();
 }

@@ -8,6 +8,7 @@ import echowand.net.Frame;
 import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
+import echowand.net.SubnetException;
 import echowand.service.CaptureResultObserver;
 import echowand.service.TimestampManager;
 import echowand.util.Selector;
@@ -33,8 +34,8 @@ public class CaptureResultTest {
     }
     
     @BeforeClass
-    public static void setUpClass() {
-        subnet = new InternalSubnet("CaptureResultTest");
+    public static void setUpClass() throws SubnetException {
+        subnet = InternalSubnet.startSubnet("CaptureResultTest");
     }
     
     @AfterClass

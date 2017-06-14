@@ -5,6 +5,7 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.net.InternalSubnet;
 import echowand.net.Node;
+import echowand.net.SubnetException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -22,8 +23,8 @@ public class ReadableConverterMapTest {
     }
 
     @Test
-    public void testPut() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testPut() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");
@@ -41,8 +42,8 @@ public class ReadableConverterMapTest {
     }
     
     @Test
-    public void testPutWildcard() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testPutWildcard() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();;
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");
@@ -86,8 +87,8 @@ public class ReadableConverterMapTest {
     }
     
     @Test
-    public void testPutMultiple() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testPutMultiple() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();;
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");
@@ -139,8 +140,8 @@ public class ReadableConverterMapTest {
     }
     
     @Test
-    public void testClear() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testClear() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();;
         Node node = subnet.getLocalNode();
         EOJ eoj = new EOJ("001101");
         EPC epc = EPC.x80;
@@ -157,8 +158,8 @@ public class ReadableConverterMapTest {
     }
     
     @Test
-    public void testDefaultConverter() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testDefaultConverter() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();;
         Node node = subnet.getLocalNode();
         ClassEOJ ceoj = new ClassEOJ("0011");
         EOJ eoj = new EOJ("001101");

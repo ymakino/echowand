@@ -284,6 +284,23 @@ public class Service {
         return list;
     }
     
+    private Thread createExclusiveThread(final Runnable runnable) {
+        return new Thread() {
+            @Override
+            public void run() {
+                synchronized (getCore().getMainLoop()) {
+                    runnable.run();
+                }
+            }
+        };
+    }
+    
+    public Thread runExclusive(final Runnable runnable) {
+        Thread th = createExclusiveThread(runnable);
+        th.start();
+        return th;
+    }
+    
     public GetResult doGet(Node node, EOJ eoj, List<EPC> epcs, int timeout, GetListener getListener) throws SubnetException {
         LOGGER.entering(CLASS_NAME, "doGet", new Object[]{node, eoj, epcs, timeout, getListener});
         

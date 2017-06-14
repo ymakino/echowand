@@ -66,7 +66,7 @@ public class ServiceTest {
     }
     
     @Before
-    public void setUp() throws TooManyObjectsException {
+    public void setUp() throws TooManyObjectsException, SubnetException {
         Random r = new Random();
         String networkName = Integer.toString(r.nextInt());
         
@@ -92,6 +92,9 @@ public class ServiceTest {
             core.startService();
             service = new Service(core);
         } catch (TooManyObjectsException ex) {
+            Logger.getLogger(ServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+            org.junit.Assert.fail(ex.getMessage());
+        } catch (SubnetException ex) {
             Logger.getLogger(ServiceTest.class.getName()).log(Level.SEVERE, null, ex);
             org.junit.Assert.fail(ex.getMessage());
         }
@@ -376,7 +379,7 @@ public class ServiceTest {
      * Test of isCaptureEnabled method, of class Service.
      */
     @Test
-    public void testIsCaptureEnabled() throws TooManyObjectsException {
+    public void testIsCaptureEnabled() throws TooManyObjectsException, SubnetException {
         System.out.println("isCaptureEnabled");
         startService();
         

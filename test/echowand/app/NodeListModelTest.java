@@ -26,7 +26,7 @@ public class NodeListModelTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        subnet = new InternalSubnet();
+        subnet = InternalSubnet.startSubnet();
         node = subnet.getLocalNode();
         transactionManager = new TransactionManager(subnet);
     }

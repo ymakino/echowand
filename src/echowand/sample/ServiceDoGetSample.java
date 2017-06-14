@@ -44,6 +44,6 @@ public class ServiceDoGetSample {
             System.out.println("Get " + i + ": " + dataList.get(i));
         }
 
-        System.exit(0);
+        core.stopService();
     }
 }

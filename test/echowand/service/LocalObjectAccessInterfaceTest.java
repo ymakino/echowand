@@ -54,9 +54,9 @@ public class LocalObjectAccessInterfaceTest {
     
     @Before
     public void setUp() throws SubnetException {
-        subnet = new InternalSubnet("LocalObjectAccessInterfaceTest");
-        core1 =  new Core(subnet);
-        core2 =  new Core(subnet);
+        subnet = InternalSubnet.startSubnet("LocalObjectAccessInterfaceTest");
+        core1 =  new Core(subnet, false);
+        core2 =  new Core(subnet, false);
         localObject1 = new DummyLocalObject();
         localObject2 = new DummyLocalObject();
     }
@@ -108,7 +108,7 @@ public class LocalObjectAccessInterfaceTest {
     }
 
     @Test
-    public void testGetData_EOJ_EPC() throws TooManyObjectsException {
+    public void testGetData_EOJ_EPC() throws TooManyObjectsException, SubnetException {
         LocalObjectAccessInterface instance = new LocalObjectAccessInterface();
         instance.setLocalObject(localObject1);
         
@@ -123,7 +123,7 @@ public class LocalObjectAccessInterfaceTest {
     }
 
     @Test
-    public void testSetData_EPC_ObjectData() throws TooManyObjectsException {
+    public void testSetData_EPC_ObjectData() throws TooManyObjectsException, SubnetException {
         LocalObjectAccessInterface instance = new LocalObjectAccessInterface();
         instance.setLocalObject(localObject1);
         
@@ -139,7 +139,7 @@ public class LocalObjectAccessInterfaceTest {
     }
 
     @Test
-    public void testSetData_3args() throws TooManyObjectsException {
+    public void testSetData_3args() throws TooManyObjectsException, SubnetException {
         LocalObjectAccessInterface instance = new LocalObjectAccessInterface();
         instance.setLocalObject(localObject1);
         

@@ -36,8 +36,8 @@ public class TransactionManagerTest {
     }
     
     @Test
-    public void testGetResponse() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testGetResponse() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         CommonFrame frame = new CommonFrame();
@@ -52,8 +52,8 @@ public class TransactionManagerTest {
     }
     
     @Test
-    public void testGetResponseSNA() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testGetResponseSNA() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         CommonFrame frame = new CommonFrame();
@@ -67,8 +67,8 @@ public class TransactionManagerTest {
     }
     
     @Test
-    public void testCreateTransaction() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testCreateTransaction() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         TransactionConfig config = new SetGetTransactionConfig();
         Transaction t = transactionManager.createTransaction(config);

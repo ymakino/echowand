@@ -50,8 +50,10 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     public int getDelay() {
         LOGGER.entering(CLASS_NAME, "getDelay");
         
-        LOGGER.exiting(CLASS_NAME, "getDelay");
-        return delay;
+        int result = delay;
+        
+        LOGGER.exiting(CLASS_NAME, "getDelay", result);
+        return result;
     }
     
     /**
@@ -73,8 +75,10 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     public int getIntervalPeriod() {
         LOGGER.entering(CLASS_NAME, "getIntervalPeriod");
         
-        LOGGER.exiting(CLASS_NAME, "getIntervalPeriod");
-        return intervalPeriod;
+        int result = intervalPeriod;
+        
+        LOGGER.exiting(CLASS_NAME, "getIntervalPeriod", result);
+        return result;
     }
     
     /**
@@ -93,7 +97,11 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
      * 定期的実行を終了する。
      */
     public synchronized void finish() {
+        LOGGER.entering(CLASS_NAME, "finish");
+        
         done = true;
+        
+        LOGGER.exiting(CLASS_NAME, "finish");
     }
     
     /**
@@ -101,7 +109,12 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
      * @return 定期的実行が終了している場合にはtrue、そうでなければfalse
      */
     public synchronized boolean isDone() {
-        return done;
+        LOGGER.entering(CLASS_NAME, "isDone");
+        
+        boolean result = done;
+        
+        LOGGER.exiting(CLASS_NAME, "isDone", result);
+        return result;
     }
 
     /**
@@ -126,7 +139,7 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
     }
     
     /**
-     * 定期的に実行される。
+     * 定期的に呼び出される。
      * @param localObject 設定されているローカルオブジェクト
      */
     public abstract void loop(LocalObject localObject);
@@ -137,5 +150,8 @@ public abstract class PropertyUpdater extends LocalObjectAccessInterface {
      * @param core 利用するCoreの指定
      */
     public void notifyCreation(LocalObject object, Core core) {
+        LOGGER.entering(CLASS_NAME, "notifyCreation", new Object[]{object, core});
+        
+        LOGGER.exiting(CLASS_NAME, "notifyCreation");
     }
 }

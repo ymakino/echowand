@@ -38,6 +38,7 @@ public class SampleLazyConfiguration {
         @Override
         public void configure(final LocalObjectConfig config, final Core core) {
             config.addPropertyDelegate(new SamplePropertyDelegate() {
+                @Override
                 public ObjectData getUserData(LocalObject object, EPC epc) {
                     return new ObjectData((byte) core.getLocalObjectManager().size());
                 }
@@ -70,6 +71,6 @@ public class SampleLazyConfiguration {
         StandardPayload standardPayload = commonFrame.getEDATA(StandardPayload.class);
         System.out.println(standardPayload.getFirstPropertyAt(0));
         
-        System.exit(0);
+        core.stopService();
     }
 }

@@ -5,6 +5,7 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.common.ESV;
 import echowand.net.InternalSubnet;
+import echowand.net.SubnetException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,8 +21,8 @@ public class ResultDataTest {
     public InternalSubnet subnet;
     
     @Before
-    public void setUp() {
-        subnet = new InternalSubnet("ResultDataTest");
+    public void setUp() throws SubnetException {
+        subnet = InternalSubnet.startSubnet("ResultDataTest");
     }
 
     /**

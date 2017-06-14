@@ -1,13 +1,20 @@
 package echowand.net;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * プログラム内でのみ有効なサブネット
  * InternalSubnetを生成する度にユニークなIDが割り振られる。
  * @author Yoshiki Makino
  */
 public class InternalSubnet implements Subnet {
+    private static final Logger LOGGER = Logger.getLogger(InternalSubnet.class.getName());
+    private static final String CLASS_NAME = InternalSubnet.class.getName();
+    
     private static int nextId = 0;
     
+    private boolean inService = false;
     private InternalNetwork network;
     private int id;
     
@@ -30,18 +37,38 @@ public class InternalSubnet implements Subnet {
     /**
      * InternalSubnetを生成する。
      * 指定された名前のInternalNetworkに接続する。
-     * param networkName 接続するInternalNetworkの名前
      * @param networkName 接続するInternalNetworkの名前の指定
      */
     public InternalSubnet(String networkName) {
         initialize(InternalNetwork.getByName(networkName));
     }
     
+    /**
+     * InternalSubnetを生成し、サービスを開始する。
+     * @return 生成したInternalSubnet
+     */
+    public static InternalSubnet startSubnet() throws SubnetException {
+        InternalSubnet subnet = new InternalSubnet();
+        subnet.startService();
+        return subnet;
+    }
+    
+    /**
+     * InternalSubnetを生成する。
+     * networkNameにより接続するInternalNetworkの指定を行う。
+     * @param networkName 接続するInternalNetworkの名前の指定
+     * @return 生成したInternalSubnet
+     */
+    public static InternalSubnet startSubnet(String networkName) throws SubnetException {
+        InternalSubnet subnet = new InternalSubnet(networkName);
+        subnet.startService();
+        return subnet;
+    }
+    
     private void initialize(InternalNetwork network) {
         id = getNextId();
         port = new InternalNetworkPort();
         this.network = network;
-        network.addPort(port);
     }
     
     private void validateSender(Frame frame) throws SubnetException {
@@ -86,13 +113,13 @@ public class InternalSubnet implements Subnet {
      * このInternalSubnetのサブネットからフレームを受信する。
      * 受信を行うまで待機する。
      * @return 受信したFrame
-     * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
+     * @throws SubnetException 受信に失敗した場合
      */
     @Override
     public Frame receive() throws SubnetException {
         for (;;) {
             Frame frame = port.receive();
-            
+
             if (shouldLocalNodeReceive(frame)) {
                 return frame;
             }
@@ -104,7 +131,7 @@ public class InternalSubnet implements Subnet {
      * このInternalSubnetのサブネットからフレームを受信する。
      * 受信フレームがない場合には即座に戻る。
      * @return 受信したFrame、もし受信フレームがない場合にはnull
-     * @throws SubnetException 無効なフレームを受信、あるいは受信に失敗した場合
+     * @throws SubnetException 受信に失敗した場合
      */
     public Frame receiveNoWait() throws SubnetException {
         for (;;) {
@@ -174,5 +201,46 @@ public class InternalSubnet implements Subnet {
      */
     public int getId() {
         return id;
+    }
+
+    @Override
+    public synchronized boolean startService() throws SubnetException {
+        if (inService) {
+            return false;
+        }
+        
+        boolean result = network.addPort(port);
+        
+        if (result == false) {
+            SubnetException exception = new SubnetException("cannot add port");
+            LOGGER.throwing(CLASS_NAME, "startService", exception);
+            throw exception;
+        }
+        
+        inService = true;
+        
+        return result;
+    }
+
+    @Override
+    public synchronized boolean stopService() {
+        if (!inService) {
+            return false;
+        }
+        
+        boolean result = network.removePort(port);
+        
+        if (result == false) {
+            LOGGER.logp(Level.WARNING, CLASS_NAME, "stopService", "cannot remove port");
+        }
+        
+        inService = false;
+        
+        return true;
+    }
+
+    @Override
+    public synchronized boolean isInService() {
+        return inService;
     }
 }

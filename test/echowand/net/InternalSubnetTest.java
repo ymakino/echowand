@@ -15,8 +15,8 @@ import static org.junit.Assert.*;
 public class InternalSubnetTest {
     
     @Test
-    public void testCreation() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testCreation() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         
@@ -39,8 +39,8 @@ public class InternalSubnetTest {
     }
     
     @Test
-    public void testSendAndReceiveSameNode() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testSendAndReceiveSameNode() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
 
@@ -72,10 +72,10 @@ public class InternalSubnetTest {
     }
     
     @Test
-    public void testSendAndReceive() {
-        InternalSubnet subnet1 = new InternalSubnet();
-        InternalSubnet subnet2 = new InternalSubnet();
-        InternalSubnet subnet3 = new InternalSubnet();
+    public void testSendAndReceive() throws SubnetException {
+        InternalSubnet subnet1 = InternalSubnet.startSubnet();
+        InternalSubnet subnet2 = InternalSubnet.startSubnet();
+        InternalSubnet subnet3 = InternalSubnet.startSubnet();
         Node local1 = subnet1.getLocalNode();
         Node group1 = subnet1.getGroupNode();
 
@@ -141,8 +141,8 @@ public class InternalSubnetTest {
     }
     
     @Test
-    public void testReceiveNoWait() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testReceiveNoWait() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         try {
             Frame frame = subnet.receiveNoWait();
             assertEquals(null, frame);
@@ -153,10 +153,10 @@ public class InternalSubnetTest {
     }
     
     @Test
-    public void testGetRemoteNode() {
-        InternalSubnet subnet1 = new InternalSubnet();
-        InternalSubnet subnet2 = new InternalSubnet();
-        InternalSubnet subnet3 = new InternalSubnet("OTHER");
+    public void testGetRemoteNode() throws SubnetException {
+        InternalSubnet subnet1 = InternalSubnet.startSubnet();
+        InternalSubnet subnet2 = InternalSubnet.startSubnet();
+        InternalSubnet subnet3 = InternalSubnet.startSubnet("OTHER");
         
         Node node1local = subnet1.getLocalNode();
         String node1name = ((InternalNode)node1local).getName();
@@ -170,10 +170,10 @@ public class InternalSubnetTest {
     }
     
     @Test
-    public void testGroupNodeEquallity() {
-        InternalSubnet subnet1 = new InternalSubnet();
-        InternalSubnet subnet2 = new InternalSubnet();
-        InternalSubnet subnet3 = new InternalSubnet("OTHER");
+    public void testGroupNodeEquallity() throws SubnetException {
+        InternalSubnet subnet1 = InternalSubnet.startSubnet();
+        InternalSubnet subnet2 = InternalSubnet.startSubnet();
+        InternalSubnet subnet3 = InternalSubnet.startSubnet("OTHER");
         
         Node node1 = subnet1.getGroupNode();
         assertTrue(subnet2.getGroupNode().equals(node1));

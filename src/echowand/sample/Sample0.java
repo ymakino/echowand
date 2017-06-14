@@ -7,6 +7,8 @@ import echowand.common.ESV;
 import echowand.net.*;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * フレームの送受信を行うサンプルプログラム

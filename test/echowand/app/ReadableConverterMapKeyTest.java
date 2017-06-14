@@ -5,6 +5,7 @@ import echowand.common.EOJ;
 import echowand.common.EPC;
 import echowand.net.InternalSubnet;
 import echowand.net.Subnet;
+import echowand.net.SubnetException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -21,8 +22,8 @@ public class ReadableConverterMapKeyTest {
      * Test of includes method, of class ReadableConverterMapKey.
      */
     @Test
-    public void testIncludes() {
-        Subnet subnet = new InternalSubnet();
+    public void testIncludes() throws SubnetException {
+        Subnet subnet = InternalSubnet.startSubnet();
         ReadableConverterMapKey key1 = new ReadableConverterMapKey(null, null, null, EPC.x80);
         assertTrue(key1.includes(new ReadableConverterMapKey(null, null, null, EPC.x80)));
         assertTrue(key1.includes(new ReadableConverterMapKey(null, new ClassEOJ("0011"), new EOJ("001101"), EPC.x80)));
@@ -52,8 +53,8 @@ public class ReadableConverterMapKeyTest {
      * Test of isBetterThan method, of class ReadableConverterMapKey.
      */
     @Test
-    public void testIsBetterThan() {
-        Subnet subnet = new InternalSubnet();
+    public void testIsBetterThan() throws SubnetException {
+        Subnet subnet = InternalSubnet.startSubnet();
         ReadableConverterMapKey key1 = new ReadableConverterMapKey(null, null, null, EPC.x80);
         assertTrue(key1.isBetterThan(new ReadableConverterMapKey(null, null, null, EPC.x80)));
         assertFalse(key1.isBetterThan(new ReadableConverterMapKey(null, new ClassEOJ("0011"), new EOJ("001101"), EPC.x80)));
@@ -98,8 +99,8 @@ public class ReadableConverterMapKeyTest {
      * Test of equals method, of class ReadableConverterMapKey.
      */
     @Test
-    public void testEquals() {
-        Subnet subnet = new InternalSubnet();
+    public void testEquals() throws SubnetException {
+        Subnet subnet = InternalSubnet.startSubnet();
         ReadableConverterMapKey key = new ReadableConverterMapKey(subnet.getLocalNode(), new ClassEOJ("0011"), new EOJ("001101"), EPC.x80);
         
         assertTrue(key.equals(new ReadableConverterMapKey(subnet.getLocalNode(), new ClassEOJ("0011"), new EOJ("001101"), EPC.x80)));
@@ -113,8 +114,8 @@ public class ReadableConverterMapKeyTest {
      * Test of hashCode method, of class ReadableConverterMapKey.
      */
     @Test
-    public void testHashCode() {
-        Subnet subnet = new InternalSubnet();
+    public void testHashCode() throws SubnetException {
+        Subnet subnet = InternalSubnet.startSubnet();
         ReadableConverterMapKey key1 = new ReadableConverterMapKey(subnet.getLocalNode(), new ClassEOJ("0011"), new EOJ("001101"), EPC.x80);
         assertTrue(key1.hashCode() == new ReadableConverterMapKey(subnet.getLocalNode(), new ClassEOJ("0011"), new EOJ("001101"), EPC.x80).hashCode());
         

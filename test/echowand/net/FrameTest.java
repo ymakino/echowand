@@ -17,8 +17,8 @@ import org.junit.*;
 public class FrameTest {
     
     @Test
-    public void testCreation() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testCreation() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         
         Node node = subnet.getGroupNode();
         CommonFrame cf = new CommonFrame(new EOJ("001101"), new EOJ("002201"), ESV.Get);

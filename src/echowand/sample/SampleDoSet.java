@@ -20,10 +20,10 @@ import java.net.SocketException;
 public class SampleDoSet {
     public static void main(String[] args) throws InterruptedException, SubnetException, TooManyObjectsException, SocketException {
         
-        Core core = new Core(Inet4Subnet.startSubnet());
+        Core core = new Core(new Inet4Subnet());
         
         // NetworkInterface nif = NetworkInterface.getByName("eth0");
-        // Core core = new Core(Inet4Subnet.startSubnet(nif));
+        // Core core = new Core(new Inet4Subnet(nif));
         
         core.startService();
         
@@ -41,6 +41,6 @@ public class SampleDoSet {
             System.out.println("Data " + i + ": " + result.getData(i));
         }
         
-        System.exit(0);
+        core.stopService();
     }
 }

@@ -11,6 +11,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.net.Subnet;
+import echowand.net.SubnetException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,8 +46,8 @@ public class CaptureSubnetTest {
         
     }
     
-    public CaptureSubnetTest() {
-        internalSubnet = new InternalSubnet("CaptureSubnetTest");
+    public CaptureSubnetTest() throws SubnetException {
+        internalSubnet = InternalSubnet.startSubnet("CaptureSubnetTest");
     }
     
     @Before

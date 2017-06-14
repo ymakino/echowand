@@ -23,10 +23,10 @@ public class SampleHumanDetectionLocalObject {
     
     public static void main(String[] args) throws Exception {
         
-        Core core = new Core(Inet4Subnet.startSubnet());
+        Core core = new Core(new Inet4Subnet());
         
         // NetworkInterface nif = NetworkInterface.getByName("eth0");
-        // Core core = new Core(Inet4Subnet.startSubnet(nif));
+        // Core core = new Core(new Inet4Subnet(nif));
         
         HumanDetectionSensorInfo info = new HumanDetectionSensorInfo();
         LocalObjectConfig config = new LocalObjectConfig(info);

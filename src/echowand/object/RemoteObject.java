@@ -10,6 +10,7 @@ import echowand.logic.TransactionListener;
 import echowand.logic.TransactionManager;
 import echowand.net.*;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -315,7 +316,7 @@ public class RemoteObject implements EchonetObject {
      * EPCのデータを取得するためにTransactionを実行する。
      * @param epc EPCの指定
      * @return 指定したEPCのデータ
-     * @throws EchonetObjectException ネットワークに問題が発生した場合
+     * @throws EchonetObjectException データのGet中にエラーが発生した場合
      */
     @Override
     public ObjectData getData(EPC epc) throws EchonetObjectException {
@@ -340,6 +341,7 @@ public class RemoteObject implements EchonetObject {
         try {
             transaction.join();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             EchonetObjectException exception = new EchonetObjectException("interrupted", e);
             logger.throwing(className, "getData", exception);
             throw exception;
@@ -396,7 +398,7 @@ public class RemoteObject implements EchonetObject {
      * @param epc EPCの指定
      * @param data セットするデータの指定
      * @return セットを受け付けた場合にはtrue、そうでなければfalse
-     * @throws EchonetObjectException ネットワークに問題が発生した場合
+     * @throws EchonetObjectException データのSet中にエラーが発生した場合
      */
     @Override
     public boolean setData(EPC epc, ObjectData data) throws EchonetObjectException {
@@ -412,12 +414,16 @@ public class RemoteObject implements EchonetObject {
 
         try {
             transaction.execute();
-            transaction.join();
         } catch (SubnetException e) {
             EchonetObjectException exception = new EchonetObjectException("setData failed", e);
             logger.throwing(className, "setData", exception);
             throw exception;
+        }
+        
+        try {
+            transaction.join();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             EchonetObjectException exception = new EchonetObjectException("interrupted", e);
             logger.throwing(className, "setData", exception);
             throw exception;

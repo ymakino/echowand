@@ -49,8 +49,8 @@ public class AnnounceRequestProcessorTest {
     }
     
     @Test
-    public void testProcessFrameToInvalidEOJ() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testProcessFrameToInvalidEOJ() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         LocalObjectManager localManager = new LocalObjectManager();
         RemoteObjectManager remoteManager = new RemoteObjectManager();
         AnnounceRequestProcessor listener = new AnnounceRequestProcessor(localManager, remoteManager);
@@ -64,8 +64,8 @@ public class AnnounceRequestProcessorTest {
     }
     
     @Test
-    public void testProcessFrame() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testProcessFrame() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         LocalObjectManager localManager = new LocalObjectManager();
         try {
             localManager.add(new LocalObject(new NodeProfileInfo()));
@@ -98,8 +98,8 @@ public class AnnounceRequestProcessorTest {
     }
     
     @Test
-    public void testProcessFrameToMulti() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testProcessFrameToMulti() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         LocalObjectManager localManager = new LocalObjectManager();
         TemperatureSensorInfo info = new TemperatureSensorInfo();
         try {

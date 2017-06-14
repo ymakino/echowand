@@ -10,6 +10,7 @@ import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
 import echowand.net.Subnet;
+import echowand.net.SubnetException;
 import echowand.service.TimestampManager;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,8 +32,8 @@ public class ResultBaseTest {
     }
     
     @Before
-    public void setUp() {
-        subnet = new InternalSubnet();
+    public void setUp() throws SubnetException {
+        subnet = InternalSubnet.startSubnet();
         resultBase = new ResultBaseImpl();
     }
     

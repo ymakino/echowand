@@ -107,8 +107,9 @@ public class TCPAcceptor {
      * 新たに生成されたTCPAcceptorを返す。
      * @return 新たに生成されたTCPConnection
      * @throws NetworkException TCPConnectionの生成に失敗した場合
+     * @throws IOException I/Oエラーが発生した場合
      */
-    public TCPConnection accept() throws NetworkException {
+    public TCPConnection accept() throws NetworkException, IOException {
         LOGGER.entering(CLASS_NAME, "accept");
         
         ServerSocket ss = getServerSocket();
@@ -119,21 +120,15 @@ public class TCPAcceptor {
             throw exception;
         }
         
-        try {
-            Socket socket = ss.accept();
-            NodeInfo localNodeInfo = new InetNodeInfo(socket.getLocalAddress());
-            NodeInfo remoteNodeInfo = new InetNodeInfo(socket.getInetAddress());
-            TCPConnection connection = new TCPConnection(socket, localNodeInfo, remoteNodeInfo);
-            
-            notifyAccepted(connection);
-            
-            LOGGER.exiting(CLASS_NAME, "accept", connection);
-            return connection;
-        } catch (IOException ex) {
-            NetworkException exception = new NetworkException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "accept", exception);
-            throw exception;
-        }
+        Socket socket = ss.accept();
+        NodeInfo localNodeInfo = new InetNodeInfo(socket.getLocalAddress());
+        NodeInfo remoteNodeInfo = new InetNodeInfo(socket.getInetAddress());
+        TCPConnection connection = new TCPConnection(socket, localNodeInfo, remoteNodeInfo);
+
+        notifyAccepted(connection);
+
+        LOGGER.exiting(CLASS_NAME, "accept", connection);
+        return connection;
     }
     
     /**
@@ -162,13 +157,6 @@ public class TCPAcceptor {
             }
             serverSocket.bind(saddr);
         } catch (IOException ex) {
-            if (serverSocket != null) {
-                try {
-                    serverSocket.close();
-                } catch (IOException ex1) {
-                }
-            }
-            
             NetworkException exception = new NetworkException("catched exception", ex);
             LOGGER.throwing(CLASS_NAME, "startService", exception);
             throw exception;

@@ -60,7 +60,8 @@ public class TransactionTest {
     
     @Before
     public void setUp() throws SubnetException {
-        subnet = new InternalSubnet();
+        subnet = InternalSubnet.startSubnet();
+        
         transactionManager = new TransactionManager(subnet);
         transactionConfig1 = new DummyTransactionConfig(ESV.Get, 1);
         transactionConfig1.setSenderNode(subnet.getLocalNode());
@@ -82,6 +83,8 @@ public class TransactionTest {
                 throw new SubnetException("failSendSubnet");
             }
         };
+        failSendSubnet.startService();
+        
         failSendTransactionManager = new TransactionManager(failSendSubnet);
         failSendTransactionConfig = new DummyTransactionConfig(ESV.Get, 1);
         failSendTransactionConfig.setSenderNode(failSendSubnet.getLocalNode());

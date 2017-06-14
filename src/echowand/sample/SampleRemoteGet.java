@@ -21,10 +21,10 @@ import java.net.SocketException;
 public class SampleRemoteGet {
     public static void main(String[] args) throws InterruptedException, SubnetException, TooManyObjectsException, SocketException, EchonetObjectException {
         
-        Core core = new Core(Inet4Subnet.startSubnet());
+        Core core = new Core(new Inet4Subnet());
         
         // NetworkInterface nif = NetworkInterface.getByName("eth0");
-        // Core core = new Core(Inet4Subnet.startSubnet(nif));
+        // Core core = new Core(new Inet4Subnet(nif));
         
         core.startService();
         
@@ -40,6 +40,7 @@ public class SampleRemoteGet {
         ObjectData data = remoteObject.getData(epc);
 
         System.out.println(data);
-        System.exit(0);
+        
+        core.stopService();
     }
 }

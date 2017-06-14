@@ -1,5 +1,6 @@
 package echowand.net;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,7 +14,6 @@ public class InetSubnetTCPAcceptorThread extends Thread {
 
     private InetSubnet subnet;
     private TCPAcceptor acceptor;
-    private boolean terminated = false;
 
     /**
      * InetSubnetTCPAcceptorThreadを生成する。
@@ -24,33 +24,38 @@ public class InetSubnetTCPAcceptorThread extends Thread {
         this.subnet = subnet;
         this.acceptor = acceptor;
     }
-    
-    /**
-     * このスレッドの停止を行う。
-     * 強制的な割り込みを行うわけではないので、即座に終了しない可能性がある。
-     */
-    public void terminate() {
-        LOGGER.entering(CLASS_NAME, "terminate");
-        
-        terminated = true;
-        
-        LOGGER.exiting(CLASS_NAME, "terminate");
-    }
 
+    private boolean doWork() {
+        LOGGER.entering(CLASS_NAME, "doWork");
+        
+        boolean repeat = true;
+
+        try {
+            TCPConnection connection = acceptor.accept();
+            subnet.registerTCPConnection(connection);
+            LOGGER.logp(Level.FINE, CLASS_NAME, "doWork", "accept", connection);
+        } catch (NetworkException ex) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "doWork", "cannot accept connections", ex);
+            repeat = false;
+        } catch (IOException ex) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "doWork", "I/O error", ex);
+            repeat = false;
+        }
+
+        LOGGER.exiting(CLASS_NAME, "doWork", repeat);
+        return repeat;
+    }
+    
     @Override
     public void run() {
         LOGGER.entering(CLASS_NAME, "run");
-
-        while (!terminated) {
-            try {
-                TCPConnection connection = acceptor.accept();
-                subnet.registerTCPConnection(connection);
-                LOGGER.logp(Level.FINE, CLASS_NAME, "run", "accept", connection);
-            } catch (NetworkException ex) {
-                LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
+        
+        while (!isInterrupted()) {
+            if (!doWork()) {
+                break;
             }
         }
-
+        
         LOGGER.exiting(CLASS_NAME, "run");
     }
 }

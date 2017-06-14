@@ -26,7 +26,7 @@ ECHONET Lite について
 ECHONET Lite は家電を制御することを目的とし、2011年に公開されたネットワークプロトコル規格です。
 詳しくは[エコーネットコンソーシアムのページ](http://www.echonet.gr.jp)をご覧ください。
 
-###ECHONET Lite 規格認証###
+### ECHONET Lite 規格認証 ###
 ECHONET Lite 規格に適合し相互接続性を保証するために
 [エコーネットコンソーシアム](http://www.echonet.gr.jp)では
 [認証制度](http://www.echonet.gr.jp/kikaku_ninsyo/index.htm)を設けています。
@@ -39,12 +39,12 @@ echowandを利用していますが、ECHONET Lite 規格認証の申請を行�
 echowandの基本的な使い方
 ---------
 
-###開発環境###
+### 開発環境 ###
 echowandは[NetBeans](http://netbeans.org/)を利用して開発しています。その他の環境での動作確認はしておりません。
 開発には[Oracle JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 を利用していますが、JDK 6以降であれば問題なく動作するはずです。
 
-###`Core`の生成と初期化###
+### `Core`の生成と初期化 ###
 `echowand.service.Core`クラス(以下`Core`とする)を利用することでライブラリの初期化を
 容易に行うことが可能です。もし個別の機能を独立して利用する場合には、`Core`を利用せずに
 必要なクラスのインスタンスを個別に生成し初期化を行う必要があります。
@@ -80,7 +80,7 @@ _Mac OS XでIPv4を利用する際には、実行時に以下のオプション�
 
 _Netbeansのプロジェクトを利用し、プロジェクト実行時にこのオプションを指定したい場合には、`プロジェクト・プロパティ`ウィンドウの`カテゴリ`から`実行`を選択し、上記の行を`VMオプション`に記述しておきます。_
 
-###ローカルオブジェクト情報の作成###
+### ローカルオブジェクト情報の作成 ###
 ECHONET Liteのローカルオブジェクト情報の作成を行います。ここで設定した情報に基づき
 ローカルオブジェクトが生成されます。
 ローカルオブジェクトを利用しないコントローラを実装する場合には本節はスキップしてください。
@@ -183,7 +183,7 @@ _EPCが80であるプロパティの値を30に設定すると点灯、31に設�
 pi@raspberrypi ~ $ java -cp echowand.jar echowand.sample.SampleLEDLocalObject
  ```
 
-###`Core`の処理を開始###
+### `Core`の処理を開始 ###
 ここまでの処理で`Core`の作成は完了しますがローカルオブジェクトの生成やその他の初期化等は
 行われていません。
 `startService`メソッドを呼び出すことで初期化が行われネットワークの送受信処理を開始します。
@@ -200,7 +200,7 @@ core.startService();
 Service service = new Service(core);
 ```
 
-###`doGet`を利用したGET処理###
+### `doGet`を利用したGET処理 ###
 `Service`の`doGet`メソッドを利用する方法を説明します。
 
 与える引数の異なる`doGet`メソッドが複数あるので、適切な`doGet`を選択します。
@@ -244,7 +244,7 @@ for (int i=0; i<result.countData(); i++) {
 にあります。
 
 
-###`doSet`を利用したSET処理###
+### `doSet`を利用したSET処理 ###
 ここでは`Service`の`doSet`メソッドを利用する方法を説明します。
 
 与える引数の異なる`doSet`メソッドが複数あるので、適切な`doSet`を選択します。
@@ -280,7 +280,7 @@ for (int i=0; i<result.countData(); i++) {
 [echowand.sample.SampleDoSet.java](https://github.com/ymakino/echowand/blob/master/src/echowand/sample/SampleDoSet.java)
 にあります。
 
-###`doObserve`を利用した状変時アナウンス受信処理###
+### `doObserve`を利用した状変時アナウンス受信処理 ###
 `Service`の`doObserve`メソッドを利用する方法を説明します。
 
 与える引数の異なる`doObserve`メソッドが複数あるので、適切な`doObserve`を選択します。
@@ -322,7 +322,7 @@ result.stopObserve();
 [echowand.sample.SampleDoObserve.java](https://github.com/ymakino/echowand/blob/master/src/echowand/sample/SampleDoObserve.java)
 にあります。
 
-###`RemoteObject`を利用したGET、SET処理###
+### `RemoteObject`を利用したGET、SET処理 ###
 GETやSETの対象となるリモートオブジェクトが1つ、さらに一度にSETやGETを行うEPCの数が1つの場合には
 `echowand.object.RemoteObject`(以下`RemoteObject`とする)を利用して処理を行うことも可能です。
 
@@ -370,7 +370,7 @@ boolean result = remoteObject.setData(epc, data);
 [echowand.sample.SampleRemoteSet.java](https://github.com/ymakino/echowand/blob/master/src/echowand/sample/SampleRemoteSet.java)
 にあります。
 
-###`RemoteObject`を利用した状変時アナウンス処理###
+### `RemoteObject`を利用した状変時アナウンス処理 ###
 `RemoteObject`を利用した状変時アナウンス処理を行うことも可能です。
 
 状変時アナウンスの処理を行うためには`echowand.object.RemoteObjectObserver`
@@ -396,7 +396,7 @@ remoteObject.addObserver(new RemoteObjectObserver() {
 [echowand.sample.SampleRemoteObserver.java](https://github.com/ymakino/echowand/blob/master/src/echowand/sample/SampleRemoteObserver.java)
 にあります。
 
-###その他の機能###
+### その他の機能 ###
 `Service`には他にも以下のような機能があります。
 
 * `doSetGet`: SetGet処理を実行

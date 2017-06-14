@@ -101,7 +101,7 @@ public class ServiceSample0 {
             // Construct a Core
             // NetworkInterface ni = NetworkInterface.getByName("eth9");
             NetworkInterface ni = NetworkInterface.getByName("en0");
-            Subnet subnet = new CaptureSubnet(Inet4Subnet.startSubnet(ni));
+            Subnet subnet = new CaptureSubnet(new Inet4Subnet(ni));
             Core core = new Core(subnet);
             
             // Create a device object information
@@ -212,7 +212,7 @@ public class ServiceSample0 {
                 System.out.println("Capture: " + resultFrame);
             }
             
-            System.exit(0);
+            core.stopService();
         } catch (SubnetException ex) {
             Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
         }

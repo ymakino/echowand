@@ -11,13 +11,13 @@ import java.util.logging.Logger;
  */
 public class TimeoutTask extends TimerTask {
     
-    private TimeoutObserver target;
+    private TimeoutObserver observer;
     
     private static Timer timer;
 
-    private long timeout;
-    private boolean done;
-    private boolean terminated;
+    private long timeoutPeriod;
+    private boolean timedOut;
+    private boolean interrupted;
     
     static {
         timer = new Timer();
@@ -27,38 +27,48 @@ public class TimeoutTask extends TimerTask {
         this(null, timeout);
     }
 
-    public TimeoutTask(TimeoutObserver target, long timeout) {
-        this.target = target;
-        this.timeout = timeout;
-        done = false;
-        terminated = false;
+    public TimeoutTask(TimeoutObserver observer, long timeoutPeriod) {
+        this.observer = observer;
+        this.timeoutPeriod = timeoutPeriod;
+        timedOut = false;
+        interrupted = false;
     }
     
     public void start() {
-        timer.schedule(this, timeout);
+        timer.schedule(this, timeoutPeriod);
     }
 
-    public synchronized boolean isDone() {
-        return done;
+    public boolean isTimedOut() {
+        return timedOut;
     }
     
-    public synchronized boolean isTerminated() {
-        return terminated;
+    public boolean isInterrupted() {
+        return interrupted;
     }
 
     @Override
-    public synchronized void run() {
-        if (!terminated) {
-            done = true;
-            
-            if (target != null) {
-                target.notifyTimeout(this);
+    public void run() {
+        synchronized (this) {
+            if (interrupted) {
+                return;
             }
+
+            timedOut = true;
+        }
+
+        if (observer != null) {
+            observer.notifyTimeout(this);
         }
     }
 
-    public synchronized void terminate() {
-        terminated = true;
+    public synchronized boolean interrupt() {
+        if (timedOut) {
+            return false;
+        }
+        
+        interrupted = true;
         cancel();
+        
+        return true;
     }
 }

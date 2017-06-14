@@ -158,8 +158,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void testGet() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testGet() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertEquals(subnet, object.getSubnet());
@@ -181,8 +181,8 @@ public class RemoteObjectTest {
     }
     
     @Test(expected=EchonetObjectException.class)
-    public void testGetFail() throws EchonetObjectException {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testGetFail() throws EchonetObjectException, SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertEquals(subnet, object.getSubnet());
@@ -195,8 +195,8 @@ public class RemoteObjectTest {
     }
 
     @Test
-    public void testSet() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testSet() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertEquals(subnet, object.getSubnet());
@@ -220,8 +220,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void testInvalidSet() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testInvalidSet() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
 
@@ -239,8 +239,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void setTimeout() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void setTimeout() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         assertTrue(object.setTimeout(1));
@@ -261,8 +261,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void testAddAndRemoveObserver() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testAddAndRemoveObserver() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         RemoteObjectObserver observer1 = new DummyRemoteObjectObserver();
@@ -278,8 +278,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void testAnno() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testAnno() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         DummyRemoteObjectObserver observer = new DummyRemoteObjectObserver();
@@ -291,8 +291,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void testObserveData() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testObserveData() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         
@@ -314,8 +314,8 @@ public class RemoteObjectTest {
     }
     
     @Test
-    public void testAccessPermission() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testAccessPermission() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObject object = new RemoteObject(subnet, subnet.getLocalNode(), new EOJ("001101"), transactionManager);
         try {

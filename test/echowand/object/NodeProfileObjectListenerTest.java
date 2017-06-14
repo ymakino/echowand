@@ -28,8 +28,8 @@ public class NodeProfileObjectListenerTest {
      * Test of begin method, of class NodeProfileObjectListener.
      */
     @Test
-    public void testTransaction() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testTransaction() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);
@@ -49,8 +49,8 @@ public class NodeProfileObjectListenerTest {
     }
     
     @Test
-    public void testINF_SNA() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testINF_SNA() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);
@@ -67,8 +67,8 @@ public class NodeProfileObjectListenerTest {
     }
     
     @Test
-    public void testAdditionOfSameEOJs() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testAdditionOfSameEOJs() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         RemoteObjectManager manager = new RemoteObjectManager();
         TransactionManager transactionManager = new TransactionManager(subnet);
         NodeProfileObjectListener profileListener = new NodeProfileObjectListener(manager, transactionManager);

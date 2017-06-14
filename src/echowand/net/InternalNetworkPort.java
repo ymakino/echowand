@@ -1,12 +1,17 @@
 package echowand.net;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * InternalNetworkと他のクラスの接続ポイント
  * @author Yoshiki Makino
  */
 public class InternalNetworkPort {
+    private static final Logger LOGGER = Logger.getLogger(InternalNetworkPort.class.getName());
+    private static final String CLASS_NAME = InternalNetworkPort.class.getName();
+    
     private InternalNetwork network;
     private LinkedBlockingQueue<Frame> loopbackQueue = new LinkedBlockingQueue<Frame>();
 
@@ -22,17 +27,24 @@ public class InternalNetworkPort {
      * @return 設定に成功した場合はtrue、失敗した場合にはfalse
      */
     public synchronized boolean setNetwork(InternalNetwork network) {
+        LOGGER.entering(CLASS_NAME, "setNetwork", network);
+        
         if (this.network != null) {
-            network.removePort(this);
+            InternalNetwork lastNetwork = this.network;
+            this.network = null;
+            lastNetwork.removePort(this);
         }
 
         this.network = network;
 
-        if (network == null) {
-            return true;
-        }
+        boolean result = true;
 
-        return network.addPort(this);
+        if (network != null) {
+            result = network.addPort(this);
+        }
+        
+        LOGGER.exiting(CLASS_NAME, "setNetwork", result);
+        return result;
     }
     
     /**
@@ -50,43 +62,64 @@ public class InternalNetworkPort {
      * @throws SubnetException 追加に失敗した場合
      */
     public boolean enqueue(Frame frame) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "enqueue", frame);
+        
         try {
             loopbackQueue.put(cloneFrame(frame));
+            LOGGER.exiting(CLASS_NAME, "enqueue", true);
             return true;
-        } catch (InterruptedException e) {
-            throw new SubnetException("catched exception", e);
         } catch (InvalidDataException e) {
-            throw new SubnetException("invalid frame", e);
+            SubnetException exception = new SubnetException("invalid frame", e);
+            LOGGER.throwing(CLASS_NAME, "enqueue", exception);
+            throw exception;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            SubnetException exception = new SubnetException("interrupted", e);
+            LOGGER.throwing(CLASS_NAME, "enqueue", exception);
+            throw exception;
         }
     }
     
     /**
      * このポートを用いてフレームを送信する。
      * 指定されたフレームはこのポートが関連付けられたInternalNetworkを経由して他のポートに転送される。
-     * @param frame 転送するフレーム
-     * @throws SubnetException 転送に失敗した場合
+     * @param frame 送信するフレーム
+     * @throws SubnetException 送信に失敗した場合
      */
     public synchronized void send(Frame frame) throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "send", frame);
+        
         try {
             if (network != null) {
                 network.broadcast(cloneFrame(frame));
             }
         } catch (InvalidDataException e) {
-            throw new SubnetException("invalid frame", e);
+            SubnetException exception = new SubnetException("invalid frame", e);
+            LOGGER.throwing(CLASS_NAME, "enqueue", exception);
+            throw exception;
         }
+        
+        LOGGER.exiting(CLASS_NAME, "send");
     }
     
     /**
      * 受信キューからフレームを取り出す。
      * キューが空の場合には、新たにフレームが追加されるまで待機する。
      * @return 受信キューから取り出されたフレーム
-     * @throws SubnetException 取り出しに失敗した場合
+     * @throws SubnetException 受信に失敗した場合
      */
     public Frame receive() throws SubnetException {
+        LOGGER.entering(CLASS_NAME, "receive");
+        
         try {
-            return loopbackQueue.take();
+            Frame frame = loopbackQueue.take();
+            LOGGER.exiting(CLASS_NAME, "receive", frame);
+            return frame;
         } catch (InterruptedException e) {
-            throw new SubnetException("catched exception", e);
+            Thread.currentThread().interrupt();
+            SubnetException exception = new SubnetException("interrupted", e);
+            LOGGER.throwing(CLASS_NAME, "enqueue", exception);
+            throw exception;
         }
     }
     
@@ -94,9 +127,13 @@ public class InternalNetworkPort {
      * 受信キューからフレームを取り出す。
      * キューが空の場合には、即座にnullを返す。
      * @return 受信キューから取り出されたフレーム
-     * @throws SubnetException 取り出しに失敗した場合
      */
-    public Frame receiveNoWait() throws SubnetException {
-        return loopbackQueue.poll();
+    public Frame receiveNoWait() {
+        LOGGER.entering(CLASS_NAME, "receiveNoWait");
+        
+        Frame frame = loopbackQueue.poll();
+        
+        LOGGER.exiting(CLASS_NAME, "receiveNoWait", frame);
+        return frame;
     }
 }

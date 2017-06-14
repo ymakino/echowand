@@ -117,7 +117,7 @@ public class TCPReceiver implements TCPConnectionObserver {
         }
         
         TCPConnectionReceiverThread receiverThread = receiverThreadMap.get(connection);
-        receiverThread.terminate();
+        receiverThread.interrupt();
         receiverThreadMap.remove(connection);
         connection.removeObserver(this);
         
@@ -142,20 +142,15 @@ public class TCPReceiver implements TCPConnectionObserver {
      * フレームを受信する。
      * 受信したフレームが利用したTCPConnectionと、受信したフレームの内容を返す。
      * @return 受信したフレームのTCPConnectionとフレームの内容
-     * @throws NetworkException 割り込みがあった場合
+     * @throws InterruptedException 割り込みがあった場合
      */
-    public Pair<TCPConnection, CommonFrame> receive() throws NetworkException {
+    public Pair<TCPConnection, CommonFrame> receive() throws InterruptedException {
         LOGGER.entering(CLASS_NAME, "receive");
         
-        try {
-            Pair<TCPConnection, CommonFrame> pair = receiveQueue.take();
-            LOGGER.exiting(CLASS_NAME, "receive", pair);
-            return pair;
-        } catch (InterruptedException ex) {
-            NetworkException exception = new NetworkException("catched exception", ex);
-            LOGGER.throwing(CLASS_NAME, "receive", exception);
-            throw exception;
-        }
+        Pair<TCPConnection, CommonFrame> pair = receiveQueue.take();
+
+        LOGGER.exiting(CLASS_NAME, "receive", pair);
+        return pair;
     }
     
     @Override

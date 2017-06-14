@@ -33,9 +33,9 @@ public class SetGetRequestProcessorTest {
     public LocalObject object;
     
     @Before
-    public void setUp() {
+    public void setUp() throws SubnetException {
         manager = new LocalObjectManager();
-        subnet = new InternalSubnet();
+        subnet = InternalSubnet.startSubnet();
         processor = new SetGetRequestProcessor(manager);
         
         DeviceObjectInfo objectInfo = new TemperatureSensorInfo();
@@ -111,7 +111,7 @@ public class SetGetRequestProcessorTest {
     public Frame createFrameINF_REQ2(Subnet subnet) {
         CommonFrame cf = new CommonFrame(new EOJ("002201"), new EOJ("001101"), ESV.INF_REQ);
         StandardPayload payload = cf.getEDATA(StandardPayload.class);
-        payload.addFirstProperty(new Property(EPC.xE0));
+        payload.addFirstProperty(new Property(EPC.xE1));
         payload.addFirstProperty(new Property(EPC.x80));
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), cf);
         return frame;
@@ -189,8 +189,8 @@ public class SetGetRequestProcessorTest {
     }
     
     @Test
-    public void testProcessINF_REQ() {
-        InternalSubnet subnet2 = new InternalSubnet();
+    public void testProcessINF_REQ() throws SubnetException {
+        InternalSubnet subnet2 = InternalSubnet.startSubnet();
         
         processor.processINF_REQ(subnet, createFrameINF_REQ1(subnet), false);
         Frame frame = receiveWithoutError(subnet);
@@ -212,7 +212,7 @@ public class SetGetRequestProcessorTest {
     
     @Test
     public void testProcessINF_REQ_Fail() throws SubnetException {
-        InternalSubnet subnet2 = new InternalSubnet();
+        InternalSubnet subnet2 = InternalSubnet.startSubnet();
         
         processor.processINF_REQ(subnet, createFrameINF_REQ2(subnet), false);
         Frame frame = receiveWithoutError(subnet);
@@ -222,9 +222,10 @@ public class SetGetRequestProcessorTest {
         assertNull(subnet2.receiveNoWait());
         
         StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        
         assertEquals(ESV.INF_SNA, payload.getESV());
         assertEquals(2, payload.getFirstOPC());
-        assertEquals(EPC.xE0, payload.getFirstPropertyAt(0).getEPC());
+        assertEquals(EPC.xE1, payload.getFirstPropertyAt(0).getEPC());
         assertEquals((byte)0x00, payload.getFirstPropertyAt(0).getPDC());
         
         assertEquals(EPC.x80, payload.getFirstPropertyAt(1).getEPC());

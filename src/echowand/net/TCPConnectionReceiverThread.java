@@ -1,5 +1,6 @@
 package echowand.net;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,7 +15,6 @@ public class TCPConnectionReceiverThread extends Thread {
     private static final String CLASS_NAME = TCPConnectionReceiverThread.class.getName();
 
     private TCPConnection connection;
-    private boolean terminated = false;
 
     /**
      * 指定したコネクションからフレームを受信するTCPConnectionReceiverThreadを生成する。
@@ -24,48 +24,56 @@ public class TCPConnectionReceiverThread extends Thread {
     public TCPConnectionReceiverThread(TCPConnection connection) {
         this.connection = connection;
     }
-
-    /**
-     * このスレッドの停止を行う。
-     * 強制的な割り込みを行うわけではないので、即座に終了しない可能性がある。
-     */
-    public synchronized void terminate() {
-        LOGGER.entering(CLASS_NAME, "terminate");
-
-        terminated = true;
-
-        LOGGER.exiting(CLASS_NAME, "terminate");
-    }
-
-    @Override
-    public void run() {
-        LOGGER.entering(CLASS_NAME, "run");
-
-        while (!terminated) {
-            
+    
+    private boolean doWork() {
+        LOGGER.entering(CLASS_NAME, "doWork");
+        
+        boolean repeat = true;
+        
+        try {
             if (connection.isInputClosed()) {
-                break;
-            }
-            
-            try {
+                LOGGER.logp(Level.FINE, CLASS_NAME, "run", "input stream is closed");
+                repeat = false;
+            } else {
                 CommonFrame commonFrame = connection.receive();
+
                 LOGGER.logp(Level.FINE, CLASS_NAME, "run", "receive: " + commonFrame);
+
                 if (commonFrame == null) {
-                    break;
-                }
-            } catch (NetworkException ex) {
-                if (!connection.isInputClosed()) {
-                    LOGGER.logp(Level.FINE, CLASS_NAME, "run", "catched exception", ex);
+                    repeat = false;
                 }
             }
+        } catch (NetworkException ex) {
+            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
+            repeat = false;
         }
         
+        LOGGER.exiting(CLASS_NAME, "doWork", repeat);
+        return repeat;
+    }
+    
+    private void cleanUp() {
         try {
             connection.close();
         } catch (NetworkException ex) {
-            LOGGER.logp(Level.INFO, CLASS_NAME, "run", "catched exception", ex);
+            LOGGER.logp(Level.INFO, CLASS_NAME, "cleanUp", "catched exception", ex);
         }
-
+    }
+    
+    @Override
+    public void run() {
+        LOGGER.entering(CLASS_NAME, "run");
+        
+        try {
+            while (!isInterrupted()) {
+                if (!doWork()) {
+                    break;
+                }
+            }
+        } finally {
+            cleanUp();
+        }
+        
         LOGGER.exiting(CLASS_NAME, "run");
     }
 }

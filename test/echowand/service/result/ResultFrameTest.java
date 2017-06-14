@@ -9,6 +9,7 @@ import echowand.net.Frame;
 import echowand.net.InternalSubnet;
 import echowand.net.Property;
 import echowand.net.StandardPayload;
+import echowand.net.SubnetException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,8 +25,8 @@ public class ResultFrameTest {
     public InternalSubnet subnet;
     
     @Before
-    public void setUp() {
-        subnet = new InternalSubnet("ResultFrameTest");
+    public void setUp() throws SubnetException {
+        subnet = InternalSubnet.startSubnet("ResultFrameTest");
     }
 
     /**

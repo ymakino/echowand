@@ -25,7 +25,7 @@ public class InstanceListRequestExecutorTest {
     
     @Before
     public void setUp() throws Exception {
-        subnet = new InternalSubnet();
+        subnet = InternalSubnet.startSubnet();
         TransactionManager transactionManager = new TransactionManager(subnet);
         RemoteObjectManager remoteManager = new RemoteObjectManager();
         executor = new InstanceListRequestExecutor(subnet, transactionManager, remoteManager);

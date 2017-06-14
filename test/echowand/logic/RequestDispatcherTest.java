@@ -21,6 +21,8 @@ import echowand.info.DeviceObjectInfo;
 import echowand.object.LocalObjectManager;
 import echowand.object.LocalObject;
 import echowand.info.TemperatureSensorInfo;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -56,7 +58,13 @@ public class RequestDispatcherTest {
             fail();
         }
         SetGetRequestProcessor processor = new SetGetRequestProcessor(manager);
-        InternalSubnet subnet = new InternalSubnet();
+        InternalSubnet subnet = null;
+        try {
+            subnet = InternalSubnet.startSubnet();
+        } catch (SubnetException e) {
+            e.printStackTrace();
+            fail();
+        }
         Node local = subnet.getLocalNode();
         Node group = subnet.getGroupNode();
         CommonFrame frame = new CommonFrame();
@@ -163,8 +171,8 @@ public class RequestDispatcherTest {
     }
     
     @Test
-    public void testNotStandardPayload() {
-        InternalSubnet subnet = new InternalSubnet();
+    public void testNotStandardPayload() throws SubnetException {
+        InternalSubnet subnet = InternalSubnet.startSubnet();
         CommonFrame commonFrame = new CommonFrame(new EOJ("001101"), new EOJ("001101"), ESV.Invalid);
         
         Frame frame = new Frame(subnet.getLocalNode(), subnet.getLocalNode(), commonFrame);

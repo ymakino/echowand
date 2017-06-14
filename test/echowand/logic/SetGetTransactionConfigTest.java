@@ -113,7 +113,6 @@ public class SetGetTransactionConfigTest {
     
     @Test
     public void testSetSourceAndDestination() {
-        InternalSubnet subnet = new InternalSubnet();
         SetGetTransactionConfig config = new SetGetTransactionConfig();
         assertEquals(null, config.getSourceEOJ());
         assertEquals(null, config.getDestinationEOJ());
