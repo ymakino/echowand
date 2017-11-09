@@ -209,7 +209,7 @@ public class ResultDataSelector implements Selector<ResultData> {
             return true;
         }
         
-        if (nodes.contains(resultData.node)) {
+        if (nodes.contains(resultData.getNode())) {
             LOGGER.exiting(CLASS_NAME, "checkNodes", true);
             return true;
         }
@@ -226,12 +226,12 @@ public class ResultDataSelector implements Selector<ResultData> {
             return true;
         }
         
-        if (eojs.contains(resultData.eoj)) {
+        if (eojs.contains(resultData.getEOJ())) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", true);
             return true;
         }
         
-        if (eojs.contains(resultData.eoj.getAllInstanceEOJ())) {
+        if (eojs.contains(resultData.getEOJ().getAllInstanceEOJ())) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", true);
             return true;
         }
@@ -248,7 +248,7 @@ public class ResultDataSelector implements Selector<ResultData> {
             return true;
         }
         
-        if (epcs.contains(resultData.epc)) {
+        if (epcs.contains(resultData.getEPC())) {
             LOGGER.exiting(CLASS_NAME, "checkEPCs", true);
             return true;
         }

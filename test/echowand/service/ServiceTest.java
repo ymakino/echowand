@@ -226,10 +226,10 @@ public class ServiceTest {
         Thread.sleep(500);
         
         assertEquals(1, result.countFrames());
-        assertEquals(1, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
-        assertEquals(EPC.x81, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
-        assertEquals(1, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getPDC());
-        assertEquals(new Data((byte)0x11), result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEDT());
+        assertEquals(1, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
+        assertEquals(EPC.x81, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
+        assertEquals(1, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getPDC());
+        assertEquals(new Data((byte)0x11), result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEDT());
     }
 
     /**
@@ -251,9 +251,9 @@ public class ServiceTest {
         
         assertEquals(0, result1.countFrames());
         assertEquals(1, result2.countFrames());
-        assertEquals(1, result2.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
-        assertEquals(EPC.x81, result2.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
-        assertEquals(0, result2.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getPDC());
+        assertEquals(1, result2.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
+        assertEquals(EPC.x81, result2.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
+        assertEquals(0, result2.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getPDC());
     }
 
     /**
@@ -275,14 +275,14 @@ public class ServiceTest {
         Thread.sleep(500);
         
         assertEquals(1, result.countFrames());
-        assertEquals(1, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
-        assertEquals(EPC.x81, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
-        assertEquals(0, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getPDC());
+        assertEquals(1, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
+        assertEquals(EPC.x81, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
+        assertEquals(0, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getPDC());
         
-        assertEquals(1, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getSecondOPC());
-        assertEquals(EPC.x81, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getSecondPropertyAt(0).getEPC());
-        assertEquals(1, result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getSecondPropertyAt(0).getPDC());
-        assertEquals(new Data((byte)0x11), result.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getSecondPropertyAt(0).getEDT());
+        assertEquals(1, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getSecondOPC());
+        assertEquals(EPC.x81, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getSecondPropertyAt(0).getEPC());
+        assertEquals(1, result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getSecondPropertyAt(0).getPDC());
+        assertEquals(new Data((byte)0x11), result.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getSecondPropertyAt(0).getEDT());
     }
 
     /**
@@ -346,7 +346,7 @@ public class ServiceTest {
         
         assertEquals(1, observeResult.countFrames());
         
-        assertEquals(new EOJ("001101"), observeResult.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getSEOJ());
+        assertEquals(new EOJ("001101"), observeResult.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getSEOJ());
     }
 
     /**
@@ -372,7 +372,7 @@ public class ServiceTest {
         
         assertEquals(1, observeResult.countFrames());
         
-        assertEquals(new EOJ("001101"), observeResult.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getSEOJ());
+        assertEquals(new EOJ("001101"), observeResult.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getSEOJ());
     }
 
     /**
@@ -836,15 +836,15 @@ public class ServiceTest {
         
         assertEquals(0, notifyResult.countFrames());
         assertEquals(1, notifyResult.countRequestFrames());
-        assertEquals(ESV.INF, notifyResult.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getESV());
-        assertEquals(1, notifyResult.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
-        assertEquals(EPC.xD5, notifyResult.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
-        assertEquals(subnet.getGroupNode(), notifyResult.getRequestFrame(0).frame.getReceiver());
+        assertEquals(ESV.INF, notifyResult.getRequestFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getESV());
+        assertEquals(1, notifyResult.getRequestFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstOPC());
+        assertEquals(EPC.xD5, notifyResult.getRequestFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getFirstPropertyAt(0).getEPC());
+        assertEquals(subnet.getGroupNode(), notifyResult.getRequestFrame(0).getReceiver());
         Thread.sleep(100);
         
         assertEquals(1, captureResult.countFrames());
         ResultFrame frame = captureResult.getFrame(0);
-        StandardPayload payload = frame.frame.getCommonFrame().getEDATA(StandardPayload.class);
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.INF, payload.getESV());
         assertEquals(new EOJ("0ef001"), payload.getDEOJ());
         assertEquals(new EOJ("0ef001"), payload.getSEOJ());
@@ -886,29 +886,29 @@ public class ServiceTest {
         boolean peer = false;
         
         assertEquals(1, notifyResult1.countRequestFrames());
-        assertEquals(service.getGroupNode(), notifyResult1.getRequestFrame(0).frame.getReceiver());
-        assertEquals(ESV.INFC, notifyResult1.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getESV());
+        assertEquals(service.getGroupNode(), notifyResult1.getRequestFrame(0).getReceiver());
+        assertEquals(ESV.INFC, notifyResult1.getRequestFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getESV());
         
         assertEquals(3, notifyResult1.countRequestData());
         
-        assertEquals(eoj, notifyResult1.getRequestData(0).eoj);
-        assertEquals(epc1, notifyResult1.getRequestData(0).epc);
-        assertEquals(data1, notifyResult1.getRequestData(0).data);
+        assertEquals(eoj, notifyResult1.getRequestData(0).getEOJ());
+        assertEquals(epc1, notifyResult1.getRequestData(0).getEPC());
+        assertEquals(data1, notifyResult1.getRequestData(0).getActualData());
         
-        assertEquals(eoj, notifyResult1.getRequestData(1).eoj);
-        assertEquals(epc1, notifyResult1.getRequestData(1).epc);
-        assertEquals(data2, notifyResult1.getRequestData(1).data);
+        assertEquals(eoj, notifyResult1.getRequestData(1).getEOJ());
+        assertEquals(epc1, notifyResult1.getRequestData(1).getEPC());
+        assertEquals(data2, notifyResult1.getRequestData(1).getActualData());
         
-        assertEquals(eoj, notifyResult1.getRequestData(2).eoj);
-        assertEquals(epc2, notifyResult1.getRequestData(2).epc);
-        assertEquals(data3, notifyResult1.getRequestData(2).data);
+        assertEquals(eoj, notifyResult1.getRequestData(2).getEOJ());
+        assertEquals(epc2, notifyResult1.getRequestData(2).getEPC());
+        assertEquals(data3, notifyResult1.getRequestData(2).getActualData());
         
         assertEquals(2, notifyResult1.countFrames());
         for (ResultFrame frame: notifyResult1.getFrameList()) {
-            if (frame.frame.getSender().equals(subnet.getLocalNode())) {
+            if (frame.getSender().equals(subnet.getLocalNode())) {
                 self = true;
             }
-            if (frame.frame.getSender().equals(peerSubnet.getLocalNode())) {
+            if (frame.getSender().equals(peerSubnet.getLocalNode())) {
                 peer = true;
             }
         }
@@ -916,8 +916,8 @@ public class ServiceTest {
         assertTrue(self);
         assertTrue(peer);
         
-        assertEquals(ESV.INFC_Res, notifyResult1.getFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getESV());
-        assertEquals(ESV.INFC_Res, notifyResult1.getFrame(1).frame.getCommonFrame().getEDATA(StandardPayload.class).getESV());
+        assertEquals(ESV.INFC_Res, notifyResult1.getFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getESV());
+        assertEquals(ESV.INFC_Res, notifyResult1.getFrame(1).getCommonFrame().getEDATA(StandardPayload.class).getESV());
         
         
         CaptureResult captureResult = peerService.doCapture();
@@ -925,22 +925,22 @@ public class ServiceTest {
         NotifyResult notifyResult2 = service.doNotify(service.getGroupNode(), eoj, properties, 1000, false);
         
         assertEquals(1, notifyResult2.countRequestFrames());
-        assertEquals(service.getGroupNode(), notifyResult2.getRequestFrame(0).frame.getReceiver());
-        assertEquals(ESV.INF, notifyResult2.getRequestFrame(0).frame.getCommonFrame().getEDATA(StandardPayload.class).getESV());
+        assertEquals(service.getGroupNode(), notifyResult2.getRequestFrame(0).getReceiver());
+        assertEquals(ESV.INF, notifyResult2.getRequestFrame(0).getCommonFrame().getEDATA(StandardPayload.class).getESV());
                 
         assertEquals(3, notifyResult2.countRequestData());
         
-        assertEquals(eoj, notifyResult2.getRequestData(0).eoj);
-        assertEquals(epc1, notifyResult2.getRequestData(0).epc);
-        assertEquals(data1, notifyResult2.getRequestData(0).data);
+        assertEquals(eoj, notifyResult2.getRequestData(0).getEOJ());
+        assertEquals(epc1, notifyResult2.getRequestData(0).getEPC());
+        assertEquals(data1, notifyResult2.getRequestData(0).getActualData());
         
-        assertEquals(eoj, notifyResult2.getRequestData(1).eoj);
-        assertEquals(epc1, notifyResult2.getRequestData(1).epc);
-        assertEquals(data2, notifyResult2.getRequestData(1).data);
+        assertEquals(eoj, notifyResult2.getRequestData(1).getEOJ());
+        assertEquals(epc1, notifyResult2.getRequestData(1).getEPC());
+        assertEquals(data2, notifyResult2.getRequestData(1).getActualData());
         
-        assertEquals(eoj, notifyResult2.getRequestData(2).eoj);
-        assertEquals(epc2, notifyResult2.getRequestData(2).epc);
-        assertEquals(data3, notifyResult2.getRequestData(2).data);
+        assertEquals(eoj, notifyResult2.getRequestData(2).getEOJ());
+        assertEquals(epc2, notifyResult2.getRequestData(2).getEPC());
+        assertEquals(data3, notifyResult2.getRequestData(2).getActualData());
         
         Thread.sleep(500);
         assertFalse(notifyResult2.isDone());
@@ -951,7 +951,7 @@ public class ServiceTest {
         
         assertEquals(1, captureResult.countFrames());
         ResultFrame frame = captureResult.getFrame(0);
-        StandardPayload payload = frame.frame.getCommonFrame().getEDATA(StandardPayload.class);
+        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
         assertEquals(ESV.INF, payload.getESV());
         assertEquals(new EOJ("0ef001"), payload.getDEOJ());
         assertEquals(eoj, payload.getSEOJ());

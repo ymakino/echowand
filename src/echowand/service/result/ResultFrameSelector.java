@@ -206,14 +206,12 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
     private boolean checkNodes(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "checkNodes", resultFrame);
         
-        Frame frame = resultFrame.frame;
-        
         if (nodes.isEmpty()) {
             LOGGER.exiting(CLASS_NAME, "checkNodes", true);
             return true;
         }
         
-        if (nodes.contains(frame.getSender())) {
+        if (nodes.contains(resultFrame.getSender())) {
             LOGGER.exiting(CLASS_NAME, "checkNodes", true);
             return true;
         }
@@ -225,14 +223,12 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
     private boolean checkEOJs(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "checkEOJs", resultFrame);
         
-        Frame frame = resultFrame.frame;
-        
         if (eojs.isEmpty()) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", true);
             return true;
         }
         
-        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        StandardPayload payload = resultFrame.getCommonFrame().getEDATA(StandardPayload.class);
         
         if (payload == null) {
             LOGGER.exiting(CLASS_NAME, "checkEOJs", false);
@@ -256,14 +252,12 @@ public class ResultFrameSelector implements Selector<ResultFrame> {
     private boolean checkEPCs(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "checkEPCs", resultFrame);
         
-        Frame frame = resultFrame.frame;
-        
         if (epcs.isEmpty()) {
             LOGGER.exiting(CLASS_NAME, "checkEPCs", true);
             return true;
         }
         
-        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        StandardPayload payload = resultFrame.getCommonFrame().getEDATA(StandardPayload.class);
         
         if (payload == null) {
             LOGGER.exiting(CLASS_NAME, "checkEPCs", false);

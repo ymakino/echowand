@@ -324,8 +324,8 @@ public class ObserveResultTest {
         result.addFrame(frame1);
         result.addFrame(frame2);
         
-        assertEquals(frame1, result.getFrame(0).frame);
-        assertEquals(frame2, result.getFrame(1).frame);
+        assertEquals(frame1, result.getFrame(0).getActualFrame());
+        assertEquals(frame2, result.getFrame(1).getActualFrame());
     }
 
     /**
@@ -342,13 +342,13 @@ public class ObserveResultTest {
         assertEquals(3, result.countData());
         
         ResultData resultData1 = result.getData(0);
-        assertEquals(frame1, result.getFrame(resultData1).frame);
+        assertEquals(frame1, result.getFrame(resultData1).getActualFrame());
         
         ResultData resultData2 = result.getData(1);
-        assertEquals(frame2, result.getFrame(resultData2).frame);
+        assertEquals(frame2, result.getFrame(resultData2).getActualFrame());
         
         ResultData resultData3 = result.getData(2);
-        assertEquals(frame2, result.getFrame(resultData3).frame);
+        assertEquals(frame2, result.getFrame(resultData3).getActualFrame());
     }
 
     /**
@@ -364,8 +364,8 @@ public class ObserveResultTest {
         result.addFrame(frame1);
         result.addFrame(frame2);
         
-        assertEquals(frame1, result.getFrameList().get(0).frame);
-        assertEquals(frame2, result.getFrameList().get(1).frame);
+        assertEquals(frame1, result.getFrameList().get(0).getActualFrame());
+        assertEquals(frame2, result.getFrameList().get(1).getActualFrame());
     }
 
     /**
@@ -386,24 +386,24 @@ public class ObserveResultTest {
     @Test
     public void testGetData() {
         result.addFrame(newFrame(ESV.INF));
-        assertEquals(new EOJ("0ef001"), result.getData(0).eoj);
-        assertEquals(EPC.x80, result.getData(0).epc);
-        assertEquals(subnet.getLocalNode(), result.getData(0).node);
-        assertEquals(new Data(new byte[]{0x30}), result.getData(0).data);
-        assertEquals(result.getFrame(0).time, result.getData(0).time);
+        assertEquals(new EOJ("0ef001"), result.getData(0).getEOJ());
+        assertEquals(EPC.x80, result.getData(0).getEPC());
+        assertEquals(subnet.getLocalNode(), result.getData(0).getNode());
+        assertEquals(new Data(new byte[]{0x30}), result.getData(0).getActualData());
+        assertEquals(result.getFrame(0).getTimestamp(), result.getData(0).getTimestamp());
         
         result.addFrame(newFrame2(ESV.INF));
-        assertEquals(new EOJ("0ef001"), result.getData(1).eoj);
-        assertEquals(EPC.x80, result.getData(1).epc);
-        assertEquals(subnet.getLocalNode(), result.getData(1).node);
-        assertEquals(new Data(new byte[]{0x31}), result.getData(1).data);
-        assertEquals(result.getFrame(1).time, result.getData(1).time);
+        assertEquals(new EOJ("0ef001"), result.getData(1).getEOJ());
+        assertEquals(EPC.x80, result.getData(1).getEPC());
+        assertEquals(subnet.getLocalNode(), result.getData(1).getNode());
+        assertEquals(new Data(new byte[]{0x31}), result.getData(1).getActualData());
+        assertEquals(result.getFrame(1).getTimestamp(), result.getData(1).getTimestamp());
         
-        assertEquals(new EOJ("0ef001"), result.getData(1).eoj);
-        assertEquals(EPC.x81, result.getData(2).epc);
-        assertEquals(subnet.getLocalNode(), result.getData(2).node);
-        assertEquals(new Data(new byte[]{0x40}), result.getData(2).data);
-        assertEquals(result.getFrame(1).time, result.getData(2).time);
+        assertEquals(new EOJ("0ef001"), result.getData(1).getEOJ());
+        assertEquals(EPC.x81, result.getData(2).getEPC());
+        assertEquals(subnet.getLocalNode(), result.getData(2).getNode());
+        assertEquals(new Data(new byte[]{0x40}), result.getData(2).getActualData());
+        assertEquals(result.getFrame(1).getTimestamp(), result.getData(2).getTimestamp());
     }
 
     /**
@@ -434,7 +434,7 @@ public class ObserveResultTest {
         Selector<ResultData> selectorEPCx80 = new Selector<ResultData>() {
             @Override
             public boolean match(ResultData resultData) {
-                return resultData.epc == EPC.x80;
+                return resultData.getEPC() == EPC.x80;
             }
         };
         
@@ -468,13 +468,13 @@ public class ObserveResultTest {
         ResultFrame resultFrame1 = result.getFrame(0);
         List<ResultData> list1 = result.getDataList(resultFrame1);
         assertEquals(1, list1.size());
-        assertEquals(EPC.x80, list1.get(0).epc);
+        assertEquals(EPC.x80, list1.get(0).getEPC());
         
         ResultFrame resultFrame2 = result.getFrame(1);
         List<ResultData> list2 = result.getDataList(resultFrame2);
         assertEquals(2, list2.size());
-        assertEquals(EPC.x80, list2.get(0).epc);
-        assertEquals(EPC.x81, list2.get(1).epc);
+        assertEquals(EPC.x80, list2.get(0).getEPC());
+        assertEquals(EPC.x81, list2.get(1).getEPC());
     }
 
     /**
@@ -533,8 +533,8 @@ public class ObserveResultTest {
         result.removeData(resultFrame);
         checkFrameDataMap();
         assertEquals(1, result.countData());
-        assertEquals(EPC.x80, result.getData(0).epc);
-        assertEquals((byte)0x30, result.getData(0).data.get(0));
+        assertEquals(EPC.x80, result.getData(0).getEPC());
+        assertEquals((byte)0x30, result.getData(0).getActualData().get(0));
         
         assertEquals(2, result.countFrames());
     }
@@ -555,8 +555,8 @@ public class ObserveResultTest {
         checkFrameDataMap();
         
         assertEquals(2, result.countData());
-        assertEquals((byte)0x30, result.getData(0).data.get(0));
-        assertEquals((byte)0x40, result.getData(1).data.get(0));
+        assertEquals((byte)0x30, result.getData(0).get(0));
+        assertEquals((byte)0x40, result.getData(1).get(0));
         
         assertEquals(2, result.countFrames());
     }
@@ -639,7 +639,7 @@ public class ObserveResultTest {
         checkFrameDataMap();
         
         assertEquals(1, result.countFrames());
-        assertEquals(frame2, result.getFrame(0).frame);
+        assertEquals(frame2, result.getFrame(0).getActualFrame());
         
         assertEquals(3, result.countData());
     }
@@ -662,7 +662,7 @@ public class ObserveResultTest {
         checkFrameDataMap();
         
         assertEquals(1, result.countFrames());
-        assertEquals(frame1, result.getFrame(0).frame);
+        assertEquals(frame1, result.getFrame(0).getActualFrame());
         
         assertEquals(3, result.countData());
     }
@@ -683,7 +683,7 @@ public class ObserveResultTest {
         checkFrameDataMap();
         
         assertEquals(1, result.countFrames());
-        assertEquals(frame2, result.getFrame(0).frame);
+        assertEquals(frame2, result.getFrame(0).getActualFrame());
         
         assertEquals(3, result.countData());
     }

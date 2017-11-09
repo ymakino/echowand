@@ -368,15 +368,15 @@ public class ResultBaseTest {
     public void testAddRequestFrame_Frame_boolean() {
         Frame frame1 = newFrame1();
         assertTrue(resultBase.addRequestFrame(frame1, true));
-        assertTrue(resultBase.getRequestFrame(0).frame == frame1);
+        assertTrue(resultBase.getRequestFrame(0).getActualFrame() == frame1);
         assertTrue(resultBase.addRequestFrame(frame1, true));
-        assertTrue(resultBase.getRequestFrame(1).frame == frame1);
+        assertTrue(resultBase.getRequestFrame(1).getActualFrame() == frame1);
         assertEquals(2, resultBase.countRequestFrames());
         
         Frame frame2 = newFrame2();
         assertTrue(resultBase.addRequestFrame(frame2, false));
         assertEquals(3, resultBase.countRequestFrames());
-        assertTrue(resultBase.getRequestFrame(2).frame == frame2);
+        assertTrue(resultBase.getRequestFrame(2).getActualFrame() == frame2);
         
         resultBase.finish();
         Frame frame3 = newFrame3();
@@ -406,7 +406,7 @@ public class ResultBaseTest {
     public void testAddFrame_Frame() {
         Frame frame1 = newFrame1();
         assertTrue(resultBase.addFrame(frame1));
-        assertTrue(resultBase.getFrame(0).frame == frame1);
+        assertTrue(resultBase.getFrame(0).getActualFrame() == frame1);
         
         resultBase.finish();
         Frame frame2 = newFrame1();
@@ -571,9 +571,9 @@ public class ResultBaseTest {
         assertTrue(resultBase.addFrame(resultFrame1));
         assertTrue(resultBase.addFrame(resultFrame2));
         
-        assertEquals(new Data((byte)0x30), resultBase.getData(0).data);
-        assertEquals(new Data((byte)0x30), resultBase.getData(1).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getData(2).data);
+        assertEquals(new Data((byte)0x30), resultBase.getData(0).getActualData());
+        assertEquals(new Data((byte)0x30), resultBase.getData(1).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getData(2).getActualData());
     }
 
     @Test
@@ -585,9 +585,9 @@ public class ResultBaseTest {
         assertTrue(resultBase.addFrame(resultFrame2));
         
         assertEquals(3, resultBase.getDataList().size());
-        assertEquals(new Data((byte)0x30), resultBase.getDataList().get(0).data);
-        assertEquals(new Data((byte)0x30), resultBase.getDataList().get(1).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getDataList().get(2).data);
+        assertEquals(new Data((byte)0x30), resultBase.getDataList().get(0).getActualData());
+        assertEquals(new Data((byte)0x30), resultBase.getDataList().get(1).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getDataList().get(2).getActualData());
     }
 
     @Test
@@ -600,8 +600,8 @@ public class ResultBaseTest {
         
         List<ResultData> dataList = resultBase.getDataList(new ResultDataSelector(new EOJ("001101")));
         assertEquals(2, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).getActualData());
     }
 
     @Test
@@ -620,13 +620,13 @@ public class ResultBaseTest {
         List<ResultData> dataList1 = resultBase.getDataList(resultFrame1);
         
         assertEquals(1, dataList1.size());
-        assertEquals(new Data((byte)0x30), dataList1.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList1.get(0).getActualData());
         
         List<ResultData> dataList2 = resultBase.getDataList(resultFrame2);
         
         assertEquals(2, dataList2.size());
-        assertEquals(new Data((byte)0x30), dataList2.get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), dataList2.get(1).data);
+        assertEquals(new Data((byte)0x30), dataList2.get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), dataList2.get(1).getActualData());
     }
 
     @Test
@@ -652,7 +652,7 @@ public class ResultBaseTest {
         
         assertTrue(resultBase.addFrame(resultFrame2));
         
-        assertEquals(new Data(), resultBase.getSecondData(0).data);
+        assertEquals(new Data(), resultBase.getSecondData(0).getActualData());
     }
 
     @Test
@@ -669,8 +669,8 @@ public class ResultBaseTest {
         List<ResultData> dataList = resultBase.getSecondDataList();
         
         assertEquals(1, dataList.size());
-        assertEquals(EPC.xFF, dataList.get(0).epc);
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(EPC.xFF, dataList.get(0).getEPC());
+        assertEquals(new Data(), dataList.get(0).getActualData());
     }
 
     @Test
@@ -689,8 +689,8 @@ public class ResultBaseTest {
         
         List<ResultData> dataList2 = resultBase.getSecondDataList(new ResultDataSelector(EPC.xFF));
         assertEquals(1, dataList2.size());
-        assertEquals(EPC.xFF, dataList2.get(0).epc);
-        assertEquals(new Data(), dataList2.get(0).data);
+        assertEquals(EPC.xFF, dataList2.get(0).getEPC());
+        assertEquals(new Data(), dataList2.get(0).getActualData());
     }
 
     @Test
@@ -709,8 +709,8 @@ public class ResultBaseTest {
         
         List<ResultData> dataList2 = resultBase.getSecondDataList(resultFrame2);
         assertEquals(1, dataList2.size());
-        assertEquals(EPC.xFF, dataList2.get(0).epc);
-        assertEquals(new Data(), dataList2.get(0).data);
+        assertEquals(EPC.xFF, dataList2.get(0).getEPC());
+        assertEquals(new Data(), dataList2.get(0).getActualData());
     }
 
     @Test
@@ -730,9 +730,9 @@ public class ResultBaseTest {
         assertTrue(resultBase.addRequestFrame(resultFrame1, true));
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
         
-        assertEquals(new Data((byte)0x30), resultBase.getRequestData(0).data);
-        assertEquals(new Data((byte)0x30), resultBase.getRequestData(1).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestData(2).data);
+        assertEquals(new Data((byte)0x30), resultBase.getRequestData(0).getActualData());
+        assertEquals(new Data((byte)0x30), resultBase.getRequestData(1).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestData(2).getActualData());
     }
 
     @Test
@@ -744,9 +744,9 @@ public class ResultBaseTest {
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
         
         assertEquals(3, resultBase.getRequestDataList().size());
-        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList().get(0).data);
-        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList().get(1).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestDataList().get(2).data);
+        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList().get(0).getActualData());
+        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList().get(1).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestDataList().get(2).getActualData());
     }
 
     @Test
@@ -759,8 +759,8 @@ public class ResultBaseTest {
         
         List<ResultData> dataList = resultBase.getRequestDataList(new ResultDataSelector(new EOJ("001101")));
         assertEquals(2, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).getActualData());
     }
 
     @Test
@@ -779,8 +779,8 @@ public class ResultBaseTest {
         List<ResultData> dataList = resultBase.getRequestDataList(resultFrame2);
         
         assertEquals(2, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).getActualData());
     }
 
     @Test
@@ -808,7 +808,7 @@ public class ResultBaseTest {
         assertTrue(resultBase.addRequestFrame(resultFrame1, true));
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
         
-        assertEquals(new Data(), resultBase.getRequestSecondData(0).data);
+        assertEquals(new Data(), resultBase.getRequestSecondData(0).getActualData());
     }
 
     @Test
@@ -820,7 +820,7 @@ public class ResultBaseTest {
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
         
         assertEquals(1, resultBase.getRequestSecondDataList().size());
-        assertEquals(new Data(), resultBase.getRequestSecondDataList().get(0).data);
+        assertEquals(new Data(), resultBase.getRequestSecondDataList().get(0).getActualData());
     }
 
     @Test
@@ -833,7 +833,7 @@ public class ResultBaseTest {
         
         List<ResultData> dataList = resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("001101")));
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
     }
 
     @Test
@@ -852,7 +852,7 @@ public class ResultBaseTest {
         List<ResultData> dataList = resultBase.getRequestSecondDataList(resultFrame2);
         
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
     }
 
     @Test
@@ -900,11 +900,11 @@ public class ResultBaseTest {
         ResultFrame resultFrame2 = new ResultFrame(newFrame3(), 10);
         
         assertTrue(resultBase.addRequestFrame(resultFrame1, true));
-        assertEquals(new Data((byte)0x30), resultBase.getRequestData(0, true).data);
+        assertEquals(new Data((byte)0x30), resultBase.getRequestData(0, true).getActualData());
         
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
-        assertEquals(new Data((byte)0x30), resultBase.getRequestData(0, false).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestData(1, false).data);
+        assertEquals(new Data((byte)0x30), resultBase.getRequestData(0, false).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestData(1, false).getActualData());
     }
 
     @Test
@@ -915,15 +915,15 @@ public class ResultBaseTest {
         assertTrue(resultBase.addRequestFrame(resultFrame1, true));
         assertEquals(1, resultBase.getRequestDataList(true).size());
         assertEquals(0, resultBase.getRequestDataList(false).size());
-        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList(true).get(0).data);
+        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList(true).get(0).getActualData());
         assertTrue(resultBase.getRequestDataList(false).isEmpty());
         
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
         assertEquals(1, resultBase.getRequestDataList(true).size());
         assertEquals(2, resultBase.getRequestDataList(false).size());
-        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList(true).get(0).data);
-        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList(false).get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestDataList(false).get(1).data);
+        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList(true).get(0).getActualData());
+        assertEquals(new Data((byte)0x30), resultBase.getRequestDataList(false).get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), resultBase.getRequestDataList(false).get(1).getActualData());
     }
 
     @Test
@@ -938,7 +938,7 @@ public class ResultBaseTest {
         
         dataList = resultBase.getRequestDataList(new ResultDataSelector(new EOJ("0ef001")), true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         dataList = resultBase.getRequestDataList(new ResultDataSelector(new EOJ("001101")), true);
         assertEquals(0, dataList.size());
         
@@ -946,8 +946,8 @@ public class ResultBaseTest {
         assertEquals(0, dataList.size());
         dataList = resultBase.getRequestDataList(new ResultDataSelector(new EOJ("001101")), false);
         assertEquals(2, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).getActualData());
     }
 
     @Test
@@ -967,12 +967,12 @@ public class ResultBaseTest {
         
         dataList = resultBase.getRequestDataList(resultFrame1, true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         
         dataList = resultBase.getRequestDataList(resultFrame2, false);
         assertEquals(2, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
-        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
+        assertEquals(new Data((byte)0x12, (byte)0x34), dataList.get(1).getActualData());
     }
 
     @Test
@@ -1002,12 +1002,12 @@ public class ResultBaseTest {
         ResultFrame resultFrame2 = new ResultFrame(newFrame4(), 10);
         
         assertTrue(resultBase.addRequestFrame(resultFrame1, true));
-        assertEquals(new Data(), resultBase.getRequestSecondData(0, true).data);
+        assertEquals(new Data(), resultBase.getRequestSecondData(0, true).getActualData());
         assertEquals(0, resultBase.countRequestSecondData(false));
         
         assertTrue(resultBase.addRequestFrame(resultFrame2, false));
-        assertEquals(new Data(), resultBase.getRequestSecondData(0, true).data);
-        assertEquals(new Data(), resultBase.getRequestSecondData(0, false).data);
+        assertEquals(new Data(), resultBase.getRequestSecondData(0, true).getActualData());
+        assertEquals(new Data(), resultBase.getRequestSecondData(0, false).getActualData());
     }
 
     @Test
@@ -1041,7 +1041,7 @@ public class ResultBaseTest {
         
         dataList = resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("001101")), true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
         assertTrue(resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("0ef001")), true).isEmpty());
         assertTrue(resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("001101")), false).isEmpty());
         
@@ -1049,11 +1049,11 @@ public class ResultBaseTest {
         
         dataList = resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("001101")), true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
         assertTrue(resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("0ef001")), true).isEmpty());
         dataList = resultBase.getRequestSecondDataList(new ResultDataSelector(new EOJ("001101")), false);
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
     }
 
     @Test
@@ -1216,10 +1216,10 @@ public class ResultBaseTest {
         assertTrue(resultBase.addFrame(resultFrame1));
         assertTrue(resultBase.addFrame(resultFrame2));
         
-        assertEquals(new Data((byte)0x30), resultBase.getData(0, true).data);
-        assertEquals(new Data(), resultBase.getData(1, true).data);
+        assertEquals(new Data((byte)0x30), resultBase.getData(0, true).getActualData());
+        assertEquals(new Data(), resultBase.getData(1, true).getActualData());
         
-        assertEquals(new Data((byte)0x30), resultBase.getData(0, false).data);
+        assertEquals(new Data((byte)0x30), resultBase.getData(0, false).getActualData());
     }
 
     @Test
@@ -1231,11 +1231,11 @@ public class ResultBaseTest {
         assertTrue(resultBase.addFrame(resultFrame2));
         
         assertEquals(2, resultBase.getDataList(true).size());
-        assertEquals(new Data((byte)0x30), resultBase.getDataList(true).get(0).data);
-        assertEquals(new Data(), resultBase.getDataList(true).get(1).data);
+        assertEquals(new Data((byte)0x30), resultBase.getDataList(true).get(0).getActualData());
+        assertEquals(new Data(), resultBase.getDataList(true).get(1).getActualData());
         
         assertEquals(1, resultBase.getDataList(false).size());
-        assertEquals(new Data((byte)0x30), resultBase.getDataList(true).get(0).data);
+        assertEquals(new Data((byte)0x30), resultBase.getDataList(true).get(0).getActualData());
     }
 
     @Test
@@ -1250,18 +1250,18 @@ public class ResultBaseTest {
         
         dataList = resultBase.getDataList(new ResultDataSelector(new EOJ("001101")), true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         
         dataList = resultBase.getDataList(new ResultDataSelector(new EOJ("0ef001")), true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
         
         dataList = resultBase.getDataList(new ResultDataSelector(new EOJ("001101")), false);
         assertEquals(0, dataList.size());
         
         dataList = resultBase.getDataList(new ResultDataSelector(new EOJ("0ef001")), false);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
     }
 
     @Test
@@ -1284,18 +1284,18 @@ public class ResultBaseTest {
         
         dataList = resultBase.getDataList(resultFrame1, true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         
         dataList = resultBase.getDataList(resultFrame1, false);
         assertEquals(0, dataList.size());
         
         dataList = resultBase.getDataList(resultFrame2, true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
         
         dataList = resultBase.getDataList(resultFrame2, false);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
     }
 
     @Test
@@ -1314,8 +1314,8 @@ public class ResultBaseTest {
     @Test
     public void testGetSecondData_int_boolean() {
         assertTrue(resultBase.addFrame(newSNAFrame2()));
-        assertEquals(new Data((byte)0x30), resultBase.getSecondData(0, true).data);
-        assertEquals(new Data(), resultBase.getSecondData(0, false).data);
+        assertEquals(new Data((byte)0x30), resultBase.getSecondData(0, true).getActualData());
+        assertEquals(new Data(), resultBase.getSecondData(0, false).getActualData());
     }
 
     @Test
@@ -1329,11 +1329,11 @@ public class ResultBaseTest {
         
         dataList = resultBase.getSecondDataList(true);
         assertEquals(1, dataList.size());
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         
         dataList = resultBase.getSecondDataList(false);
         assertEquals(1, dataList.size());
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(new Data(), dataList.get(0).getActualData());
     }
 
     @Test
@@ -1348,24 +1348,24 @@ public class ResultBaseTest {
         
         dataList = resultBase.getSecondDataList(new ResultDataSelector(EPC.x91), true);
         assertEquals(1, dataList.size());
-        assertEquals(EPC.x91, dataList.get(0).epc);
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(EPC.x91, dataList.get(0).getEPC());
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         
         dataList = resultBase.getSecondDataList(new ResultDataSelector(EPC.xF1), true);
         assertTrue(dataList.isEmpty());
         
         dataList = resultBase.getSecondDataList(new ResultDataSelector(EPC.xFF), true);
         assertEquals(1, dataList.size());
-        assertEquals(EPC.xFF, dataList.get(0).epc);
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(EPC.xFF, dataList.get(0).getEPC());
+        assertEquals(new Data(), dataList.get(0).getActualData());
         
         dataList = resultBase.getSecondDataList(new ResultDataSelector(EPC.x91), false);
         assertTrue(dataList.isEmpty());
         
         dataList = resultBase.getSecondDataList(new ResultDataSelector(EPC.xF1), false);
         assertEquals(1, dataList.size());
-        assertEquals(EPC.xF1, dataList.get(0).epc);
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(EPC.xF1, dataList.get(0).getEPC());
+        assertEquals(new Data(), dataList.get(0).getActualData());
         
         dataList = resultBase.getSecondDataList(new ResultDataSelector(EPC.xFF), false);
         assertTrue(dataList.isEmpty());
@@ -1383,21 +1383,21 @@ public class ResultBaseTest {
         
         dataList = resultBase.getSecondDataList(resultFrame1, true);
         assertEquals(1, dataList.size());
-        assertEquals(EPC.xFF, dataList.get(0).epc);
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(EPC.xFF, dataList.get(0).getEPC());
+        assertEquals(new Data(), dataList.get(0).getActualData());
         
         dataList = resultBase.getSecondDataList(resultFrame2, true);
         assertEquals(1, dataList.size());
-        assertEquals(EPC.x91, dataList.get(0).epc);
-        assertEquals(new Data((byte)0x30), dataList.get(0).data);
+        assertEquals(EPC.x91, dataList.get(0).getEPC());
+        assertEquals(new Data((byte)0x30), dataList.get(0).getActualData());
         
         dataList = resultBase.getSecondDataList(resultFrame1, false);
         assertTrue(dataList.isEmpty());
         
         dataList = resultBase.getSecondDataList(resultFrame2, false);
         assertEquals(1, dataList.size());
-        assertEquals(EPC.xF1, dataList.get(0).epc);
-        assertEquals(new Data(), dataList.get(0).data);
+        assertEquals(EPC.xF1, dataList.get(0).getEPC());
+        assertEquals(new Data(), dataList.get(0).getActualData());
     }
 
     public class ResultBaseImpl extends ResultBase<ResultBaseImpl> {

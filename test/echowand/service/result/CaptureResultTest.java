@@ -241,8 +241,8 @@ public class CaptureResultTest {
         result.addReceivedFrame(frame1);
         result.addSentFrame(frame2);
         
-        assertEquals(frame1, result.getFrame(0).frame);
-        assertEquals(frame2, result.getFrame(1).frame);
+        assertEquals(frame1, result.getFrame(0).getActualFrame());
+        assertEquals(frame2, result.getFrame(1).getActualFrame());
     }
 
     /**
@@ -256,7 +256,7 @@ public class CaptureResultTest {
         result.addReceivedFrame(frame1);
         result.addSentFrame(frame2);
         
-        assertEquals(frame2, result.getSentFrame(0).frame);
+        assertEquals(frame2, result.getSentFrame(0).getActualFrame());
     }
 
     /**
@@ -270,7 +270,7 @@ public class CaptureResultTest {
         result.addSentFrame(frame1);
         result.addReceivedFrame(frame2);
         
-        assertEquals(frame2, result.getReceivedFrame(0).frame);
+        assertEquals(frame2, result.getReceivedFrame(0).getActualFrame());
     }
 
     /**
@@ -288,8 +288,8 @@ public class CaptureResultTest {
         
         List<ResultFrame> resultFrameList = result.getFrameList();
         assertEquals(2, resultFrameList.size());
-        assertEquals(frame1, resultFrameList.get(0).frame);
-        assertEquals(frame2, resultFrameList.get(1).frame);
+        assertEquals(frame1, resultFrameList.get(0).getActualFrame());
+        assertEquals(frame2, resultFrameList.get(1).getActualFrame());
     }
 
     /**
@@ -307,7 +307,7 @@ public class CaptureResultTest {
         
         List<ResultFrame> resultFrameList = result.getSentFrameList();
         assertEquals(1, resultFrameList.size());
-        assertEquals(frame1, resultFrameList.get(0).frame);
+        assertEquals(frame1, resultFrameList.get(0).getActualFrame());
     }
 
     /**
@@ -325,7 +325,7 @@ public class CaptureResultTest {
         
         List<ResultFrame> resultFrameList = result.getReceivedFrameList();
         assertEquals(1, resultFrameList.size());
-        assertEquals(frame2, resultFrameList.get(0).frame);
+        assertEquals(frame2, resultFrameList.get(0).getActualFrame());
     }
 
     /**
@@ -463,7 +463,7 @@ public class CaptureResultTest {
         assertEquals(1, result.countSentFrames());
         assertEquals(2, result.countReceivedFrames());
         
-        assertEquals(frame1, result.getSentFrame(0).frame);
+        assertEquals(frame1, result.getSentFrame(0).getActualFrame());
         
         result.removeSentFrame(0);
         
@@ -493,7 +493,7 @@ public class CaptureResultTest {
         assertEquals(2, result.countSentFrames());
         assertEquals(1, result.countReceivedFrames());
         
-        assertEquals(frame1, result.getSentFrame(0).frame);
+        assertEquals(frame1, result.getSentFrame(0).getActualFrame());
         
         result.removeReceivedFrame(0);
         
@@ -522,8 +522,8 @@ public class CaptureResultTest {
         assertEquals(2, result.truncateSentFrames(2));
         
         assertEquals(2, result.countSentFrames());
-        assertEquals(frame3, result.getSentFrame(0).frame);
-        assertEquals(frame4, result.getSentFrame(1).frame);
+        assertEquals(frame3, result.getSentFrame(0).getActualFrame());
+        assertEquals(frame4, result.getSentFrame(1).getActualFrame());
         
         assertEquals(2, result.truncateSentFrames(1000));
         
@@ -574,8 +574,8 @@ public class CaptureResultTest {
         assertEquals(2, result.truncateReceivedFrames(2));
         
         assertEquals(2, result.countReceivedFrames());
-        assertEquals(frame3, result.getReceivedFrame(0).frame);
-        assertEquals(frame4, result.getReceivedFrame(1).frame);
+        assertEquals(frame3, result.getReceivedFrame(0).getActualFrame());
+        assertEquals(frame4, result.getReceivedFrame(1).getActualFrame());
         
         assertEquals(2, result.truncateReceivedFrames(1000));
         
@@ -628,8 +628,8 @@ public class CaptureResultTest {
         assertEquals(2, result.countFrames());
         assertEquals(1, result.countSentFrames());
         assertEquals(1, result.countReceivedFrames());
-        assertEquals(frame3, result.getFrame(0).frame);
-        assertEquals(frame4, result.getFrame(1).frame);
+        assertEquals(frame3, result.getFrame(0).getActualFrame());
+        assertEquals(frame4, result.getFrame(1).getActualFrame());
         
         assertEquals(2, result.truncateFrames(1000));
         

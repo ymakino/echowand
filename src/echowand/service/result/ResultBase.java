@@ -346,7 +346,7 @@ public abstract class ResultBase<ResultType extends ResultBase> {
             EOJ eoj = payload.getSEOJ();
             EPC epc = property.getEPC();
             Data data = property.getEDT();
-            return new ResultData(node, esv, eoj, epc, data, resultFrame.time);
+            return new ResultData(node, esv, eoj, epc, data, resultFrame.getTimestamp());
     }
     
     public synchronized boolean addRequestFrame(ResultFrame resultFrame, boolean success) {
@@ -361,9 +361,7 @@ public abstract class ResultBase<ResultType extends ResultBase> {
             return false;
         }
         
-        Frame frame = resultFrame.frame;
-        
-        if (!hasStandardPayload(frame)) {
+        if (!hasStandardPayload(resultFrame.getActualFrame())) {
             invalidRequestFrameList.add(resultFrame);
             LOGGER.exiting(CLASS_NAME, "addRequestFrame", false);
             return false;
@@ -371,12 +369,12 @@ public abstract class ResultBase<ResultType extends ResultBase> {
         
         boolean result = requestFrameManager.add(resultFrame, success);
 
-        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        StandardPayload payload = resultFrame.getCommonFrame().getEDATA(StandardPayload.class);
 
         int count = payload.getFirstOPC();
         for (int i = 0; i < count; i++) {
             Property property = payload.getFirstPropertyAt(i);
-            ResultData resultData = createResultData(resultFrame, frame, payload, property);
+            ResultData resultData = createResultData(resultFrame, resultFrame.getActualFrame(), payload, property);
             
             result &= requestDataManager.add(resultData, success);
 
@@ -386,7 +384,7 @@ public abstract class ResultBase<ResultType extends ResultBase> {
         int countSecond = payload.getSecondOPC();
         for (int i = 0; i < countSecond; i++) {
             Property property = payload.getSecondPropertyAt(i);
-            ResultData resultData = createResultData(resultFrame, frame, payload, property);
+            ResultData resultData = createResultData(resultFrame, resultFrame.getActualFrame(), payload, property);
             
             result &= requestSecondDataManager.add(resultData, success);
 
@@ -433,15 +431,13 @@ public abstract class ResultBase<ResultType extends ResultBase> {
         }
         
         try {
-            Frame frame = resultFrame.frame;
-
-            if (!hasStandardPayload(frame)) {
+            if (!hasStandardPayload(resultFrame.getActualFrame())) {
                 invalidFrameList.add(resultFrame);
                 LOGGER.exiting(CLASS_NAME, "addFrame", false);
                 return false;
             }
 
-            StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+            StandardPayload payload = resultFrame.getCommonFrame().getEDATA(StandardPayload.class);
 
             if (!isValidPayload(payload)) {
                 invalidFrameList.add(resultFrame);
@@ -454,7 +450,7 @@ public abstract class ResultBase<ResultType extends ResultBase> {
             int count = payload.getFirstOPC();
             for (int i=0; i<count; i++) {
                 Property property = payload.getFirstPropertyAt(i);
-                ResultData resultData = createResultData(resultFrame, frame, payload, property);
+                ResultData resultData = createResultData(resultFrame, resultFrame.getActualFrame(), payload, property);
                 
                 result &= responseDataManager.add(resultData, isValidProperty(property));
 
@@ -464,7 +460,7 @@ public abstract class ResultBase<ResultType extends ResultBase> {
             int countSecond = payload.getSecondOPC();
             for (int i=0; i<countSecond; i++) {
                 Property property = payload.getSecondPropertyAt(i);
-                ResultData resultData = createResultData(resultFrame, frame, payload, property);
+                ResultData resultData = createResultData(resultFrame, resultFrame.getActualFrame(), payload, property);
 
                 result &= responseSecondDataManager.add(resultData, isValidSecondProperty(property));
 

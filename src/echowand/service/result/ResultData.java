@@ -15,22 +15,22 @@ public class ResultData {
     private static final Logger LOGGER = Logger.getLogger(ResultData.class.getName());
     private static final String CLASS_NAME = ResultData.class.getName();
     
-    public final Node node;
-    public final ESV esv;
-    public final EOJ eoj;
-    public final EPC epc;
-    public final Data data;
-    public final long time;
+    private final Node node;
+    private final ESV esv;
+    private final EOJ eoj;
+    private final EPC epc;
+    private final Data data;
+    private final long timestamp;
     
-    public ResultData(Node node, ESV esv, EOJ eoj, EPC epc, Data data, long time) {
-        LOGGER.entering(CLASS_NAME, "ResultData", new Object[]{node, eoj, epc, data, time});
+    public ResultData(Node node, ESV esv, EOJ eoj, EPC epc, Data data, long timestamp) {
+        LOGGER.entering(CLASS_NAME, "ResultData", new Object[]{node, eoj, epc, data, timestamp});
         
         this.node = node;
         this.esv = esv;
         this.eoj = eoj;
         this.epc = epc;
         this.data = data;
-        this.time = time;
+        this.timestamp = timestamp;
         
         LOGGER.exiting(CLASS_NAME, "ResultData");
     }
@@ -43,13 +43,61 @@ public class ResultData {
         this.eoj = eoj;
         this.epc = epc;
         this.data = data;
-        this.time = System.currentTimeMillis();
+        this.timestamp = System.currentTimeMillis();
         
         LOGGER.exiting(CLASS_NAME, "ResultData");
     }
     
+    public Node getNode() {
+        return node;
+    }
+    
+    public ESV getESV() {
+        return esv;
+    }
+    
+    public EOJ getEOJ() {
+        return eoj;
+    }
+    
+    public EPC getEPC() {
+        return epc;
+    }
+    
+    public Data getActualData() {
+        return data;
+    }
+    
+    public long getTimestamp() {
+        return timestamp;
+    }
+    
+    public byte get(int index) {
+        return data.get(index);
+    }
+    
+    public int size() {
+        return data.size();
+    }
+    
+    public boolean isEmpty() {
+        return data.isEmpty();
+    }
+    
+    public byte[] toBytes() {
+        return data.toBytes();
+    }
+    
+    public byte[] toBytes(int offset, int length) {
+        return data.toBytes(offset, length);
+    }
+    
+    public void copyBytes(int srcOffset, byte[] destData, int destOffset, int length) {
+        data.copyBytes(srcOffset, destData, destOffset, length);
+    }
+    
     @Override
     public String toString() {
-        return "ResultData{Node: " + node + ", ESV: " + esv + ", EOJ: " + eoj + ", EPC: " + epc + ", Data: " + data + ", Time: " + time + "}";
+        return "ResultData{Node: " + node + ", ESV: " + esv + ", EOJ: " + eoj + ", EPC: " + epc + ", Data: " + data + ", Time: " + timestamp + "}";
     }
 }

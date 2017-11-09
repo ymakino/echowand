@@ -180,14 +180,12 @@ public class ObserveResult {
             return false;
         }
         
-        Frame frame = resultFrame.frame;
-        
-        if (!hasStandardPayload(frame)) {
+        if (!hasStandardPayload(resultFrame.getActualFrame())) {
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
             return false;
         }
         
-        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        StandardPayload payload = resultFrame.getCommonFrame().getEDATA(StandardPayload.class);
         
         if (payload.getESV() != ESV.INF && payload.getESV() != ESV.INFC) {
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
@@ -205,13 +203,13 @@ public class ObserveResult {
         for (int i=0; i<count; i++) {
             Property property = payload.getFirstPropertyAt(i);
             
-            Node node = frame.getSender();
+            Node node = resultFrame.getSender();
             ESV esv = payload.getESV();
             EOJ eoj = payload.getSEOJ();
             EPC epc = property.getEPC();
             Data data = property.getEDT();
             
-            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.time);
+            ResultData resultData = new ResultData(node, esv, eoj, epc, data, resultFrame.getTimestamp());
             
             frameDataList.add(resultData);
             

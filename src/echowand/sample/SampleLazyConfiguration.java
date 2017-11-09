@@ -67,7 +67,7 @@ public class SampleLazyConfiguration {
         System.out.println(getResult.countFrames());
         System.out.println(getResult.getFrame(0));
         
-        CommonFrame commonFrame = getResult.getFrame(0).frame.getCommonFrame();
+        CommonFrame commonFrame = getResult.getFrame(0).getCommonFrame();
         StandardPayload standardPayload = commonFrame.getEDATA(StandardPayload.class);
         System.out.println(standardPayload.getFirstPropertyAt(0));
         

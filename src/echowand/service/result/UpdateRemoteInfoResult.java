@@ -221,22 +221,20 @@ public class UpdateRemoteInfoResult {
     public synchronized boolean addFrame(ResultFrame resultFrame) {
         LOGGER.entering(CLASS_NAME, "addFrame", resultFrame);
 
-        Frame frame = resultFrame.frame;
-
-        if (!frame.getCommonFrame().isStandardPayload()) {
+        if (!resultFrame.getCommonFrame().isStandardPayload()) {
             invalidFrameList.add(resultFrame);
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
             return false;
         }
 
-        if (!hasStandardPayload(frame)) {
+        if (!hasStandardPayload(resultFrame.getActualFrame())) {
             invalidFrameList.add(resultFrame);
             LOGGER.exiting(CLASS_NAME, "addFrame", false);
             return false;
         }
 
-        Node node = frame.getSender();
-        StandardPayload payload = frame.getCommonFrame().getEDATA(StandardPayload.class);
+        Node node = resultFrame.getSender();
+        StandardPayload payload = resultFrame.getCommonFrame().getEDATA(StandardPayload.class);
 
         if (payload.getESV() != ESV.Get_Res && payload.getESV() != ESV.Get_SNA) {
             invalidFrameList.add(resultFrame);
@@ -370,7 +368,7 @@ public class UpdateRemoteInfoResult {
         LinkedList<ResultFrame> resultFrameList = new LinkedList<ResultFrame>();
         
         for (ResultFrame resultFrame : frameList) {
-            if (resultFrame.frame.getSender().equals(node)) {
+            if (resultFrame.getSender().equals(node)) {
                 resultFrameList.add(resultFrame);
             }
         }
