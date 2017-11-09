@@ -7,14 +7,14 @@ import echowand.util.ConstraintUnion;
 /**
  * 温度センサのデータ制約を表現する。
  * データの範囲は0xF554 - 0x7FFD (-273.2C - 3276.6C)となる。
- * オーバーフローコードとして0x8000、アンダーフローコードとして0x7FFFが利用される。
+ * オーバーフローコードとして0x7FFF、アンダーフローコードとして0x8000が利用される。
  * @author Yoshiki Makino
  */
 public class PropertyConstraintTemperature implements Constraint {
     private static final short MIN_VALUE = (short)0xf554;
     private static final short MAX_VALUE = (short)0x7ffd;
-    private static final short OVERFLOW = (short)0x8000;
-    private static final short UNDERFLOW = (short)0x7fff;
+    private static final short OVERFLOW = (short)0x7fff;
+    private static final short UNDERFLOW = (short)0x8000;
     
     private ConstraintUnion constraint;
     
