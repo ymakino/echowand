@@ -172,11 +172,12 @@ public abstract class ResultBase<ResultType extends ResultBase> {
         
         if (!done) {
             done = true;
-            notifyAll();
-        }
         
-        if (listener != null) {
-            listener.finish(self());
+            if (listener != null) {
+                listener.finish(self());
+            }
+            
+            notifyAll();
         }
         
         LOGGER.exiting(CLASS_NAME, "finish");

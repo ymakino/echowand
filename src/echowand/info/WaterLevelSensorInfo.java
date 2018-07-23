@@ -14,6 +14,6 @@ public class WaterLevelSensorInfo extends DeviceObjectInfo {
     public WaterLevelSensorInfo() {
         setClassEOJ(new ClassEOJ((byte)0x00, (byte)(0x14)));
         
-        add(EPC.xE0, true, false, false, 1, new PropertyConstraintDetection());
+        add(EPC.xE0, true, false, false, 1, new PropertyConstraintWaterLevel());
     }
 }

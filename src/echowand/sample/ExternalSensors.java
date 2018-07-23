@@ -27,6 +27,8 @@ import echowand.object.SetGetRequestProcessor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -172,6 +174,7 @@ public class ExternalSensors implements Runnable {
     private List<String> illuminance2Commands = new LinkedList<String>();
     private List<String> airSpeedCommands = new LinkedList<String>();
     
+    private NetworkInterface networkInterface;
     private Inet4Subnet subnet;
     private TransactionManager transactionManager;
     private RemoteObjectManager remoteManager;
@@ -185,6 +188,11 @@ public class ExternalSensors implements Runnable {
     private List<LocalObject> airSpeedSensors = new LinkedList<LocalObject>();
 
     public ExternalSensors() {
+        this.networkInterface = null;
+    }
+
+    public void setNetworkInterface(NetworkInterface networkInterface) {
+        this.networkInterface = networkInterface;
     }
     
     public void addTemperatureCommand(String temperatureCommand) {
@@ -242,7 +250,11 @@ public class ExternalSensors implements Runnable {
     }
 
     private void initialize() throws SubnetException {
-        subnet = Inet4Subnet.startSubnet();
+        if (networkInterface == null) {
+            subnet = Inet4Subnet.startSubnet();
+        } else {
+            subnet = Inet4Subnet.startSubnet(networkInterface);
+        }
         transactionManager = new TransactionManager(subnet);
         remoteManager = new RemoteObjectManager();
         localManager = new LocalObjectManager();
@@ -346,10 +358,11 @@ public class ExternalSensors implements Runnable {
     }
     
     public static String usage() {
-        return "Usage: ExternalSensors [ -t TemperatureCommand | -h HumidityCommand | -i1 IlluminanceCommand | -i2 IlluminanceCommand | -a airSpeedCommand ]";
+        return "Usage: ExternalSensors [ -i interface ] [ -t TemperatureCommand | -h HumidityCommand | -i1 IlluminanceCommand | -i2 IlluminanceCommand | -a airSpeedCommand ]";
     }
     
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, SocketException {
+        
         if (args.length > 0 && args[0].equals("-h")) {
             System.out.println(usage());
             System.exit(0);
@@ -361,8 +374,11 @@ public class ExternalSensors implements Runnable {
         }
         
         ExternalSensors sensors = new ExternalSensors();
+        
         for (int i=0; i<args.length; i+=2) {
-            if (args[i].equals("-t")) {
+            if (args[i].equals("-i")) {
+                sensors.setNetworkInterface(NetworkInterface.getByName(args[i+1]));
+            } else if (args[i].equals("-t")) {
                 sensors.addTemperatureCommand(args[i+1]);;
             } else if (args[i].equals("-h")) {
                 sensors.addHumidityCommand(args[i+1]);;

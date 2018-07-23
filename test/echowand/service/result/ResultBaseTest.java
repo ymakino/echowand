@@ -1443,4 +1443,85 @@ public class ResultBaseTest {
         }
     }
     
+    public class TestListener implements ResultListener<ResultBaseImpl> {
+        int beginCount = 0;
+        int finishCount = 0;
+        
+        public int getBeginCount() {
+            return beginCount;
+        }
+        
+        public int getFinishCount() {
+            return finishCount;
+        }
+
+        @Override
+        public void begin(ResultBaseImpl result) {
+            beginCount++;
+        }
+
+        @Override
+        public void send(ResultBaseImpl result, ResultFrame resultFrame, boolean success) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void send(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData, boolean success) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void send(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData, boolean success, boolean isSecond) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void receive(ResultBaseImpl result, ResultFrame resultFrame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void receive(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void receive(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData, boolean isSecond) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void finish(ResultBaseImpl result) {
+            finishCount++;
+        }
+    }
+        
+    @Test
+    public void testFinish() {
+        TestListener listener = new TestListener();
+        
+        resultBase.setResultListener(listener);
+        
+        assertFalse(resultBase.isDone());
+        assertEquals(0, listener.getBeginCount());
+        assertEquals(0, listener.getFinishCount());
+        
+        resultBase.begin();
+        
+        assertFalse(resultBase.isDone());
+        assertEquals(1, listener.getBeginCount());
+        assertEquals(0, listener.getFinishCount());
+        
+        resultBase.finish();
+        
+        assertTrue(resultBase.isDone());
+        assertEquals(1, listener.getBeginCount());
+        assertEquals(1, listener.getFinishCount());
+        
+        resultBase.finish();
+        
+        assertTrue(resultBase.isDone());
+        assertEquals(1, listener.getBeginCount());
+        assertEquals(1, listener.getFinishCount());
+    }
 }
