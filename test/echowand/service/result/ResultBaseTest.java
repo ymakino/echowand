@@ -12,6 +12,7 @@ import echowand.net.StandardPayload;
 import echowand.net.Subnet;
 import echowand.net.SubnetException;
 import echowand.service.TimestampManager;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1444,16 +1445,18 @@ public class ResultBaseTest {
     }
     
     public class TestListener implements ResultListener<ResultBaseImpl> {
-        int beginCount = 0;
-        int finishCount = 0;
+        public int beginCount = 0;
+        public int finishCount = 0;
+        public int countSendFrame = 0;
+        public int countSendData = 0;
+        public int countSendDataSecond = 0;
+        public int countReceiveFrame = 0;
+        public int countReceiveData = 0;
+        public int countReceiveDataSecond = 0;
         
-        public int getBeginCount() {
-            return beginCount;
-        }
-        
-        public int getFinishCount() {
-            return finishCount;
-        }
+        public LinkedList<ResultFrame> resultFrameList = new LinkedList<ResultFrame>();
+        public LinkedList<ResultData> resultDataList = new LinkedList<ResultData>();
+        public LinkedList<ResultData> secondResultDataList = new LinkedList<ResultData>();
 
         @Override
         public void begin(ResultBaseImpl result) {
@@ -1462,32 +1465,42 @@ public class ResultBaseTest {
 
         @Override
         public void send(ResultBaseImpl result, ResultFrame resultFrame, boolean success) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            countSendFrame++;
+            resultFrameList.add(resultFrame);
         }
 
         @Override
         public void send(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData, boolean success) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            countSendData++;
+            resultDataList.add(resultData);
         }
 
         @Override
         public void send(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData, boolean success, boolean isSecond) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            if (isSecond) {
+                countSendDataSecond++;
+                secondResultDataList.add(resultData);
+            }
         }
 
         @Override
         public void receive(ResultBaseImpl result, ResultFrame resultFrame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            countReceiveFrame++;
+            resultFrameList.add(resultFrame);
         }
 
         @Override
         public void receive(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            countReceiveData++;
+            resultDataList.add(resultData);
         }
 
         @Override
         public void receive(ResultBaseImpl result, ResultFrame resultFrame, ResultData resultData, boolean isSecond) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            if (isSecond) {
+                countReceiveDataSecond++;
+                secondResultDataList.add(resultData);
+            }
         }
 
         @Override
@@ -1503,25 +1516,143 @@ public class ResultBaseTest {
         resultBase.setResultListener(listener);
         
         assertFalse(resultBase.isDone());
-        assertEquals(0, listener.getBeginCount());
-        assertEquals(0, listener.getFinishCount());
+        assertEquals(0, listener.beginCount);
+        assertEquals(0, listener.finishCount);
+        assertEquals(0, listener.countSendFrame);
+        assertEquals(0, listener.countSendData);
+        assertEquals(0, listener.countSendDataSecond);
+        assertEquals(0, listener.countReceiveFrame);
+        assertEquals(0, listener.countReceiveData);
+        assertEquals(0, listener.countReceiveDataSecond);
         
         resultBase.begin();
         
         assertFalse(resultBase.isDone());
-        assertEquals(1, listener.getBeginCount());
-        assertEquals(0, listener.getFinishCount());
+        assertEquals(1, listener.beginCount);
+        assertEquals(0, listener.finishCount);
         
         resultBase.finish();
         
         assertTrue(resultBase.isDone());
-        assertEquals(1, listener.getBeginCount());
-        assertEquals(1, listener.getFinishCount());
+        assertEquals(1, listener.beginCount);
+        assertEquals(1, listener.finishCount);
         
         resultBase.finish();
         
         assertTrue(resultBase.isDone());
-        assertEquals(1, listener.getBeginCount());
-        assertEquals(1, listener.getFinishCount());
+        assertEquals(1, listener.beginCount);
+        assertEquals(1, listener.finishCount);
+        assertEquals(0, listener.countSendFrame);
+        assertEquals(0, listener.countSendData);
+        assertEquals(0, listener.countSendDataSecond);
+        assertEquals(0, listener.countReceiveFrame);
+        assertEquals(0, listener.countReceiveData);
+        assertEquals(0, listener.countReceiveDataSecond);
+    }
+    
+    public Frame newRequestFrame1() {
+        StandardPayload payload = new StandardPayload();
+        payload.setDEOJ(new EOJ("0ef001"));
+        payload.setSEOJ(new EOJ("0ef001"));
+        payload.setESV(ESV.SetGet);
+        payload.addFirstProperty(new Property(EPC.x88, new Data((byte)0x01)));
+        payload.addSecondProperty(new Property(EPC.x80));
+        payload.addSecondProperty(new Property(EPC.xE0));
+        
+        CommonFrame commonFrame = new CommonFrame();
+        commonFrame.setEDATA(payload);
+        
+        return new Frame(subnet.getLocalNode(), subnet.getLocalNode(), commonFrame);
+    }
+    
+    public Frame newResponseFrame1() {
+        StandardPayload payload = new StandardPayload();
+        payload.setDEOJ(new EOJ("0ef001"));
+        payload.setSEOJ(new EOJ("0ef001"));
+        payload.setESV(ESV.SetGet_Res);
+        payload.addFirstProperty(new Property(EPC.x88));
+        payload.addSecondProperty(new Property(EPC.x80, new Data((byte)0x02)));
+        payload.addSecondProperty(new Property(EPC.xE0, new Data((byte)0x03)));
+        
+        CommonFrame commonFrame = new CommonFrame();
+        commonFrame.setEDATA(payload);
+        
+        return new Frame(subnet.getLocalNode(), subnet.getLocalNode(), commonFrame);
+    }
+
+    @Test
+    public void testListener() throws Exception {
+        TestListener listener = new TestListener();
+        resultBase.setResultListener(listener);
+        
+        resultBase.begin();
+        
+        resultBase.addRequestFrame(newRequestFrame1(), true);
+        
+        assertEquals(1, listener.countSendFrame);
+        assertEquals(3, listener.countSendData);
+        assertEquals(2, listener.countSendDataSecond);
+        assertEquals(0, listener.countReceiveFrame);
+        assertEquals(0, listener.countReceiveData);
+        assertEquals(0, listener.countReceiveDataSecond);
+        
+        assertTrue(listener.resultFrameList.get(0).getActualFrame().toString().equals(newRequestFrame1().toString()));
+        assertEquals(EPC.x88, listener.resultDataList.get(0).getEPC());
+        assertEquals(new Data((byte)0x01), listener.resultDataList.get(0).getActualData());
+        assertEquals(EPC.x80, listener.resultDataList.get(1).getEPC());
+        assertEquals(new Data(), listener.resultDataList.get(1).getActualData());
+        assertEquals(EPC.xE0, listener.resultDataList.get(2).getEPC());
+        assertEquals(new Data(), listener.resultDataList.get(2).getActualData());
+        
+        assertEquals(EPC.x80, listener.secondResultDataList.get(0).getEPC());
+        assertEquals(new Data(), listener.secondResultDataList.get(0).getActualData());
+        assertEquals(EPC.xE0, listener.secondResultDataList.get(1).getEPC());
+        assertEquals(new Data(), listener.secondResultDataList.get(1).getActualData());
+        
+        resultBase.addFrame(newResponseFrame1());
+        
+        assertEquals(1, listener.countSendFrame);
+        assertEquals(3, listener.countSendData);
+        assertEquals(2, listener.countSendDataSecond);
+        assertEquals(1, listener.countReceiveFrame);
+        assertEquals(3, listener.countReceiveData);
+        assertEquals(2, listener.countReceiveDataSecond);
+        
+        assertTrue(listener.resultFrameList.get(1).getActualFrame().toString().equals(newResponseFrame1().toString()));
+        assertEquals(EPC.x88, listener.resultDataList.get(3).getEPC());
+        assertEquals(new Data(), listener.resultDataList.get(3).getActualData());
+        assertEquals(EPC.x80, listener.resultDataList.get(4).getEPC());
+        assertEquals(new Data((byte)0x02), listener.resultDataList.get(4).getActualData());
+        assertEquals(EPC.xE0, listener.resultDataList.get(5).getEPC());
+        assertEquals(new Data((byte)0x03), listener.resultDataList.get(5).getActualData());
+        
+        assertEquals(EPC.x80, listener.secondResultDataList.get(2).getEPC());
+        assertEquals(new Data((byte)0x02), listener.secondResultDataList.get(2).getActualData());
+        assertEquals(EPC.xE0, listener.secondResultDataList.get(3).getEPC());
+        assertEquals(new Data((byte)0x03), listener.secondResultDataList.get(3).getActualData());
+        
+        resultBase.addFrame(newResponseFrame1());
+        
+        assertEquals(1, listener.countSendFrame);
+        assertEquals(3, listener.countSendData);
+        assertEquals(2, listener.countSendDataSecond);
+        assertEquals(2, listener.countReceiveFrame);
+        assertEquals(6, listener.countReceiveData);
+        assertEquals(4, listener.countReceiveDataSecond);
+        
+        assertTrue(listener.resultFrameList.get(2).getActualFrame().toString().equals(newResponseFrame1().toString()));
+        assertEquals(EPC.x88, listener.resultDataList.get(6).getEPC());
+        assertEquals(new Data(), listener.resultDataList.get(6).getActualData());
+        assertEquals(EPC.x80, listener.resultDataList.get(7).getEPC());
+        assertEquals(new Data((byte)0x02), listener.resultDataList.get(7).getActualData());
+        assertEquals(EPC.xE0, listener.resultDataList.get(8).getEPC());
+        assertEquals(new Data((byte)0x03), listener.resultDataList.get(8).getActualData());
+        
+        assertEquals(EPC.x80, listener.secondResultDataList.get(4).getEPC());
+        assertEquals(new Data((byte)0x02), listener.secondResultDataList.get(4).getActualData());
+        assertEquals(EPC.xE0, listener.secondResultDataList.get(5).getEPC());
+        assertEquals(new Data((byte)0x03), listener.secondResultDataList.get(5).getActualData());
+        
+        resultBase.finish();
     }
 }
