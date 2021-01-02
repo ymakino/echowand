@@ -51,7 +51,7 @@ public class NetworkInterfaceSelectorFrame extends javax.swing.JFrame {
     private boolean closed = false;
 
     /**
-     * Creates new form NetworkInterfaceSelector
+     * Creates new form NetworkInterfaceSelectorFrame
      */
     public NetworkInterfaceSelectorFrame() {
         initComponents();
@@ -89,6 +89,7 @@ public class NetworkInterfaceSelectorFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Network Interface Selector");
+        getContentPane().setLayout(new java.awt.BorderLayout());
 
         interfaceList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };

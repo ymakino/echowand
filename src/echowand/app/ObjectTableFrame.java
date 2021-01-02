@@ -2,7 +2,7 @@ package echowand.app;
 
 /**
  *
- * @author Yoshiki Makino
+ * @author ymakino
  */
 public class ObjectTableFrame extends javax.swing.JFrame {
     private ObjectTableModel model;
@@ -16,9 +16,9 @@ public class ObjectTableFrame extends javax.swing.JFrame {
         this.model = model;
         initComponents();
         
-        viewerMain.fixObjectTableColumnWidth(jTable1);
-        viewerMain.setObjectTableRenderer(jTable1);
-        viewerMain.setObjectTableEditor(jTable1);
+        viewerMain.fixObjectTableColumnWidth(objectTable);
+        viewerMain.setObjectTableRenderer(objectTable);
+        viewerMain.setObjectTableEditor(objectTable);
     }
 
     /**
@@ -30,9 +30,9 @@ public class ObjectTableFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        ReloadButton = new javax.swing.JButton();
+        objectTableScrollPane = new javax.swing.JScrollPane();
+        objectTable = new javax.swing.JTable();
+        reloadButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -41,50 +41,49 @@ public class ObjectTableFrame extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(model);
-        jScrollPane1.setViewportView(jTable1);
+        objectTable.setModel(model);
+        objectTableScrollPane.setViewportView(objectTable);
 
-        ReloadButton.setText("Reload");
-        ReloadButton.addActionListener(new java.awt.event.ActionListener() {
+        reloadButton.setText("Reload");
+        reloadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ReloadButtonActionPerformed(evt);
+                reloadButtonActionPerformed(evt);
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(ReloadButton)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(objectTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(reloadButton)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(ReloadButton)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(objectTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reloadButton)
                 .addContainerGap())
         );
 
         pack();
-        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ReloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReloadButtonActionPerformed
+    private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
         model.refreshCache();
-    }//GEN-LAST:event_ReloadButtonActionPerformed
+    }//GEN-LAST:event_reloadButtonActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         model.release();
     }//GEN-LAST:event_formWindowClosed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ReloadButton;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable objectTable;
+    private javax.swing.JScrollPane objectTableScrollPane;
+    private javax.swing.JButton reloadButton;
     // End of variables declaration//GEN-END:variables
 }
