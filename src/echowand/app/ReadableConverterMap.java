@@ -73,6 +73,7 @@ public class ReadableConverterMap {
         putInternal(new ClassEOJ("0022"), EPC.xE5, new ReadableConverterUnsignedInteger("V"));
         putInternal(new ClassEOJ("0025"), EPC.xE0, new ReadableConverterUnsignedInteger("cm\u00B3"));
         putInternal(new ClassEOJ("0025"), EPC.xE2, new ReadableConverterUnsignedInteger("cm\u00B3/min"));
+        putInternal(new ClassEOJ("002d"), EPC.xE0, new ReadableConverterReal(10, "hPa"));
         
         
         
