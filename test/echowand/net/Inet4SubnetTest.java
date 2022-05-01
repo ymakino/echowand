@@ -101,15 +101,23 @@ public class Inet4SubnetTest {
             e.printStackTrace();
         }
 
-        FrameReceiver receiver = new FrameReceiver(subnet);
-        receiver.start();
         
-        Frame receivedFrame = receiver.getReceivedFrame();
-        if (success) {
-            assertFalse(receivedFrame == null);
-            assertTrue(Arrays.equals(sendFrame.getCommonFrame().toBytes(), receivedFrame.getCommonFrame().toBytes()));
-        } else {
-            assertTrue(receivedFrame == null);
+        for (;;) {
+            FrameReceiver receiver = new FrameReceiver(subnet);
+            receiver.start();
+            Frame receivedFrame = receiver.getReceivedFrame();
+            
+            if (success) {
+                assertFalse(receivedFrame == null);
+                if (Arrays.equals(sendFrame.getCommonFrame().toBytes(), receivedFrame.getCommonFrame().toBytes())) {
+                    return;
+                }
+            } else {
+                if (receivedFrame == null) {
+                    return;
+                }
+                assertFalse(Arrays.equals(sendFrame.getCommonFrame().toBytes(), receivedFrame.getCommonFrame().toBytes()));
+            }
         }
     }
 

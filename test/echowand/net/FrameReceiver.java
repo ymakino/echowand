@@ -30,8 +30,8 @@ class FrameReceiver extends Thread {
             e.printStackTrace();
         }
         return receivedFrame;
-    }
-
+        }
+        
     @Override
     public void run() {
         try {

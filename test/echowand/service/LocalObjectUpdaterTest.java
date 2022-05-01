@@ -139,7 +139,7 @@ public class LocalObjectUpdaterTest {
         
         updater.start();
         
-        Thread.sleep(2000);
+        Thread.sleep(1900);
         
         propertyUpdater1.finish();
         propertyUpdater2.finish();
