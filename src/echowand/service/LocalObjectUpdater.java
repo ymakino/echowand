@@ -69,26 +69,26 @@ public class LocalObjectUpdater {
     
     /**
      * 指定されたPropertyUpdaterの登録を追加する。
-     * @param delegate 追加するPropertyUpdaterの指定
+     * @param updater 追加するPropertyUpdaterの指定
      * @return 追加に成功した場合にはtrue、そうでなければfalse
      */
-    public boolean addPropertyUpdater(PropertyUpdater delegate) {
-        LOGGER.entering(CLASS_NAME, "addPropertyUpdater", delegate);
+    public boolean addPropertyUpdater(PropertyUpdater updater) {
+        LOGGER.entering(CLASS_NAME, "addPropertyUpdater", updater);
         
-        boolean result = propertyUpdaters.add(delegate);
+        boolean result = propertyUpdaters.add(updater);
         LOGGER.exiting(CLASS_NAME, "addPropertyUpdater", result);
         return result;
     }
     
     /**
      * 指定されたPropertyUpdaterの登録を抹消する。
-     * @param delegate 抹消するPropertyUpdaterの指定
+     * @param updater 抹消するPropertyUpdaterの指定
      * @return 抹消に成功した場合にはtrue、そうでなければfalse
      */
-    public boolean removePropertyUpdater(PropertyUpdater delegate) {
-        LOGGER.entering(CLASS_NAME, "removePropertyUpdater", delegate);
+    public boolean removePropertyUpdater(PropertyUpdater updater) {
+        LOGGER.entering(CLASS_NAME, "removePropertyUpdater", updater);
         
-        boolean result = propertyUpdaters.remove(delegate);
+        boolean result = propertyUpdaters.remove(updater);
         LOGGER.exiting(CLASS_NAME, "removePropertyUpdater", result);
         return result;
     }
