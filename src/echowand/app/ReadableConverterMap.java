@@ -64,6 +64,10 @@ public class ReadableConverterMap {
         putInternal(new ClassEOJ("0011"), EPC.xE0, new ReadableConverterReal(10, "\u2103"));
         putInternal(new ClassEOJ("0012"), EPC.xE0, new ReadableConverterPercentage());
         putInternal(new ClassEOJ("0019"), EPC.xB1, new ReadableConverterToggle((byte)0x41, "FOUND", (byte)0x42, "NOT FOUND"));
+        putInternal(new ClassEOJ("001b"), EPC.xE0, new ReadableConverterUnsignedInteger("ppm"));
+        putInternal(new ClassEOJ("001c"), EPC.xE0, new ReadableConverterUnsignedInteger("ppm"));
+        putInternal(new ClassEOJ("001d"), EPC.xE0, new ReadableConverterUnsignedInteger("ppm"));
+        putInternal(new ClassEOJ("001e"), EPC.xE0, new ReadableConverterInteger("Pa"));
         putInternal(new ClassEOJ("001f"), EPC.xE0, new ReadableConverterReal(100, "m/sec"));
         putInternal(new ClassEOJ("001f"), EPC.xE1, new ReadableConverterUnsignedInteger("\u00B0"));
         putInternal(new ClassEOJ("0022"), EPC.xE0, new ReadableConverterReal(1000, "kWh"));
